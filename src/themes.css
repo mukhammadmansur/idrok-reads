@@ -10,7 +10,6 @@
   --side-muted: #626e58;
   --side-panel: #eeeede;
   --button-ink: #fff;
-  --environment-frame: none;
 }
 :root[data-theme="forest"] {
   --canvas: #e0e8d3;
@@ -26,7 +25,6 @@
   --green-dark: #244322;
   --line: #b9c8aa;
   --button-ink: #fffced;
-  --environment-frame: url("/themes/forest-frame.webp");
 }
 :root[data-theme="ice"] {
   --canvas: #dcecf5;
@@ -42,7 +40,6 @@
   --green-dark: #184b69;
   --line: #accbdc;
   --button-ink: #fff;
-  --environment-frame: url("/themes/ice-frame.webp");
 }
 :root[data-theme="holo"] {
   --canvas: #071b2b;
@@ -58,7 +55,6 @@
   --green-dark: #a6eff9;
   --line: #2d5b70;
   --button-ink: #082839;
-  --environment-frame: url("/themes/holo-frame.webp");
 }
 html[data-theme] body {
   background: var(--canvas);
@@ -251,14 +247,6 @@ html[data-theme] body {
   position: relative;
   border-radius: 22px;
 }
-.detail-theme-frame {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-  width: 100%;
-  pointer-events: none;
-  z-index: 2;
-}
 .app-shell[data-theme="forest"] .detail-art {
   outline: 8px solid #775438;
   outline-offset: -8px;
@@ -404,15 +392,6 @@ html[data-theme] body {
 .theme-ice .book-stage,
 .theme-holo .book-stage {
   padding: 24px;
-}
-.book-material-frame {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  pointer-events: none;
 }
 .reader :is(.book-page, .paper-spread) {
   min-height: 480px;
@@ -699,9 +678,6 @@ html[data-theme] body {
   }
 }
 /* Keep material corners clear of the first label and last folio on phones. */
-.detail-theme-frame {
-  object-fit: fill;
-}
 .app-shell .detail-reward strong {
   color: var(--muted);
 }

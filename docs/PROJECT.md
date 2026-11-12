@@ -18,7 +18,7 @@ React 19, TypeScript, Vite, npm lockfile, Lucide icons, CSS tokens, authored loc
 
 The route layer is a small hash router: library, story details, reader, completion, independent quiz library/session, rewards, and parent view. Unknown stories and destinations have a recovery action. Everything is client-side; no server credentials or API contract is implied.
 
-Story content is typed structured data, never HTML. Each logical page contains two leaves of text, heading, caption, and optional illustration blocks. Pictures appear at their editorial moment, rather than being mandatory on one half of every page. The same pages feed one reader; themes control CSS custom properties and environmental details. Themes never own progress or story logic. Selecting a theme on story details updates the whole application immediately and persists it in the existing versioned profile.
+Story content is typed structured data, never HTML. Each logical page contains two leaves of text, heading, caption, and optional illustration blocks. Pictures appear at their editorial moment, rather than being mandatory on one half of every page. The same pages feed one reader; themes control CSS custom properties and environmental details. Themes never own progress or story logic. Selecting a world on the home page stays on that page; selecting it on story details also updates the whole application immediately. Both persist the choice in the existing versioned profile. Nonclassic worlds use full environment artwork behind readable surfaces; HoloBook uses translucent leaves and backdrop blur with local text backing.
 
 Progress functions are immutable and separated from rendering. Versioned storage parsing tolerates malformed data. Completion retains its original timestamp across refresh/replay. Quiz attempts are recorded only by an explicit completed attempt; refreshing results does not record another attempt. The best score is preserved. Local storage remains user-editable, so server-enforced anti-abuse and privacy are not claimed.
 
@@ -33,7 +33,7 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/components/StoryDetails.tsx` | Story description, theme selection, start/resume/replay |
 | `src/components/Reader.tsx` | Shared reader engine, navigation, completion |
 | `src/components/StoryPageContent.tsx` | Shared leaf/block renderer for readable text and optional inline scenes |
-| `src/components/ThemeVisual.tsx` | Theme icons, frame assets, and material previews |
+| `src/components/ThemeVisual.tsx` | Theme icons, world thumbnails, and shared environment backdrop |
 | `src/components/Recap.tsx` | Curated illustration animation and video fallback |
 | `src/components/Quiz.tsx` | Independent quiz library, answers, feedback, results, retries |
 | `src/components/Progress.tsx` | Milestones, story badges, local parent activity |
@@ -43,8 +43,10 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/lib/progress.ts` | Storage validation and pure page/completion/quiz transitions |
 | `src/lib/context.tsx` | Local persistence and route subscription |
 | `src/styles.css` | Base components, responsive rules, and paper motion |
-| `src/themes.css` | Persisted application palettes, generated material frames, and story leaf layout |
-| `public/art/` | Original lightweight SVG story illustrations |
+| `src/themes.css` | Persisted application palettes and story leaf layout |
+| `src/worlds.css` | Full environment scenery, material surfaces, world selection and responsive glass |
+| `public/worlds/` | Generated WebP environments and matching selection thumbnails |
+| `public/art/` | Original SVG covers and generated story scenes |
 | `src/lib/progress.test.ts` | State and content validation tests |
 | `tests/` | Functional, responsive, failure-state and accessibility browser checks |
 

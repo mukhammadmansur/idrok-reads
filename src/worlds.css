@@ -1,0 +1,471 @@
+/* A world is a real place behind the interface, not a colored page or border. */
+.world-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--canvas);
+}
+.world-backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 85% center;
+  animation: world-breathe 28s ease-in-out infinite alternate;
+}
+.world-backdrop.world-forest img {
+  object-position: 75% center;
+}
+.world-backdrop.world-ice img,
+.world-backdrop.world-holo img {
+  object-position: right center;
+}
+@keyframes world-breathe {
+  from {
+    transform: scale(1.025);
+  }
+  to {
+    transform: scale(1.065);
+  }
+}
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+.app-shell:not([data-theme="classic"]),
+.reader:not(.theme-classic) {
+  background: transparent;
+}
+:root[data-theme="forest"] {
+  --world-pane: rgba(249, 245, 225, 0.91);
+  --world-soft: rgba(249, 245, 225, 0.84);
+  --world-border: rgba(216, 225, 191, 0.65);
+  --side: rgba(19, 43, 27, 0.88);
+  --side-panel: rgba(51, 77, 39, 0.76);
+}
+:root[data-theme="ice"] {
+  --world-pane: rgba(241, 250, 255, 0.91);
+  --world-soft: rgba(237, 248, 255, 0.82);
+  --world-border: rgba(255, 255, 255, 0.8);
+  --side: rgba(235, 248, 255, 0.88);
+  --side-panel: rgba(210, 233, 247, 0.8);
+}
+:root[data-theme="holo"] {
+  --world-pane: rgba(9, 29, 49, 0.84);
+  --world-soft: rgba(10, 31, 53, 0.73);
+  --world-border: rgba(171, 227, 251, 0.3);
+  --side: rgba(6, 22, 38, 0.83);
+  --side-panel: rgba(27, 63, 86, 0.74);
+}
+.app-shell:not([data-theme="classic"]) .sidebar {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-right-color: var(--world-border);
+}
+.app-shell:not([data-theme="classic"]) .topbar {
+  background: var(--world-pane);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: var(--world-border);
+}
+/* These panels have identical geometry across worlds, so selecting a card does
+   not move the card or scroll the child away from their place. */
+.home-page .page-intro {
+  padding: 22px;
+  border-radius: 18px;
+}
+.home-page :is(.library-section, .world-section) {
+  padding: 24px;
+  border-radius: 18px;
+}
+.home-page .bottom-invitation {
+  padding: 22px;
+  border-radius: 16px;
+}
+.app-shell:not([data-theme="classic"])
+  .home-page
+  :is(.page-intro, .library-section, .world-section, .bottom-invitation),
+.app-shell:not([data-theme="classic"])
+  main
+  > .page:not(.home-page):not(.details-page) {
+  background: var(--world-pane);
+  border: 1px solid var(--world-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.app-shell:not([data-theme="classic"])
+  main
+  > .page:not(.home-page):not(.details-page) {
+  margin: 28px auto;
+  width: calc(100% - 48px);
+  border-radius: 20px;
+}
+.app-shell:not([data-theme="classic"])
+  .details-page
+  :is(.detail-copy, .story-preview) {
+  background: var(--world-pane);
+  border: 1px solid var(--world-border);
+  border-radius: 18px;
+  padding: 28px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.app-shell:not([data-theme="classic"]) .details-page .back-link {
+  background: var(--world-pane);
+  padding: 8px 12px;
+  border-radius: 9px;
+}
+.app-shell:not([data-theme="classic"]) .footer {
+  color: var(--ink);
+  background: var(--world-pane);
+  border-radius: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+}
+.app-shell[data-theme="holo"] .detail-art,
+.app-shell[data-theme="ice"] .detail-art,
+.app-shell[data-theme="forest"] .detail-art {
+  outline: none;
+  border: 1px solid var(--world-border);
+  box-shadow: 0 18px 60px #0003;
+  border-radius: 18px;
+}
+/* A scene thumbnail is a selection button, not a story-navigation link. */
+.world-grid {
+  align-items: stretch;
+}
+.world-card {
+  text-align: left;
+  padding: 0;
+  appearance: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.world-card .material-preview {
+  width: 100%;
+  height: 156px;
+  background: var(--surface-alt);
+}
+.world-card .material-preview img {
+  position: static;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.world-card .material-forest img {
+  object-position: 75% center;
+}
+.world-card .material-ice img,
+.world-card .material-holo img {
+  object-position: right center;
+}
+.world-card .world-caption {
+  width: 100%;
+  flex: 1;
+  padding: 15px 13px;
+  min-height: 76px;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+}
+.world-card .world-caption strong {
+  font-size: 13px;
+}
+.world-card .world-caption small {
+  font-size: 10px;
+  line-height: 1.6;
+}
+.world-card .world-caption > svg {
+  color: var(--green);
+}
+.world-card.world-selected {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+  box-shadow: 0 5px 22px #00000018;
+}
+.world-card.world-selected .world-caption strong {
+  font-weight: 700;
+}
+.world-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 9px 24px #0000001c;
+}
+/* The reading surface uses the scene as its actual backdrop. HoloBook's
+   translucency, blur and highlights are live CSS glass, not a baked picture. */
+.reader:not(.theme-classic) {
+  padding-top: 18px;
+}
+.reader:not(.theme-classic) .reader-header {
+  padding: 12px 20px;
+  background: var(--world-pane);
+  border: 1px solid var(--world-border);
+  border-radius: 14px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.reader:not(.theme-classic) .reader-world-label {
+  width: max-content;
+  margin: 18px auto;
+  padding: 8px 14px;
+  background: var(--world-pane);
+  border: 1px solid var(--world-border);
+  border-radius: 30px;
+}
+.reader:not(.theme-classic) .book-stage {
+  padding: 0;
+  margin-top: 28px;
+}
+.reader:not(.theme-classic) .reader-navigation {
+  background: var(--world-pane);
+  border: 1px solid var(--world-border);
+  border-radius: 13px;
+  padding: 10px 15px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.reader:not(.theme-classic) .reader-bottom {
+  background: var(--world-pane);
+  border-radius: 9px;
+  padding: 5px 12px;
+}
+.reader.theme-forest .book-page {
+  border: 5px solid #6e4a2e;
+  outline: 1px solid #ba945c;
+  background: rgba(251, 246, 223, 0.94);
+  box-shadow:
+    0 25px 65px #10221860,
+    inset 0 0 0 2px #d8c89e;
+  border-radius: 9px 16px 16px 9px;
+}
+.reader.theme-forest .reader-leaf {
+  background: rgba(249, 244, 220, 0.92);
+}
+.reader.theme-forest .reader-leaf.leaf-right {
+  background: rgba(249, 244, 220, 0.92);
+}
+.reader.theme-forest .reader-leaf.leaf-left {
+  border-color: #a68b5a55;
+}
+.reader.theme-ice .book-page {
+  border: 1px solid #ffffffed;
+  outline: 3px solid #d4f4ff70;
+  background: rgba(234, 248, 255, 0.64);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  box-shadow:
+    0 22px 70px #315b8640,
+    inset 0 0 0 5px #ffffff45;
+  border-radius: 14px;
+}
+.reader.theme-ice .reader-leaf,
+.reader.theme-ice .reader-leaf.leaf-right {
+  background: rgba(239, 250, 255, 0.47);
+}
+.reader.theme-ice .reader-leaf.leaf-left {
+  border-color: #93c4df66;
+}
+.reader.theme-holo .book-page {
+  border: 1px solid #bceeffa6;
+  background: rgba(7, 24, 43, 0.15);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    0 25px 80px #0005,
+    inset 0 1px 0 #e0f9ff8c,
+    inset 0 -1px 0 #60d9ff33;
+  border-radius: 18px;
+}
+.reader.theme-holo .reader-leaf,
+.reader.theme-holo .reader-leaf.leaf-right {
+  background: rgba(7, 25, 43, 0.54);
+}
+.reader.theme-holo .reader-leaf.leaf-left {
+  border-color: #c0edff35;
+}
+.reader.theme-holo .reader-leaf .chapter-label {
+  color: #c1eaff;
+}
+.reader.theme-holo .book-page::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid #d5f6ff26;
+  border-radius: 13px;
+  pointer-events: none;
+}
+.reader.theme-holo progress::-webkit-progress-value {
+  background: #8be5ff;
+}
+.reader.theme-ice progress::-webkit-progress-value {
+  background: #578fb5;
+}
+.reader:not(.theme-classic) .reader-leaf.leaf-left {
+  padding-top: 48px;
+}
+.reader:not(.theme-classic) .reader-leaf.leaf-right {
+  padding-bottom: 50px;
+}
+.reader:not(.theme-classic) .page-number {
+  bottom: 18px;
+}
+@media (max-width: 850px) {
+  .home-page :is(.library-section, .world-section) {
+    padding: 18px;
+  }
+  .world-card .material-preview {
+    height: 130px;
+  }
+  .world-card .world-caption {
+    padding: 12px 10px;
+  }
+  .world-card .world-caption small {
+    display: block;
+    font-size: 9px;
+  }
+  .reader:not(.theme-classic) .reader-leaf.leaf-left {
+    padding-top: 36px;
+  }
+}
+@media (max-width: 600px) {
+  .world-backdrop.world-forest img {
+    object-position: 83% center;
+  }
+  .world-backdrop.world-ice img {
+    object-position: 88% center;
+  }
+  .world-backdrop.world-holo img {
+    object-position: 94% center;
+  }
+  .home-page .page-intro {
+    padding: 18px 14px;
+  }
+  .home-page :is(.library-section, .world-section) {
+    padding: 18px 14px;
+  }
+  .home-page .bottom-invitation {
+    padding: 18px 14px;
+  }
+  .world-grid {
+    gap: 15px 12px;
+  }
+  .world-card .material-preview {
+    height: 126px;
+  }
+  .world-card .world-caption {
+    padding: 12px 10px;
+    min-height: 80px;
+  }
+  .world-card .world-caption strong {
+    font-size: 12px;
+  }
+  .world-card .world-caption small {
+    font-size: 9px;
+  }
+  .app-shell:not([data-theme="classic"])
+    main
+    > .page:not(.home-page):not(.details-page) {
+    width: calc(100% - 28px);
+    padding: 22px 18px;
+    margin: 18px auto;
+  }
+  .app-shell:not([data-theme="classic"])
+    .details-page
+    :is(.detail-copy, .story-preview) {
+    padding: 22px;
+  }
+  .reader:not(.theme-classic) {
+    padding-top: 10px;
+  }
+  .reader:not(.theme-classic) .reader-header {
+    padding: 9px 12px;
+  }
+  .reader:not(.theme-classic) .reader-world-label {
+    margin: 14px auto;
+    padding: 7px 12px;
+  }
+  .reader:not(.theme-classic) .book-stage {
+    margin-top: 20px;
+  }
+  .reader:not(.theme-classic) .reader-navigation {
+    padding: 7px 6px;
+    gap: 8px;
+  }
+  .reader:not(.theme-classic) .reader-bottom {
+    padding: 4px 8px;
+    font-size: 8px;
+  }
+  .reader:not(.theme-classic) .reader-leaf.leaf-left {
+    padding-top: 28px;
+  }
+  .reader:not(.theme-classic) .reader-leaf.leaf-right {
+    padding-bottom: 40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-backdrop img {
+    animation: none;
+  }
+  .world-card {
+    transition: none;
+  }
+}
+/* Smoked glass remains transparent at the leaf level; a soft local backing
+   protects letters without turning the entire book into an opaque blue box. */
+.reader.theme-holo .book-page {
+  background: rgba(7, 24, 43, 0.12);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+}
+.reader.theme-holo .reader-leaf,
+.reader.theme-holo .reader-leaf.leaf-right {
+  background: rgba(7, 25, 43, 0.2);
+}
+.reader.theme-holo .leaf-content {
+  background: rgba(5, 19, 34, 0.45);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 0 20px 8px #05132226;
+}
+.reader.theme-holo .reader-leaf p,
+.reader.theme-holo .story-opening-title {
+  color: #f1fcff;
+}
+.reader.theme-holo .reader-leaf .chapter-label {
+  background: rgba(5, 19, 34, 0.65);
+  padding: 6px 9px;
+  border-radius: 4px;
+  width: fit-content;
+  color: #d7f1ff;
+}
+.reader.theme-holo .page-number {
+  color: #e1f5ff;
+  background: rgba(5, 19, 34, 0.65);
+  border-radius: 5px;
+  padding: 3px 6px;
+  left: calc(50% - 13px);
+  right: auto;
+  min-width: 26px;
+}
+.reader.theme-ice {
+  --reader-muted: #315b73;
+}
+.world-card .material-holo img {
+  object-position: 83% 40%;
+}
+@supports not (backdrop-filter: blur(10px)) {
+  .reader.theme-holo .book-page {
+    background: rgba(7, 24, 43, 0.9);
+  }
+}
+@media (max-width: 600px) {
+  .reader.theme-holo .leaf-content {
+    padding: 14px;
+  }
+}

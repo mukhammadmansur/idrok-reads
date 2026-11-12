@@ -4,6 +4,7 @@ import App from "./App";
 import { ProgressProvider } from "./lib/context";
 import "./styles.css";
 import "./themes.css";
+import "./worlds.css";
 class ErrorBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }

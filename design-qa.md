@@ -1,61 +1,42 @@
-# Theme and story layout QA — 2026-11-12
+# World selection and immersive reading QA — 2026-11-12
 
 ## Target and scope
 
-The supplied visual targets are the user's cyan futuristic glass/HUD reference, white crystalline Ice Skating border, the existing reader screenshot, and the story-details screenshot. ForestBook's target is the user's explicit bark-and-long-ivy description. These are material and interaction references for an existing reading product, not a request to reproduce dashboard charts or the skating poster's copy.
+The user's latest screenshot rejects the previous decorative frames and book-icon cards as artificial. The requested behavior is in-place world selection, a convincing forest and crystal environment, and genuinely glass-like futuristic pages. The earlier cyan HUD and icy-border references inform material character, not literal dashboard or poster content. This is an iteration on those references and the user's explicit feedback, not a pixel clone of a fixed final mockup.
 
-Source visual truth paths for the generated material assets used in the comparison:
+## Sources and evidence
 
-- `public/themes/forest-frame.webp`
-- `public/themes/ice-frame.webp`
-- `public/themes/holo-frame.webp`
+Source visual truth for this iteration: `public/worlds/{forest,ice,holo}.webp`. Each generated environment was opened and inspected. The original user references remain in the conversation. Before-state capture: `/tmp/iqro-world-redesign/before-cards.png`.
 
-The original user references remain in the conversation. Generated frame assets were separately opened and inspected before integration. They retain transparent centers; they are real raster assets rather than CSS/SVG approximations. Three new story vignettes depict the corresponding airplane-making, ant-rescue, and whale/turtle events.
+- [Combined source artwork and rendered reader](docs/visual-review/worlds-comparison.webp).
+- [World selection cards](docs/visual-review/world-cards.webp).
+- [HoloBook live glass](docs/visual-review/holo-glass.webp).
+- [IceBook mobile](docs/visual-review/ice-world-mobile.webp).
+- Full capture set: `/tmp/iqro-world-redesign/{forest,ice,holo}-{reader,details,cards,mobile}-final.png`.
 
-## Evidence and normalization
+Actual Chromium viewports: desktop 1440 × 1050 and mobile 390 × 1000, DPR 1. Reader desktop captures use the viewport to accurately show fixed scenery; mobile captures include the full flow. The combined board displays each unmodified environment beside the same story's rendered opening, proportionally scaled, without browser chrome. It was opened as a single comparison image and reviewed, with focused mobile and card captures reviewed separately.
 
-- Combined source-material / rendered-page comparison: [material comparison](docs/visual-review/material-comparison.webp).
-- Full-page selected theme: [HoloBook details and shell](docs/visual-review/holo-details.webp).
-- Focused mobile state: [IceBook page 4](docs/visual-review/ice-mobile.webp).
-- Full runtime captures: `/tmp/iqro-theme-review/{forest,ice,holo}-reader-v2.png`, `*-details-v2.png`, and `*-mobile-v2.png`.
-- Focused book captures: `/tmp/iqro-theme-review/{forest,ice,holo}-book-focus.png`.
-- Browser viewport: 1440 × 1050 desktop and 390 × 1000 mobile; device scale factor 1. No device frame or browser chrome was included.
-- Source material files: 1536 × 1024 RGBA, converted to WebP with retained alpha. They intentionally adapt to the book's viewport-dependent aspect ratio. This is material-identity comparison, not a pixel equality claim between a bare frame and a full interface.
-- Combined comparison input: a single 1280 px wide browser-rendered board containing each source frame next to its actual cropped book, all on the same story and logical page 4. It was opened and visually reviewed after capture.
-- Focused comparisons examined book edges, text insets, inline scene scale, selected-theme controls, and mobile frame clearance. Full-page details captures confirmed that sidebar, canvas, buttons, text and borders change together.
+## Comparison and fixes
 
-## Comparison history
+1. **P1 behavior:** world cards unexpectedly opened a story. Replaced navigation links with pressed-state selection buttons. Selection updates the environment on the current page, survives refresh and does not move the cards. Story navigation remains on story cards.
+2. **P1 visual identity:** icon-and-frame cards and tinted backgrounds did not convey different places. Added real scene thumbnails and full environments: woodland with a tactile wooden table, luminous crystal palace, and glass orbital observatory. Removed the old frame overlays from previews, covers and reader; archived their source files.
+3. **P2 HoloBook:** an initial dark, empty-space composition still made the panel appear opaque. Replaced it with a planet and glass architecture crossing behind the book, reduced leaf opacity, and applied real backdrop blur. The final capture shows the scene through the panel. Local dark backing protects story text without filling the entire book.
+4. **P2 verification race:** the drag test checked local storage immediately after the rendered folio changed, before React's persistence effect necessarily ran. Changed the assertion to poll the expected saved page. No drag behavior or application timing was changed.
+5. Final source/render comparison and mobile review found no outstanding P0/P1/P2 issue in this requested scope. Old dense-frame frost-folio polish is resolved by removing the frame; folio and navigation are clear.
 
-1. Initial implementation review found two P2 mismatches: portrait cover frames were cropped by inherited `object-fit: cover`, and the mobile material rim covered the small first chapter label. Corrected frame fitting and increased mobile inner top/footer clearance. Post-fix evidence is the `*-details-v2.png` and `*-mobile-v2.png` capture set and the tracked review images above.
-2. Automated contrast checks found an IceBook selected-filter text ratio below 4.5:1 and insufficient contrast on the existing completion badge. Darkened the IceBook muted token and bound the completion badge to the active surface/ink palette. Reran checks in all four themes, including completed stories, earned rewards, and populated parent activity: passed.
-3. Final visual comparison found no remaining actionable P0/P1/P2 issue in the requested material/layout scope. A nonessential decorative mobile folio can blend into dense frost; the primary page counter and navigation remain clear. This is retained as P3 polish, not hidden or substituted in tests.
+## Fidelity surfaces
 
-## Required fidelity surfaces
+- **Typography:** retained original readable story type and content. HoloBook uses light system text on soft backing; IceBook uses dark blue text. Large-text mode is preserved.
+- **Layout:** one reader engine with two structured leaves, stacked on mobile. Text and optional scene placement remain intact. World cards retain consistent geometry while the scene changes.
+- **Materials:** forest has warm paper and brown cover edges in a deep woodland; ice uses frosted translucent surfaces; holo uses live rgba surfaces, backdrop blur and fine highlights. It has an opaque fallback when backdrop filtering is unsupported.
+- **Whole-page treatment:** scenery, sidebar, topbar, details, reader, quiz and progress surfaces share the persisted world. ClassicBook retains its calm baseline and curved paper turning.
+- **Assets/content:** local optimized WebP environments, no fake dashboard charts or irrelevant copy. All story and quiz text is preserved. Prior frame assets are documented as archived, not production artwork.
+- **Responsive/accessibility:** reviewed 390 px mobile and 1440 px desktop captures, with automated layout coverage at 320, 390, 768, 1024 and 1440 px. Reduced motion disables world breathing and keeps existing instant reading navigation. Controls retain accessible labels, selected state and keyboard focus.
 
-- **Typography:** retained calm Georgia story text at 20–25 px with approximately 1.85 line height; HoloBook uses readable system sans at 21–24 px. Large-text mode remains supported. Tiny chapter labels are secondary. No dense dashboard typography was copied into child reading content.
-- **Spacing/layout:** one engine renders two structured leaves on desktop and stacks them on mobile. Illustrations are optional blocks among text. Every original story sentence is preserved exactly once across leaves. Frames reserve outer room and do not replace live content. The cover/sidebar arrangement of story details remains intact.
-- **Colors/tokens:** ClassicBook, forest/parchment, frost-blue, and navy/cyan have complete persisted application palettes. Selection immediately updates the shell and survives refresh/navigation. Automated WCAG A/AA checks pass for the tested states in each palette.
-- **Image quality:** generated wood/ivy, ice-crystal, and glass assets preserve their distinctive edges in the rendered comparison. Transparent story scenes sit among paragraphs instead of filling a mandatory whole leaf. Covers are used only for the opening, not repeated on every page. WebP keeps the six new production images to approximately 1.9 MiB; local assets have no external runtime dependency.
-- **Copy/content:** Uzbek labels, original story wording, separate Savol-javob flow, and existing quiz content are retained. No financial charts or irrelevant reference text were introduced. Only two of each story's eight logical pages contain illustrations, with the second picture tied to a specific plot event.
+## Runtime verification
 
-## Interaction/browser verification
+Build, lint, 10 unit tests and all 32 browser tests passed. Browser captures reported no uncaught page errors. Coverage includes world selection without navigation, persistence, real image loading, missing-scenery fallback, transparent HoloBook CSS, reading/resume, pointer/touch drag, one-time hint, separate quizzes, rewards, parent activity and axe WCAG A/AA checks.
 
-Real Chromium rendered the captures and exercised theme controls, navigation, storage/resume, all story pages, paper turns, pointer/touch dragging, one-time instruction, completion, quiz and parent flows. Captures reported no uncaught page errors. Checks: build, lint, 10 unit tests, and 29 browser tests passed. Responsive checks cover 320, 390, 768, 1024 and 1440 px.
-
-The optional `sites-preview` shared relay was unavailable and `terminal.local` returned a domain denial. No shared/live preview or deployment is claimed. Visual verification used the running Vite application directly in executor Chromium at loopback port 4173. The local development service remains running; the tracked screenshots make the result reviewable without a shared relay.
-
-## Follow-up polish
-
-- P3: give the nonessential mobile frost folio more separation from dense decorative crystals. The primary progress counter remains visible and is covered by navigation tests.
-- Further art can be added through the existing block model without changing reader logic or making illustrations compulsory.
-
-## Implementation checklist
-
-- [x] Distinct raster material frames for forest, ice and holographic glass.
-- [x] Immediate, persisted whole-application theme selection.
-- [x] Structured leaves and editorial illustration placement.
-- [x] Preserved reading, drag/turn, quiz, reward and parent behavior.
-- [x] Post-fix browser captures and combined visual comparison.
-- [x] Build, lint, unit, functional, responsive and contrast checks.
+The optional shared preview relay remains unavailable; no shared live preview or deployment is claimed. Verification used the running Vite app directly in executor Chromium at loopback port 4173. Tracked screenshots make the result reviewable without a shared relay. Windows checkouts need to pull `main` to receive these files.
 
 final result: passed

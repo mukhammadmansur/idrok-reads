@@ -5,7 +5,7 @@ import { stories, themes } from "../data/stories";
 import { useProgress } from "../lib/context";
 import { Art, EmptyState, SectionTitle, StoryCard } from "./ui";
 export default function Home() {
-  const { progress } = useProgress();
+  const { progress, update } = useProgress();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Barchasi");
   const featured = stories[0];
@@ -167,17 +167,18 @@ export default function Home() {
           eyebrow="BITTA HIKOYA. TO‘RT XIL KAYFIYAT."
           title="O‘z olamingni tanla"
           action={
-            <span className="world-hint">
-              Kitob ichida almashtirish mumkin <ArrowUpRightSmall />
-            </span>
+            <span className="world-hint">Olamni shu yerda almashtir</span>
           }
         />
         <div className="world-grid">
           {themes.map((t) => (
-            <a
-              href={`#/story/${featured.slug}?theme=${t.id}`}
+            <button
+              type="button"
               key={t.id}
-              className={`world-card theme-preview-${t.id}`}
+              className={`world-card theme-preview-${t.id} ${progress.theme === t.id ? "world-selected" : ""}`}
+              aria-label={`${t.name} olamini tanlash`}
+              aria-pressed={progress.theme === t.id}
+              onClick={() => update((p) => ({ ...p, theme: t.id }))}
             >
               <ThemePreview theme={t.id} />
               <div className="world-caption">
@@ -185,9 +186,11 @@ export default function Home() {
                   <strong>{t.label}</strong>
                   <small>{t.description}</small>
                 </span>
-                <ArrowRight size={17} />
+                {progress.theme === t.id && (
+                  <Check size={18} aria-hidden="true" />
+                )}
               </div>
-            </a>
+            </button>
           ))}
         </div>
       </section>
@@ -213,7 +216,4 @@ export default function Home() {
       </section>
     </div>
   );
-}
-function ArrowUpRightSmall() {
-  return <span aria-hidden="true">↗</span>;
 }

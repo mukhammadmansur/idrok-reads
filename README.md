@@ -1,14 +1,14 @@
 # WBooks — interactive stories for small readers
 
-An Uzbek-language frontend MVP for ages 6–10. The current application retains its Iqro branding; the intended private GitHub repository is `mukhammadmaqsud/wbooks`.
+An Uzbek-language frontend MVP for ages 6–10. The current application retains its Iqro branding; the private GitHub repository is `mukhammadmaqsud/iqro_kids_reads`.
 
 ## Run locally
 
 Node.js 22.12+ or 24 LTS and npm are required. This environment was validated with Node 24.22.1.
 
 ```sh
-git clone https://github.com/mukhammadmaqsud/wbooks.git
-cd wbooks
+git clone https://github.com/mukhammadmaqsud/iqro_kids_reads.git
+cd iqro_kids_reads
 npm ci
 npm run dev -- --port 5173
 ```
@@ -21,7 +21,7 @@ The repository has no required environment variables, external API services, or 
 
 - Searchable, filterable library with three original eight-page stories and original SVG cover illustrations.
 - Immediate, persisted themes across the whole application: shell, library, details, quizzes, rewards, parent view, and **one reader engine** for ClassicBook, ForestBook, IceBook, and HoloBook.
-- Material-specific image frames: bark and ivy, fern-like ice crystals, and cyan holographic glass.
+- World cards select the environment in place without opening a story. Full forest, crystal-palace and orbital-observatory scenery surrounds the interface; HoloBook uses live transparent glass with a blurred view through the book. ClassicBook keeps its calm reading surface.
 - Previous/next pages, arrow keys, swipe, larger text, and reduced-motion support.
 - ClassicBook turns a curved, two-sided paper leaf with moving shadows in 1.25 seconds. The leaf follows a held mouse or finger; a short drag returns it to its place. A small hand demonstrates dragging once per browser. Page corners, buttons, arrow keys, and horizontal swipes share the same renderer; progress updates after the leaf settles.
 - Reading progress, resume, idempotent completion, badges, and milestones.

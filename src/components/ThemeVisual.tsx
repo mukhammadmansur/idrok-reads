@@ -1,7 +1,7 @@
-import { BookOpen, Leaf, Orbit, Snowflake, Sun } from "lucide-react";
+import { useState } from "react";
+import { Leaf, Orbit, Snowflake, Sun } from "lucide-react";
 import type { ThemeId } from "../data/types";
-export const themeFrame = (theme: ThemeId) =>
-  theme === "classic" ? undefined : `/themes/${theme}-frame.webp`;
+export const worldImage = (theme: ThemeId) => `/worlds/${theme}.webp`;
 export function ThemeGlyph({
   theme,
   size = 22,
@@ -15,11 +15,32 @@ export function ThemeGlyph({
   return <Icon size={size} strokeWidth={1.5} aria-hidden="true" />;
 }
 export function ThemePreview({ theme }: { theme: ThemeId }) {
-  const frame = themeFrame(theme);
   return (
     <div className={`material-preview material-${theme}`} aria-hidden="true">
-      <BookOpen size={52} strokeWidth={1.15} />
-      {frame && <img src={frame} alt="" loading="lazy" />}
+      <img
+        src={worldImage(theme)}
+        alt=""
+        loading="lazy"
+        width="480"
+        height="270"
+      />
+    </div>
+  );
+}
+export function WorldBackdrop({ theme }: { theme: ThemeId }) {
+  const [failed, setFailed] = useState<string | null>(null);
+  if (theme === "classic") return null;
+  return (
+    <div className={`world-backdrop world-${theme}`} aria-hidden="true">
+      {failed !== theme && (
+        <img
+          key={theme}
+          src={worldImage(theme)}
+          alt=""
+          fetchPriority="high"
+          onError={() => setFailed(theme)}
+        />
+      )}
     </div>
   );
 }

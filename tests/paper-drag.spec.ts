@@ -33,14 +33,16 @@ for (const width of [390, 1440])
     await page.mouse.up();
     await page.clock.runFor(1600);
     await expect(page.locator(".page-number")).toHaveText("2");
-    expect(
-      await page.evaluate(
-        () =>
-          JSON.parse(localStorage.getItem("iqro.progress.v1")!).reading[
-            "oy-dosti"
-          ].page,
-      ),
-    ).toBe(1);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            JSON.parse(localStorage.getItem("iqro.progress.v1")!).reading[
+              "oy-dosti"
+            ].page,
+        ),
+      )
+      .toBe(1);
     // Let go before the middle: the leaf returns, and saved progress stays put.
     await page.mouse.move(x, y);
     await page.mouse.down();

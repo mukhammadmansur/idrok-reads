@@ -81,12 +81,17 @@ for (const [id, name] of themes)
       new RegExp(`theme-${id}`),
     );
     if (id !== "classic") {
-      await expect(page.locator(".book-material-frame")).toBeVisible();
-      expect(
-        await page
-          .locator(".book-material-frame")
-          .evaluate((e: HTMLImageElement) => e.complete && e.naturalWidth > 0),
-      ).toBe(true);
+      await expect(page.locator(".world-backdrop img")).toBeVisible();
+      await expect
+        .poll(() =>
+          page
+            .locator(".world-backdrop img")
+            .evaluate(
+              (e: HTMLImageElement) => e.complete && e.naturalWidth > 0,
+            ),
+        )
+        .toBe(true);
+      await expect(page.locator(".book-material-frame")).toHaveCount(0);
     }
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
     await expect(page.locator(".book-page .inline-scene")).toHaveCount(0);

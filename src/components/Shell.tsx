@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { themes } from "../data/stories";
-import { ThemeGlyph } from "./ThemeVisual";
+import { ThemeGlyph, WorldBackdrop } from "./ThemeVisual";
 import { useProgress } from "../lib/context";
 const links = [
   { href: "/", label: "Kutubxona", icon: Compass },
@@ -33,6 +33,7 @@ export default function Shell({
         : "/";
   return (
     <div className="app-shell" data-theme={progress.theme}>
+      <WorldBackdrop theme={progress.theme} />
       <a
         className="skip-link"
         href="#main-content"

@@ -17,7 +17,7 @@ import { completeStory, recordPage } from "../lib/progress";
 import { PageArtwork, PageText } from "./StoryPageContent";
 import PaperTurn from "./PaperTurn";
 import Recap from "./Recap";
-import { ThemeGlyph, themeFrame } from "./ThemeVisual";
+import { ThemeGlyph, WorldBackdrop } from "./ThemeVisual";
 import PageTurnHint from "./PageTurnHint";
 import { usePaperDrag } from "../lib/usePaperDrag";
 export default function Reader({
@@ -170,6 +170,7 @@ export default function Reader({
       data-theme={theme}
       className={`reader theme-${theme} ${large ? "large-type" : ""}`}
     >
+      <WorldBackdrop theme={theme} />
       <header className="reader-header">
         <a
           href={`#/story/${story.slug}`}
@@ -238,14 +239,6 @@ export default function Reader({
           if (theme === "classic") event.preventDefault();
         }}
       >
-        {themeFrame(theme) && (
-          <img
-            className="book-material-frame"
-            src={themeFrame(theme)}
-            alt=""
-            aria-hidden="true"
-          />
-        )}
         <article
           ref={surface}
           className="book-page"

@@ -11,7 +11,7 @@ import { themes } from "../data/stories";
 import type { Story } from "../data/types";
 import { navigate, useProgress } from "../lib/context";
 import { Art } from "./ui";
-import { ThemeGlyph, themeFrame } from "./ThemeVisual";
+import { ThemeGlyph } from "./ThemeVisual";
 export default function StoryDetails({
   story,
   initialTheme,
@@ -53,14 +53,6 @@ export default function StoryDetails({
       <div className="details-layout">
         <div className="detail-art">
           <Art src={story.cover} alt={story.subtitle} />
-          {themeFrame(theme) && (
-            <img
-              className="detail-theme-frame"
-              src={themeFrame(theme)}
-              alt=""
-              aria-hidden="true"
-            />
-          )}
           <span className="art-label">IQRO ORIGINAL HIKOYA</span>
         </div>
         <div className="detail-copy">

@@ -43,28 +43,136 @@ const question = (
   explanation: string,
 ): Question => ({ id, prompt, options, answer, explanation });
 const art = (name: string) => `/art/${name}.svg`;
-const sceneArt: Record<
-  string,
-  { page: number; src: string; alt: string; side: 0 | 1 }
-> = {
-  "oy-dosti": {
-    page: 3,
-    src: "/art/moon-paper-plane.webp",
-    alt: "Timo va Lola maysalar ustida qog‘oz samolyot yasashyapti.",
-    side: 1,
-  },
-  "bulut-kemasi": {
-    page: 5,
-    src: "/art/cloud-ant-rescue.webp",
-    alt: "Yashil barg yelkanli qog‘oz kema ho‘l toshda qolgan chumolini qutqaryapti.",
-    side: 0,
-  },
-  "dengiz-siri": {
-    page: 5,
-    src: "/art/sea-friends.webp",
-    alt: "Kichkina kit Nuri va toshbaqa Marvarid xavfsiz tosh yonida oqim tinishini kutishyapti.",
-    side: 1,
-  },
+type StoryScene = {
+  page: number;
+  src: string;
+  alt: string;
+  side: 0 | 1;
+  before?: boolean;
+};
+const scene = (
+  page: number,
+  name: string,
+  alt: string,
+  side: 0 | 1,
+  before = false,
+): StoryScene => ({ page, src: `/art/${name}.webp`, alt, side, before });
+const sceneArt: Record<string, StoryScene[]> = {
+  "oy-dosti": [
+    scene(
+      1,
+      "moon-letter",
+      "Timo deraza yonida Oyga do‘stlik maktubini yozyapti.",
+      0,
+    ),
+    scene(
+      2,
+      "moon-tree",
+      "Timo daraxt shoxida maktubini ushlab turibdi, Lola esa pastda kutyapti.",
+      1,
+      true,
+    ),
+    scene(
+      3,
+      "moon-paper-plane",
+      "Timo va Lola maysalar ustida qog‘oz samolyot yasashyapti.",
+      1,
+    ),
+    scene(
+      4,
+      "moon-owl",
+      "Boyo‘g‘li Usta Timo va Lolaga mehr ulashish haqida gapiryapti.",
+      0,
+      true,
+    ),
+    scene(
+      6,
+      "moon-gathering",
+      "Timo maktubini o‘qiyapti, o‘rmon do‘stlari yerdagi chiroq atrofida tinglashyapti.",
+      1,
+    ),
+    scene(
+      7,
+      "moon-gathering",
+      "Timo, Lola va do‘stlari Oy nurida birga: endi hech kim yolg‘iz emas.",
+      0,
+      true,
+    ),
+  ],
+  "bulut-kemasi": [
+    scene(
+      1,
+      "cloud-folding",
+      "Zara va bobosi stol yonida qog‘ozdan kema buklashyapti.",
+      0,
+    ),
+    scene(
+      3,
+      "cloud-sail",
+      "Bobosi Zaraga yelkan haqida tushuntiryapti, Zara barg va cho‘pni ushlab turibdi.",
+      1,
+      true,
+    ),
+    scene(
+      5,
+      "cloud-ant-rescue",
+      "Yashil barg yelkanli qog‘oz kema ho‘l toshda qolgan chumolini qutqaryapti.",
+      0,
+    ),
+    scene(
+      6,
+      "cloud-passenger",
+      "Zara birinchi yo‘lovchisini kuzatyapti: chumoli kemadan xavfsiz maysaga tushyapti.",
+      1,
+    ),
+    scene(
+      7,
+      "cloud-goodbye",
+      "Zara va bobosi kechki osmonda kemaga o‘xshagan bulutga qo‘l silkishyapti.",
+      0,
+      true,
+    ),
+  ],
+  "dengiz-siri": [
+    scene(
+      1,
+      "sea-meeting",
+      "Nuri marjonlar yonida qo‘shiq aytayotgan Marvarid bilan tanishyapti.",
+      1,
+    ),
+    scene(
+      2,
+      "sea-courage",
+      "Marvarid Nurini birga suzishga taklif qilyapti, Nuri esa ikkilanib turibdi.",
+      0,
+      true,
+    ),
+    scene(
+      3,
+      "sea-courage",
+      "Marvarid qo‘rqayotgan Nurini mehr bilan qo‘llab-quvvatlayapti.",
+      1,
+    ),
+    scene(
+      4,
+      "sea-lights",
+      "Nuri va Marvarid yulduzlarga o‘xshab yaltiragan mayda baliqlarni tomosha qilishyapti.",
+      0,
+      true,
+    ),
+    scene(
+      5,
+      "sea-friends",
+      "Kichkina kit Nuri va toshbaqa Marvarid xavfsiz tosh yonida oqim tinishini kutishyapti.",
+      1,
+    ),
+    scene(
+      6,
+      "sea-song",
+      "Marvarid uyiga yetib kelib rahmat aytyapti, Nuri quvonchdan kuylayapti.",
+      0,
+    ),
+  ],
 };
 function textLeaves(text: string): [ReadingBlock[], ReadingBlock[]] {
   const sentences = text.match(/[^.!?]+[.!?]+[»”"]?|[^.!?]+$/gu) || [text];
@@ -119,14 +227,16 @@ function makeStory(
         leaves[1] = [{ type: "text", text }];
         illustration = art(id);
       }
-      const scene = sceneArt[id];
-      if (scene && i === scene.page) {
-        leaves[scene.side].push({
+      const pageScene = sceneArt[id]?.find((s) => i === s.page);
+      if (pageScene) {
+        const block: ReadingBlock = {
           type: "illustration",
-          src: scene.src,
-          alt: scene.alt,
-        });
-        illustration = scene.src;
+          src: pageScene.src,
+          alt: pageScene.alt,
+        };
+        if (pageScene.before) leaves[pageScene.side].unshift(block);
+        else leaves[pageScene.side].push(block);
+        illustration = pageScene.src;
       }
       return { text, leaves, illustration, scene: `${title}: ${i + 1}-sahifa` };
     }),
@@ -135,7 +245,8 @@ function makeStory(
       duration: 32,
       scenes: [0, 2, 4, 7].map((i) => ({
         text: paragraphs[i],
-        illustration: art(id),
+        illustration:
+          sceneArt[id]?.find((scene) => scene.page === i)?.src ?? art(id),
       })),
     },
     quiz,

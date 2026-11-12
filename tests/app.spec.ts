@@ -19,6 +19,7 @@ test("reading, resume, completion, recap and separate quiz survive refresh", asy
   await expect(page.locator(".reader")).toHaveClass(/theme-forest/);
   await page.getByRole("button", { name: "Keyingi", exact: true }).click();
   await page.getByRole("button", { name: "Keyingi", exact: true }).click();
+  await expect(page.locator(".page-number")).toHaveText("3");
   await page
     .getByRole("link", { name: "Hikoya tafsilotlariga qaytish" })
     .click();
@@ -148,6 +149,7 @@ for (const width of [320, 390, 768, 1024, 1440])
   });
 for (const slug of ["oy-dosti", "bulut-kemasi", "dengiz-siri"])
   test(`all pages and themes work for ${slug}`, async ({ page }) => {
+    await page.clock.install();
     for (const theme of ["ClassicBook", "ForestBook", "IceBook", "HoloBook"]) {
       await page.goto(`/#/story/${slug}`);
       await page.getByRole("button", { name: theme, exact: true }).click();
@@ -161,6 +163,7 @@ for (const slug of ["oy-dosti", "bulut-kemasi", "dengiz-siri"])
         await page
           .getByRole("button", { name: "Keyingi", exact: true })
           .click();
+        await page.clock.runFor(1500);
         await expect(page.locator(".page-number")).toHaveText(String(i));
       }
       await page
@@ -209,30 +212,24 @@ test("keyboard navigation, swipe and reduced motion work", async ({ page }) => {
   await expect(page.locator(".page-number")).toHaveText("2");
   await page.keyboard.press("ArrowLeft");
   await expect(page.locator(".page-number")).toHaveText("1");
-  await page
-    .locator(".book-page")
-    .evaluate((element) =>
-      element.dispatchEvent(
-        new TouchEvent("touchstart", {
-          bubbles: true,
-          touches: [
-            new Touch({ identifier: 0, target: element, clientX: 280 }),
-          ],
-        }),
-      ),
-    );
-  await page
-    .locator(".book-page")
-    .evaluate((element) =>
-      element.dispatchEvent(
-        new TouchEvent("touchend", {
-          bubbles: true,
-          changedTouches: [
-            new Touch({ identifier: 0, target: element, clientX: 90 }),
-          ],
-        }),
-      ),
-    );
+  await page.locator(".book-page").evaluate((element) =>
+    element.dispatchEvent(
+      new TouchEvent("touchstart", {
+        bubbles: true,
+        touches: [new Touch({ identifier: 0, target: element, clientX: 280 })],
+      }),
+    ),
+  );
+  await page.locator(".book-page").evaluate((element) =>
+    element.dispatchEvent(
+      new TouchEvent("touchend", {
+        bubbles: true,
+        changedTouches: [
+          new Touch({ identifier: 0, target: element, clientX: 90 }),
+        ],
+      }),
+    ),
+  );
   await expect(page.locator(".page-number")).toHaveText("2");
   expect(
     await page

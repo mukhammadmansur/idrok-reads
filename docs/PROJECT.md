@@ -31,7 +31,9 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/components/Shell.tsx` | Desktop sidebar, mobile navigation, skip link, storage warning |
 | `src/components/Home.tsx` | Featured story, discovery, search, filters, resume, theme previews |
 | `src/components/StoryDetails.tsx` | Story description, theme selection, start/resume/replay |
-| `src/components/Reader.tsx` | Shared reader engine, navigation, completion |
+| `src/components/Reader.tsx` | Shared reader engine, pointer navigation, completion |
+| `src/components/PaperTurn.tsx` | Curved physical leaves for ClassicBook, ForestBook and IceBook |
+| `src/components/HologramReveal.tsx` | Drag-controlled light reveal on the stationary HoloBook glass |
 | `src/components/StoryPageContent.tsx` | Shared leaf/block renderer for readable text and optional inline scenes |
 | `src/components/ThemeVisual.tsx` | Theme icons, world thumbnails, and shared environment backdrop |
 | `src/components/Recap.tsx` | Curated illustration animation and video fallback |

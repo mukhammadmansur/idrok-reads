@@ -68,22 +68,24 @@ describe("structured story leaves", () => {
         expect(normalize(text)).toBe(normalize(page.text));
       }
   });
-  it("uses optional illustrations at specific moments instead of repeating a cover on every page", () => {
+  it("illustrates every main dialogue with story-specific scenes", () => {
     for (const story of stories) {
       const illustrated = story.pages.filter((p) =>
         p.leaves.flat().some((b) => b.type === "illustration"),
       );
-      expect(illustrated.length).toBe(2);
-      expect(
-        story.pages[1].leaves.flat().every((b) => b.type !== "illustration"),
-      ).toBe(true);
+      expect(illustrated.length).toBeGreaterThanOrEqual(6);
+      for (const page of story.pages.filter((p) => p.text.includes("«")))
+        expect(
+          page.leaves.flat().some((b) => b.type === "illustration"),
+          page.text,
+        ).toBe(true);
       const assets = illustrated.flatMap((p) =>
         p.leaves
           .flat()
           .filter((b) => b.type === "illustration")
           .map((b) => ("src" in b ? b.src : "")),
       );
-      expect(new Set(assets).size).toBe(assets.length);
+      expect(new Set(assets).size).toBeGreaterThanOrEqual(6);
     }
   });
 });

@@ -16,6 +16,7 @@ import { useProgress } from "../lib/context";
 import { completeStory, recordPage } from "../lib/progress";
 import { PageArtwork, PageText } from "./StoryPageContent";
 import PaperTurn from "./PaperTurn";
+import HologramReveal from "./HologramReveal";
 import Recap from "./Recap";
 import { ThemeGlyph, WorldBackdrop } from "./ThemeVisual";
 import PageTurnHint from "./PageTurnHint";
@@ -55,15 +56,12 @@ export default function Reader({
         Math.min(story.pages.length - 1, page + direction),
       );
       if (target === page) return;
-      if (
-        theme === "classic" &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ) {
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         turnLock.current = true;
         setTurn({ target, direction: direction > 0 ? 1 : -1 });
       } else setPage(target);
     },
-    [page, story.pages.length, theme, completed],
+    [page, story.pages.length, completed],
   );
   const startDrag = useCallback(
     (direction: -1 | 1) => {
@@ -77,7 +75,7 @@ export default function Reader({
     [page, completed, story.pages.length],
   );
   const drag = usePaperDrag({
-    enabled: theme === "classic" && !completed,
+    enabled: !completed,
     onStart: startDrag,
     onInstantTurn: changePage,
     onInteract: () => setHintDismissed(true),
@@ -291,16 +289,25 @@ export default function Reader({
           !hintDismissed &&
           !turn &&
           page < story.pages.length - 1 && <PageTurnHint />}
-        {turn && (
-          <PaperTurn
-            source={surface}
-            story={story}
-            target={turn.target}
-            direction={turn.direction}
-            gesture={turn.dragging ? drag.motion : undefined}
-            onComplete={finishTurn}
-          />
-        )}
+        {turn &&
+          (theme !== "holo" ? (
+            <PaperTurn
+              source={surface}
+              story={story}
+              target={turn.target}
+              direction={turn.direction}
+              gesture={turn.dragging ? drag.motion : undefined}
+              onComplete={finishTurn}
+            />
+          ) : (
+            <HologramReveal
+              source={surface}
+              story={story}
+              target={turn.target}
+              gesture={turn.dragging ? drag.motion : undefined}
+              onComplete={finishTurn}
+            />
+          ))}
       </div>
       <nav className="reader-navigation" aria-label="Sahifa boshqaruvi">
         <button

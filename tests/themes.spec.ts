@@ -94,7 +94,7 @@ for (const [id, name] of themes)
       await expect(page.locator(".book-material-frame")).toHaveCount(0);
     }
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
-    await expect(page.locator(".book-page .inline-scene")).toHaveCount(0);
+    await expect(page.locator(".book-page .inline-scene")).toHaveCount(1);
     await expect(page.locator(".leaf-left p")).toBeVisible();
     await expect(page.locator(".leaf-right p")).toBeVisible();
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();

@@ -35,8 +35,25 @@ Actual Chromium viewports: desktop 1440 × 1050 and mobile 390 × 1000, DPR 1. R
 
 ## Runtime verification
 
-Build, lint, 10 unit tests and all 32 browser tests passed. Browser captures reported no uncaught page errors. Coverage includes world selection without navigation, persistence, real image loading, missing-scenery fallback, transparent HoloBook CSS, reading/resume, pointer/touch drag, one-time hint, separate quizzes, rewards, parent activity and axe WCAG A/AA checks.
+Build, lint, 10 unit tests and all 39 browser tests passed after the dialogue and gesture update. Browser captures reported no uncaught page errors. Coverage includes world selection without navigation, persistence, real image loading, missing-scenery fallback, transparent HoloBook CSS, reading/resume, pointer/touch drag, one-time hint, separate quizzes, rewards, parent activity and axe WCAG A/AA checks.
 
 The optional shared preview relay remains unavailable; no shared live preview or deployment is claimed. Verification used the running Vite app directly in executor Chromium at loopback port 4173. Tracked screenshots make the result reviewable without a shared relay. Windows checkouts need to pull `main` to receive these files.
+
+## Follow-up: gestures, holograms and dialogue scenes
+
+The next user request extends held dragging to every world, asks for HoloBook content to materialize on glass, and requires illustrations at all main conversations. ClassicBook, ForestBook and IceBook now share the existing curved-paper renderer. HoloBook has a separate decorative reveal layer: the glass stays still while a cyan scan reveals the next page with blur resolving to sharp text. Its progress follows the held pointer, reverses on a short release and commits only after settling. Both renderers retain cancellation, resize cleanup, reduced-motion support and the same saved progress owner.
+
+Twelve new optimized watercolor scenes illustrate letter-writing, advice, teamwork, encouragement and gratitude. Six or seven of each story's eight pages now contain context-specific art, including every quoted conversation. Connected closing/encouragement passages intentionally reuse two scenes. Art alternates across leaves and before/after text; illustrations are larger to make expressions visible. Recaps use matching scenes where available. Original text remains exactly once, checked by unit tests.
+
+Latest browser evidence, opened and visually reviewed:
+
+- [HoloBook illustrated conversation](docs/visual-review/holo-dialogue.webp).
+- [Hologram midway through appearing](docs/visual-review/hologram-reveal.webp).
+- [ForestBook midway through physical turning](docs/visual-review/forest-paper-turn.webp).
+- [IceBook conversation on mobile](docs/visual-review/ice-dialogue-mobile.webp).
+
+Captures use 1440 × 1000/1050 desktop and 390 × 1000 mobile, DPR 1, actual Chromium. Raw captures are in `/tmp/iqro-dialogue-review/`. The final reader captures show legible text on material surfaces, clear scene actions and unobstructed navigation. No outstanding P0/P1/P2 visual issue was identified in this update's scope.
+
+Seven new browser tests cover mouse drag/short-release/backward navigation at mobile and desktop widths, touch navigation in all three added worlds, and vertical scrolling without an accidental page change. Existing all-story checks now advance the browser clock through every animation; the resume flow waits for the requested page to finish opening before exiting. This preserves the rule that leaving during an incomplete transition keeps the last fully opened page. Final production build, lint, 10 unit tests and 39 browser tests passed.
 
 final result: passed

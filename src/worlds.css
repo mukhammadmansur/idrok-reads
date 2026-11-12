@@ -469,3 +469,62 @@
     padding: 14px;
   }
 }
+
+/* Every world follows horizontal pointer gestures. Vertical movement stays native. */
+.reader .book-stage {
+  cursor: grab;
+}
+.reader .book-stage.is-dragging {
+  cursor: grabbing;
+}
+.reader .book-stage :is(.page-art, .page-text) {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.reader .book-stage img {
+  -webkit-user-drag: none;
+}
+.world-transition {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: inherit;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.hologram-reveal::after {
+  content: "";
+  position: absolute;
+  top: var(--scan-position, 0%);
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #d5fbff;
+  box-shadow: 0 0 14px 4px #6ce1ffb3;
+}
+.reader.theme-holo .reader-leaf p {
+  text-shadow: 0 0 12px #91eaff38;
+}
+.reader.theme-holo .inline-scene img {
+  filter: drop-shadow(0 0 8px #74dfff38);
+}
+@media (max-width: 600px) {
+  .world-transition {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+}
+/* Dialogue art is large enough to read expressions and gestures. */
+.reader .inline-scene img {
+  height: 230px;
+  max-height: 240px;
+}
+@media (max-width: 600px) {
+  .reader .inline-scene img {
+    height: 190px;
+    max-height: 200px;
+  }
+}

@@ -1,6 +1,6 @@
 # Environment artwork and story scenes
 
-These assets were generated with Image Gen for this project on 2026-11-12 and encoded with FFmpeg as WebP (environment quality 86; story scenes quality 88; compression level 6). They are local files with no runtime image API, external service or credentials.
+These assets were generated with Image Gen for this project on 2026-11-12 and encoded with FFmpeg as WebP (environment quality 86; earlier story scenes quality 88; dialogue scenes quality 87; compression level 6). They are local files with no runtime image API, external service or credentials.
 
 | Production asset | Use | Art direction / context |
 | --- | --- | --- |
@@ -17,3 +17,15 @@ The four environment files total approximately 1 MiB. The active nonclassic envi
 The original authored SVG covers remain in use for discovery and opening illustrations. Editorial placement is specified in `src/data/stories.ts`; block types live in `src/data/types.ts`. Do not replace missing illustration blocks with repeated covers. Text-only pages are intentional.
 
 The earlier decorative frame assets and review captures are retained under `docs/visual-review/archive/` for design history. They are no longer shipped from `public/` or used in the interface.
+
+## Dialogue illustrations
+
+Twelve additional scenes were generated as three 2×2 illustration sheets with consistent characters within each story, cropped into individual local WebP assets with FFmpeg. The generated source sheets remain outside the repository in `/workspace/generated_images/`. The optimized production crops total approximately 1.4 MiB.
+
+| Assets under `public/art/` | Story moments |
+| --- | --- |
+| `moon-letter.webp`, `moon-tree.webp`, `moon-owl.webp`, `moon-gathering.webp` | Writing the friendship letter, tree attempt, owl's advice and friends gathering around the grounded lantern. |
+| `cloud-folding.webp`, `cloud-sail.webp`, `cloud-passenger.webp`, `cloud-goodbye.webp` | Folding with grandfather, leaf-sail advice, first passenger and sunset farewell. |
+| `sea-meeting.webp`, `sea-courage.webp`, `sea-lights.webp`, `sea-song.webp` | Meeting Marvarid, encouragement, glowing fish and the grateful goodbye/song. |
+
+All main quoted dialogue pages have illustrations. The gathering and courage scenes span two connected dialogue pages each; descriptive alt text matches the current passage. No story sentence is removed or duplicated. Recap scenes now use corresponding scene artwork when available.

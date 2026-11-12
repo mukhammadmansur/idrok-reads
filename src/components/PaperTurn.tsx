@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, type RefObject } from "react";
+import type { PaperDragRef } from "../lib/usePaperDrag";
 import type { Story } from "../data/types";
 import { paperGeometry, PAPER_STRIPS, PAPER_TURN_MS } from "../lib/paper-turn";
 import { PageArtwork, PageText } from "./StoryPageContent";
@@ -27,12 +28,14 @@ export default function PaperTurn({
   target,
   direction,
   onComplete,
+  gesture,
 }: {
   source: RefObject<HTMLElement | null>;
   story: Story;
   target: number;
   direction: -1 | 1;
-  onComplete: () => void;
+  onComplete: (commit: boolean) => void;
+  gesture?: PaperDragRef;
 }) {
   const template = useRef<HTMLDivElement>(null);
   const visual = useRef<HTMLDivElement>(null);
@@ -41,7 +44,7 @@ export default function PaperTurn({
     const next = template.current;
     const host = visual.current;
     if (!current || !next || !host) {
-      onComplete();
+      onComplete(!gesture || !!gesture.current?.commit);
       return;
     }
     const width = current.clientWidth;
@@ -123,16 +126,41 @@ export default function PaperTurn({
     let frame = 0;
     let finished = false;
     let started: number | undefined;
-    const complete = () => {
+    let releaseStarted: number | undefined;
+    let releaseFrom = 0;
+    let releaseTo = 1;
+    const complete = (commit = true) => {
       if (finished) return;
       finished = true;
       cancelAnimationFrame(frame);
-      onComplete();
+      onComplete(commit);
     };
     const draw = (time: number) => {
       if (finished) return;
       started ??= time;
-      const progress = Math.min(1, (time - started) / PAPER_TURN_MS);
+      let progress = Math.min(1, (time - started) / PAPER_TURN_MS);
+      let settled = progress >= 1;
+      if (gesture?.current) {
+        const motion = gesture.current;
+        progress = motion.progress;
+        settled = false;
+        if (motion.released) {
+          if (releaseStarted === undefined) {
+            releaseStarted = time;
+            releaseFrom = progress;
+            releaseTo = motion.commit ? 1 : 0;
+          }
+          const duration = Math.max(
+            220,
+            Math.abs(releaseTo - releaseFrom) * PAPER_TURN_MS,
+          );
+          const elapsed = Math.min(1, (time - releaseStarted) / duration);
+          progress =
+            releaseFrom +
+            (releaseTo - releaseFrom) * (1 - Math.pow(1 - elapsed, 2));
+          settled = elapsed >= 1;
+        }
+      }
       const geometry = paperGeometry(progress, leafWidth, portrait && backward);
       const hinge = portrait ? 0 : width / 2;
       geometry.forEach((part, index) => {
@@ -153,25 +181,26 @@ export default function PaperTurn({
       });
       shadow.style.opacity = String(Math.sin(Math.PI * progress) * 0.28);
       shadow.style.transform = `translateX(${(backward ? -1 : 1) * Math.cos(Math.PI * progress) * leafWidth * 0.25}px)`;
-      if (progress < 1) frame = requestAnimationFrame(draw);
-      else complete();
+      if (!settled) frame = requestAnimationFrame(draw);
+      else complete(!gesture || !!gesture.current?.commit);
     };
     // No timers or global render loops: the renderer exists only during a turn.
     frame = requestAnimationFrame(draw);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const motionChange = () => {
-      if (reduced.matches) complete();
+      if (reduced.matches) complete(!gesture || !!gesture.current?.commit);
     };
     reduced.addEventListener("change", motionChange);
-    window.addEventListener("resize", complete, { once: true });
+    const resize = () => complete(!gesture || !!gesture.current?.commit);
+    window.addEventListener("resize", resize, { once: true });
     return () => {
       finished = true;
       cancelAnimationFrame(frame);
       reduced.removeEventListener("change", motionChange);
-      window.removeEventListener("resize", complete);
+      window.removeEventListener("resize", resize);
       host.replaceChildren();
     };
-  }, [source, story, target, direction, onComplete]);
+  }, [source, story, target, direction, onComplete, gesture]);
   return (
     <div
       className={`paper-turn paper-turn-${direction === 1 ? "next" : "previous"}`}

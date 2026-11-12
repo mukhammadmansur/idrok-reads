@@ -1,7 +1,7 @@
 // A paper leaf is a connected ribbon of narrow 3D strips. The changing tangent
 // bends the sheet while preserving the width of each strip (no scale-to-zero).
 export const PAPER_STRIPS = 16;
-export const PAPER_TURN_MS = 860;
+export const PAPER_TURN_MS = 1250;
 export function paperGeometry(
   progress: number,
   width: number,

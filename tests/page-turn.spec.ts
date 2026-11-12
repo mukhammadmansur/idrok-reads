@@ -36,13 +36,13 @@ for (const width of [390, 1440])
     ).toBe(0);
     // Inputs during a turn must never skip pages or award completion.
     await page.keyboard.press("ArrowRight");
-    await page.clock.runFor(600);
+    await page.clock.runFor(1000);
     await expect(page.locator(".page-number")).toHaveText("2");
     await expect(page.locator(".paper-turn")).toHaveCount(0);
     await page.getByRole("button", { name: "Oldingi", exact: true }).click();
     await page.clock.runFor(400);
     await expect(page.locator(".paper-turn-previous")).toBeAttached();
-    await page.clock.runFor(600);
+    await page.clock.runFor(1000);
     await expect(page.locator(".page-number")).toHaveText("1");
     expect(
       await page.evaluate(
@@ -59,7 +59,7 @@ test("paper corners and swipe use the same renderer; vertical scrolling does not
   await page
     .getByRole("button", { name: "Keyingi sahifani varaqlash" })
     .click();
-  await page.clock.runFor(1000);
+  await page.clock.runFor(1500);
   await expect(page.locator(".page-number")).toHaveText("2");
   const swipe = async (x: number, y: number) => {
     await page.locator(".book-page").evaluate(
@@ -94,7 +94,7 @@ test("paper corners and swipe use the same renderer; vertical scrolling does not
   await expect(page.locator(".page-number")).toHaveText("2");
   await swipe(100, 310);
   await expect(page.locator(".paper-turn-next")).toBeAttached();
-  await page.clock.runFor(1000);
+  await page.clock.runFor(1500);
   await expect(page.locator(".page-number")).toHaveText("3");
 });
 test("reduced motion, resize and leaving mid-turn never trap navigation", async ({

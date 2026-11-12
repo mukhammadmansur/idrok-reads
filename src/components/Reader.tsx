@@ -17,6 +17,8 @@ import { completeStory, recordPage } from "../lib/progress";
 import { PageArtwork, PageText } from "./StoryPageContent";
 import PaperTurn from "./PaperTurn";
 import Recap from "./Recap";
+import PageTurnHint from "./PageTurnHint";
+import { usePaperDrag } from "../lib/usePaperDrag";
 export default function Reader({
   story,
   completed = false,
@@ -30,12 +32,14 @@ export default function Reader({
   );
   const [showThemes, setShowThemes] = useState(false);
   const [large, setLarge] = useState(false);
+  const [hintDismissed, setHintDismissed] = useState(false);
   const touch = useRef<{ x: number; y: number } | null>(null);
   const surface = useRef<HTMLElement>(null);
   const turnLock = useRef(false);
   const [turn, setTurn] = useState<{
     target: number;
     direction: -1 | 1;
+    dragging?: boolean;
   } | null>(null);
   const theme = progress.theme;
   useEffect(() => {
@@ -44,6 +48,7 @@ export default function Reader({
   const changePage = useCallback(
     (direction: number) => {
       if (turnLock.current || completed) return;
+      setHintDismissed(true);
       const target = Math.max(
         0,
         Math.min(story.pages.length - 1, page + direction),
@@ -59,12 +64,32 @@ export default function Reader({
     },
     [page, story.pages.length, theme, completed],
   );
-  const finishTurn = useCallback(() => {
-    if (!turn) return;
-    turnLock.current = false;
-    setPage(turn.target);
-    setTurn(null);
-  }, [turn]);
+  const startDrag = useCallback(
+    (direction: -1 | 1) => {
+      if (turnLock.current || completed) return false;
+      const target = page + direction;
+      if (target < 0 || target >= story.pages.length) return false;
+      turnLock.current = true;
+      setTurn({ target, direction, dragging: true });
+      return true;
+    },
+    [page, completed, story.pages.length],
+  );
+  const drag = usePaperDrag({
+    enabled: theme === "classic" && !completed,
+    onStart: startDrag,
+    onInstantTurn: changePage,
+    onInteract: () => setHintDismissed(true),
+  });
+  const finishTurn = useCallback(
+    (commit: boolean) => {
+      if (!turn) return;
+      turnLock.current = false;
+      if (commit) setPage(turn.target);
+      setTurn(null);
+    },
+    [turn],
+  );
   useEffect(() => {
     if (completed) return;
     const key = (e: KeyboardEvent) => {
@@ -202,12 +227,19 @@ export default function Reader({
         {themes.find((t) => t.id === theme)?.symbol}{" "}
         {themes.find((t) => t.id === theme)?.name}
       </div>
-      <div className={`book-stage ${turn ? "is-turning" : ""}`}>
+      <div
+        className={`book-stage ${turn ? "is-turning" : ""} ${turn?.dragging ? "is-dragging" : ""}`}
+        {...drag.handlers}
+        onDragStart={(event) => {
+          if (theme === "classic") event.preventDefault();
+        }}
+      >
         <article
           ref={surface}
           className="book-page"
           aria-busy={!!turn}
           onTouchStart={(e) => {
+            if (drag.pointerActive()) return;
             if (e.touches.length === 1)
               touch.current = {
                 x: e.touches[0].clientX,
@@ -250,12 +282,17 @@ export default function Reader({
             </>
           )}
         </article>
+        {theme === "classic" &&
+          !hintDismissed &&
+          !turn &&
+          page < story.pages.length - 1 && <PageTurnHint />}
         {turn && (
           <PaperTurn
             source={surface}
             story={story}
             target={turn.target}
             direction={turn.direction}
+            gesture={turn.dragging ? drag.motion : undefined}
             onComplete={finishTurn}
           />
         )}

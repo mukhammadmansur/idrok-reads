@@ -3824,3 +3824,131 @@ progress::-moz-progress-bar {
     min-height: 0;
   }
 }
+
+.theme-classic .book-stage {
+  cursor: grab;
+}
+.theme-classic .book-stage.is-dragging {
+  cursor: grabbing;
+}
+.theme-classic .book-stage :is(.page-art, .page-text) {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.theme-classic .book-stage img {
+  -webkit-user-drag: none;
+}
+.page-drag-hint {
+  position: absolute;
+  right: 12%;
+  bottom: 70px;
+  width: 190px;
+  height: 100px;
+  z-index: 6;
+  pointer-events: none;
+  color: #42533a;
+}
+.hint-hand {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  display: block;
+  filter: drop-shadow(0 3px 5px #483c2b30);
+  animation: demonstrate-page-drag 3.4s 0.35s both;
+}
+.hint-hand svg {
+  fill: #fff8e9;
+}
+.hint-touch {
+  position: absolute;
+  left: 8px;
+  top: -8px;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #a58b55;
+  border-radius: 50%;
+  animation: demonstrate-page-touch 3.4s 0.35s both;
+}
+.hint-trail {
+  position: absolute;
+  left: 15px;
+  right: 30px;
+  top: 28px;
+  border-top: 1px dashed #9e946a;
+  animation: demonstrate-page-trail 3.4s 0.35s both;
+}
+.hint-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  border: 1px solid #ded5bf;
+  border-radius: 6px;
+  padding: 7px 10px;
+  background: #faf6e9ed;
+  font-size: 10px;
+  line-height: 1.4;
+  animation: demonstrate-page-trail 3.4s 0.35s both;
+}
+@keyframes demonstrate-page-drag {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateX(0) rotate(-8deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translateX(0) rotate(-8deg) scale(0.92);
+  }
+  65%,
+  78% {
+    opacity: 1;
+    transform: translateX(-125px) translateY(-8px) rotate(-18deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-135px) translateY(-8px) rotate(-18deg);
+  }
+}
+@keyframes demonstrate-page-touch {
+  0%,
+  12% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  22%,
+  55% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+@keyframes demonstrate-page-trail {
+  0%,
+  8%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  78% {
+    opacity: 1;
+  }
+}
+@media (max-width: 600px) {
+  .page-drag-hint {
+    right: 8%;
+    bottom: 62px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-drag-hint {
+    opacity: 1;
+  }
+  .hint-touch,
+  .hint-trail {
+    display: none;
+  }
+}

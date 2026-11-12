@@ -5,7 +5,7 @@ const worldAssets: Record<ThemeId, string> = {
   classic: "/worlds/classic.webp",
   forest: "/worlds/forest.webp",
   ice: "/worlds/ice-garden.webp",
-  holo: "/worlds/holo-spaceport.webp",
+  holo: "/worlds/holo-city.webp",
 };
 export const worldImage = (theme: ThemeId) => worldAssets[theme];
 export function ThemeGlyph({

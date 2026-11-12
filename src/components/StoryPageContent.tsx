@@ -25,6 +25,7 @@ function StoryLeaf({
   decorative?: boolean;
 }) {
   const blocks = story.pages[page].leaves[side];
+  const narration = blocks.some((block) => block.type === "text");
   const legacy =
     side === 0
       ? decorative
@@ -35,21 +36,12 @@ function StoryLeaf({
         : "page-text";
   return (
     <div
-      className={`${legacy} reader-leaf leaf-${side === 0 ? "left" : "right"} ${page === 0 ? "opening-leaf" : ""}`}
+      className={`${legacy} reader-leaf leaf-${side === 0 ? "left" : "right"} ${narration ? "narration-leaf" : "illustration-leaf"} ${page === 0 ? "opening-leaf" : ""}`}
       data-leaf={side === 0 ? "left" : "right"}
     >
-      <span className="chapter-label">
-        {side === 0
-          ? "IQRO ORIGINAL HIKOYA"
-          : page === 0
-            ? "BIR BOR EKAN..."
-            : page === story.pages.length - 1
-              ? "VA SHUNDAY QILIB..."
-              : "SARGUZASHT DAVOM ETADI"}
-      </span>
       <div
         className="leaf-content"
-        aria-live={!decorative && side === 1 ? "polite" : undefined}
+        aria-live={!decorative && narration ? "polite" : undefined}
       >
         {blocks.map((block, i) => (
           <ContentBlock key={`${page}-${side}-${i}`} block={block} />

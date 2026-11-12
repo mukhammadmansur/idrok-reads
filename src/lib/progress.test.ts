@@ -66,6 +66,12 @@ describe("structured story leaves", () => {
           .map((b) => ("text" in b ? b.text : ""))
           .join(" ");
         expect(normalize(text)).toBe(normalize(page.text));
+        const passages = page.leaves.flat().filter((b) => b.type === "text");
+        expect(
+          passages,
+          "One complete passage gives a single clear reading order",
+        ).toHaveLength(1);
+        expect("text" in passages[0] && passages[0].text).toBe(page.text);
       }
   });
   it("illustrates every main dialogue with story-specific scenes", () => {

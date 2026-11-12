@@ -143,7 +143,7 @@ for (const width of [320, 390, 768, 1024, 1440])
       await expect(page.locator(".reader")).toHaveClass(
         new RegExp(`theme-${theme}`),
       );
-      await expect(page.locator(".page-text p")).toBeVisible();
+      await expect(page.locator(".live-book .narration-leaf p")).toBeVisible();
       await noOverflow(page);
       await page.getByRole("button", { name: "Keyingi", exact: true }).click();
       await expect(page.locator(".page-number")).not.toHaveText("1");
@@ -239,7 +239,7 @@ test("keyboard navigation, swipe and reduced motion work", async ({ page }) => {
   await expect(page.locator(".page-number")).toHaveText("2");
   expect(
     await page
-      .locator(".page-text p")
+      .locator(".live-book .narration-leaf p")
       .evaluate((e) => getComputedStyle(e).animationName),
   ).toBe("none");
 });

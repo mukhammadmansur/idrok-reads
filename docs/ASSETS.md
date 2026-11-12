@@ -7,7 +7,7 @@ These assets were generated with Image Gen for this project on 2026-11-12 and en
 | `public/worlds/classic.webp` | ClassicBook selection thumbnail | Sunny reading nook, wooden desk and illustrated book. The ClassicBook reading canvas stays calm. |
 | `public/worlds/forest.webp` | ForestBook environment and thumbnail | Deep enchanted woodland, real bark, climbing ivy, fireflies and a wooden reading table. |
 | `public/worlds/ice-garden.webp` | IceBook environment and thumbnail | Enchanted snow garden: frosted birches, crystal flowers, a translucent ice path and a warmly lit crystal arch. |
-| `public/worlds/holo-spaceport.webp` | HoloBook environment and thumbnail | Cyberpunk alien metropolis: neon towers, skybridges, a flying exploration ship and a friendly alien on a glass observation deck. |
+| `public/worlds/holo-city.webp` | HoloBook environment and thumbnail | Unoccupied cyberpunk spaceport: neon towers, skybridges, flying exploration ships and an empty glass observation deck. The alien character was removed at the founder’s request. |
 | `public/art/moon-paper-plane.webp` | Oyga maktub, logical page 4 | Timo and Lola making a paper airplane. |
 | `public/art/cloud-ant-rescue.webp` | Bulutlar kemasi, logical page 6 | A paper boat with a leaf sail rescuing the ant. |
 | `public/art/sea-friends.webp` | Dengizning kichik siri, logical page 6 | Nuri and Marvarid waiting safely beside a rock. |
@@ -37,3 +37,15 @@ The founder rejected the original ice-palace and orbital-observatory pictures. T
 ## Founder clarification: future means science fiction
 
 The founder clarified that Kelajak means alien civilizations, cyberpunk cities and spaceships, supported by their supplied futuristic image-search reference. `holo-spaceport.webp` is new Image Gen artwork in that direction; the superseded fairy glass garden is now archived outside `public/`. The HoloBook reader remains transparent glass with its existing reveal animation. The new asset name also avoids stale browser images. Ice, Forest and Classic production artwork is unchanged by this clarification.
+
+## Original picture-book scenes
+
+The founder supplied printed picture-book pages as inspiration and explicitly asked not to copy them. Twelve new Image Gen watercolor/gouache scenes use soft ivory vignette edges and expressive characters. Three consistent four-scene sheets were inspected and cropped with FFmpeg into 627×627 WebP files (quality 87, compression 6). They render around 354 px desktop / 224 px mobile. Generated PNG originals remain outside the repository in `/workspace/generated_images/`.
+
+| New files under `public/art/` | Story moments |
+| --- | --- |
+| `picture-moon-opening.webp`, `picture-moon-lantern.webp`, `picture-moon-gathering.webp`, `picture-moon-owl.webp` | Moon watching, safe ground lantern, reading the letter together, owl’s advice. |
+| `picture-cloud-opening.webp`, `picture-cloud-puddle.webp`, `picture-cloud-wind.webp`, `picture-cloud-goodbye.webp` | Zara at the window, first puddle attempt, moving leaf-sail boat, sunset farewell. |
+| `picture-sea-opening.webp`, `picture-sea-meeting.webp`, `picture-sea-lights.webp`, `picture-sea-home.webp` | Shallow sea, turtle meeting, glowing fish, returning home. |
+
+`holo-city.webp` is an Image Gen edit removing the alien character from the prior spaceport and reconstructing the empty deck. The city and spacecraft remain. The old character-bearing image is archived at `docs/visual-review/archive/worlds/holo-spaceport-with-alien.webp`. New production filenames avoid stale browser images.

@@ -138,7 +138,7 @@ test("turning leaves retain the live book material, typography and size", async 
   await page.clock.install();
   const appearance = (leaf: Element) => {
     const style = getComputedStyle(leaf),
-      text = getComputedStyle(leaf.querySelector("p")!);
+      text = getComputedStyle(leaf.querySelector("p") ?? leaf);
     return {
       background: style.backgroundColor,
       padding: style.padding,

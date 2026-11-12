@@ -97,8 +97,8 @@ for (const [id, name] of themes)
     }
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
     await expect(page.locator(".book-page .inline-scene")).toHaveCount(1);
-    await expect(page.locator(".live-book .leaf-left p")).toBeVisible();
-    await expect(page.locator(".live-book .leaf-right p")).toBeVisible();
+    await expect(page.locator(".live-book p")).toHaveCount(1);
+    await expect(page.locator(".live-book .narration-leaf p")).toBeVisible();
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
     await expect(

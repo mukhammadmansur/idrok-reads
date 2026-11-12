@@ -1,55 +1,52 @@
-# Reading comfort QA — 2026-11-12
+# Picture-book composition QA — 2026-11-12
 
-## Request and evidence
+## Source target and evidence
 
-Target: the founder's attached HoloBook details screenshot, plus current start/read/finish behavior. Requested changes: clearer details and completion flows, softer backgrounds in all four worlds, pleasant transitions and illustration motion, simpler stories and animal names, YouTube links, a stable book size and consistent appearance during page turns. This is a focused improvement of the existing codebase rather than a pixel clone.
+The founder supplied the previous HoloBook screenshot plus collages/close-ups of printed children's books. They explicitly requested inspiration rather than copying: large illustrations, natural pages and a clear starting point for reading. The references are visible in the conversation but are not mounted as local files. Original generated visual sources for this adaptation are public/art/picture-cloud-opening.webp (627×627), corresponding moon/sea scenes, and public/worlds/holo-city.webp.
 
-Actual Chromium captured the baseline before edits and the final implementation. Desktop viewport 1440 × 1050; mobile 390 × 1000; DPR 1. Accepted screenshots were opened and inspected before inclusion. Two comparison boards were opened as combined evidence after capture:
+- [Before/after comparison](docs/visual-review/picturebook-comparison.webp).
+- [Source illustration and focused rendered spread](docs/visual-review/picturebook-art-layout.webp).
+- [ClassicBook](docs/visual-review/picturebook-classic.webp), [HoloBook](docs/visual-review/picturebook-holo.webp), [mobile reading](docs/visual-review/picturebook-mobile.webp).
+- Raw captures: /tmp/iqro-picturebook-review/.
 
-- [Before/after start and completion flow](docs/visual-review/comfort-flow.webp).
-- [All four final reader worlds](docs/visual-review/comfort-worlds.webp).
-- [Mobile book invitation](docs/visual-review/comfort-mobile.webp).
-- Full numbered baseline and final screenshot set: `/tmp/iqro-comfort-review/`.
+The old and new application captures show the same story (Bulutlar kemasi), page one and theme at 1440×1050 CSS pixels, DPR 1. A temporary snapshot of the prior commit supplied the old view on port 4181; the new view uses port 4173. Mobile is 390×1000, DPR 1. No device/browser frame is included. The full comparison scales both views proportionally to equal widths. A second combined input places the 627 px source illustration beside the actual book crop so art quality and body text can be inspected clearly. Both boards were opened and reviewed together. This is an original adaptation of picture-book principles, not a pixel clone of the supplied printed books.
 
-The original attached screenshot remains in the conversation. Full flow findings and setup instructions are in [the reading comfort review](docs/READING_COMFORT.md).
+## Findings and fixes
 
-## Findings resolved
+- P1: automatic sentence splitting created competing reading blocks and could split a quotation at the spine. Every page now contains one complete passage in one reading area; narration and picture change sides between scenes. Tests verify the exact full passage, once, on all 24 pages.
+- P1: small repeated covers, chapter chips and rounded dark text panels made the book look like a dashboard. They are removed from the reading leaves. The opening is a natural "Bir bor ekan..." with a large original scene. HoloBook retains glass, with narration written directly on a darker glass leaf.
+- P2: weak illustration scale and missing scenes. Twelve original watercolor/gouache scenes replace the small openings and fill missing moments. All published pages are illustrated. Images render about 354 px high on desktop and 224 px on mobile, with paper blending or a soft glass vignette.
+- P2: unwanted alien in the futuristic environment. Image Gen removed it and reconstructed the deck, preserving the neon city and spacecraft. Both card and scenery use the new holo-city.webp filename.
+- P2: scenery movement was too subtle. Active environments now pan/zoom on a 16-second alternating cycle; inactive layers pause. City light breathes slowly. Browser tests observe the transform actually changing and then verify reduced motion disables it.
+- Regression tests that assumed text always belonged to the right leaf were updated to target the narration leaf. Navigation behavior and expected progress were not weakened.
 
-- P1: page height changed by up to 129 px in the captured desktop baseline. Distinct React keys prevent stale extra leaves, and inert measurement spreads reserve one height for all pages. Every tested page has exactly two live leaves. Width/large-text changes recalculate the reserved height without clipping content.
-- P1: next-book actions were below the video. Library/replay/rewards actions now precede media; completed details explicitly explain video/replay. Replay starts at page one and preserves the existing completion badge/date.
-- P2: oversize cover, long text and repeated opening copy made details harder to follow. A compact cover, short description and one invitation establish an obvious action. In-progress and completed states remain distinct.
-- P2: live and turning surfaces used different backgrounds/layout boxes. Paper/forest/ice share surface tokens and leaf dimensions in the live book, preview and curved strips. HoloBook keeps stationary glass with a content reveal. Browser checks compare background, padding, paragraph font/size/line-height and book height before/during/after turning.
-- P2: backgrounds competed with reading content. Forest is softened/desaturated; Holo is darker and softened; ice stays light; classic has a faint warm reading-nook environment. Retained layers crossfade over 1.25 seconds, avoiding an abrupt image replacement.
-- P2: low-contrast secondary replay text found during visual review and axe checks. Bound the secondary button to the active surface/ink palette; post-fix contrast checks pass in all four worlds.
+The final full and focused comparison found no remaining actionable P0/P1/P2 issue in this scope. The existing brief hand demonstration remains once per browser. Minor illustration-edge refinement can be future polish.
 
-## Required review surfaces
+## Required fidelity surfaces
 
-- Typography and copy: short concrete Uzbek sentences; child-friendly Tulkixon, Quyonvoy, Boyo‘g‘li bobo, Kitvoy and Toshbaqacha names in story/discovery/alt/quiz copy. Current story text appears exactly once across the two leaves. IDs and quiz answer indices stay stable.
-- Layout: desktop spread/mobile stacked leaves preserve one size across each story, including large text. The reader remains one engine. Details and completion keep obvious primary and replay actions.
-- Materials/images: existing real environment and illustration assets remain. Live and animated paper surfaces match; Holo stays translucent. No new external image dependency was added.
-- Motion: scenery crossfade/breathing, drifting ambient motes, restrained illustration movement, content entrance, cover interaction and completion-medal entrance. Reduced motion disables decorative movement and transitions. No forced audio or forced quiz is introduced.
-- Accessibility: hidden measurement copies are inert and aria-hidden. Existing keyboard, pointer, touch, storage/failure recovery and independent quiz behavior remain covered. Automated WCAG A/AA rules pass for tested states; this is not a claim of complete accessibility compliance or child-user research.
+Typography: Georgia at 26 px / 1.7 desktop and 21 px / 1.65 mobile supports print-like reading; large type remains available. Holo uses system sans at 25 px with a serif opening heading. Paragraphs wrap in one column, with complete quotations and no competing reading order.
+
+Layout: two physical leaves retain the existing turning engine and stable measured height. Large art, calm whitespace and a single narration block follow the reference principles. Caption/chapter UI no longer competes with story content. Tests check no clipping at 320, 390 and 1440 px, including large text.
+
+Colors: Classic/Forest/Ice retain their paper materials. Holo keeps transparent glass and readable white narration on a darker leaf. Automated WCAG A/AA checks pass for the tested themes and completion states.
+
+Images: original generated raster art, not reference-book copies or code-drawn substitutes. New 627×627 WebP files are sharp at the intended render size. Paper blending and the holographic edge mask were inspected at focused and full sizes. Discovery covers remain outside the reading content.
+
+Copy: simplified Uzbek passages, character names, quiz answers and story IDs are preserved. Each passage appears exactly once. Hidden measurement copies stay inert and aria-hidden; only live narration announces the page.
 
 ## Validation and limits
 
-Production build and lint passed; 12 unit tests passed. Browser coverage is 45 scenarios: 44 passed in the final full run, and the remaining material-consistency scenario passed on a focused rerun after correcting its start/resume button selector. Application code was unchanged by that test-only correction. New coverage checks every story/page/theme at 320, 390 and 1440 px, large-text fitting, exactly two live leaves, no height drift/content clipping, completed details/replay, click-to-load media/fallback and live/animated material consistency.
+Build, lint and 12 unit tests passed. Browser coverage is 48 scenarios: 42 passed in the complete run; the six right-leaf-dependent selectors were corrected and all six passed on the focused rerun. Application code did not change after that full run. Coverage includes every page's full passage and loaded large art, stable dimensions, large type, material consistency, keyboard/touch/held drag, reduced motion, moving backgrounds, quizzes and completion/replay/media integration. Responsive checks also cover 768 and 1024 px. Final captures reported no uncaught page errors.
 
-YouTube link parsing and iframe integration are verified using controlled browser fixtures. Three demo films are labeled as related viewing, not original story recaps. A direct YouTube link stays available. Actual external playback is unverified because the cloud network returns 403 for YouTube; uploader/region embedding restrictions also remain external. No production deployment or shared-preview publication was performed. Browser verification used the local running Vite application.
+No deployment or hosted preview is claimed. Actual executor Chromium rendered the local Vite application. The optional managed preview relay remains unavailable. YouTube retains its previously documented external-network verification limit; this update does not alter video integration.
 
-No outstanding P0/P1/P2 implementation or visual issue was identified in the requested scope. Live third-party media playback remains the stated verification limit.
+## Implementation checklist
 
-## Latest revision: replace the rejected IceBook and HoloBook artwork
-
-The founder rejected the actual ice-palace and giant-planet pictures. New Image Gen artwork now replaces both production sources: `public/worlds/ice-garden.webp` and `public/worlds/holo-garden.webp`. Ice is a frosted storybook garden with birches, crystal flowers and an ice path; Holo is an iridescent glass garden and portal with no planet. The previous assets are archived outside `public/`. Both cards and full-page scenery share the new asset mapping. New filenames avoid showing the rejected files from browser caches.
-
-Reviewed source art at full composition, then actual Chromium card/reader captures at 1440 × 1050 and mobile 390 × 1000. [New cards and reader worlds](docs/visual-review/new-worlds.webp). Raw captures: `/tmp/iqro-new-worlds/`. Image crop and modest filtering were adjusted for the new compositions; contrast and reader controls remain clear. No page logic, story text or other world artwork was changed in this revision.
-
-Production build and lint passed, plus 9 targeted browser checks covering selection/persistence, theme changes, actual image loading, missing-image fallback, transparent glass and axe contrast across the four themes and completed-book states. Browser captures reported no uncaught page errors. Existing whole-reader verification above belongs to the preceding implementation; it was not rerun for this artwork-only revision.
-
-## Latest founder clarification: cyberpunk, aliens and spaceships
-
-The supplied sci-fi image-search reference and explicit founder clarification replace the garden interpretation of Kelajak. New production artwork `public/worlds/holo-spaceport.webp` depicts a neon alien city, flying exploration spacecraft, holographic navigation shapes and a friendly alien explorer on a glass deck. The previous glass garden is archived outside `public/`. Both thumbnail and full scenery use the new file. Transparent reader glass and its reveal animation remain intact; the other three worlds are unchanged.
-
-Source art and real Chromium captures at 1440 × 1050 and 390 × 1000 were opened and inspected. [Actual future reader](docs/visual-review/future-spaceport.webp) and [selection cards](docs/visual-review/future-spaceport-cards.webp). Raw screenshots: `/tmp/iqro-spaceport-review/`. Desktop framing visibly retains the alien at the left edge and the spacecraft at the upper-right, with clear text on glass. The image is a new sci-fi composition rather than a recolor of the rejected garden. Build, lint and 9 targeted world/theme/contrast browser tests passed for this revision.
+- [x] Alien removed from production artwork and selection mapping.
+- [x] Clearly moving backgrounds with reduced-motion support.
+- [x] One complete reading passage, never split between leaves.
+- [x] Large original illustrations and simplified book composition.
+- [x] Stable dimensions, physical turns, hologram reveal and saved progress retained.
+- [x] Combined visual comparisons opened and reviewed.
 
 final result: passed

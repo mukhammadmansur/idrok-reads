@@ -61,6 +61,18 @@ const scene = (
 const sceneArt: Record<string, StoryScene[]> = {
   "oy-dosti": [
     scene(
+      0,
+      "picture-moon-opening",
+      "Tulkixon maysali tepalikda Oyga qarab turibdi.",
+      0,
+    ),
+    scene(
+      5,
+      "picture-moon-lantern",
+      "Tulkixon va Quyonvoy chiroqni tepalikdagi yerga qo‘yishyapti.",
+      0,
+    ),
+    scene(
       1,
       "moon-letter",
       "Tulkixon deraza yonida Oyga do‘stlik maktubini yozyapti.",
@@ -81,26 +93,44 @@ const sceneArt: Record<string, StoryScene[]> = {
     ),
     scene(
       4,
-      "moon-owl",
+      "picture-moon-owl",
       "Boyo‘g‘li bobo Tulkixon va Quyonvoyga mehr ulashish haqida gapiryapti.",
       0,
       true,
     ),
     scene(
       6,
-      "moon-gathering",
+      "picture-moon-gathering",
       "Tulkixon maktubini o‘qiyapti, o‘rmon do‘stlari yerdagi chiroq atrofida tinglashyapti.",
       1,
     ),
     scene(
       7,
-      "moon-gathering",
+      "picture-moon-gathering",
       "Tulkixon, Quyonvoy va do‘stlari Oy nurida birga: endi hech kim yolg‘iz emas.",
       0,
       true,
     ),
   ],
   "bulut-kemasi": [
+    scene(
+      0,
+      "picture-cloud-opening",
+      "Zara deraza yonida kemaga o‘xshagan bulutni tomosha qilyapti.",
+      0,
+    ),
+    scene(
+      2,
+      "picture-cloud-puddle",
+      "Zara oq qog‘oz kemani hovlidagi ko‘lmakka qo‘yyapti.",
+      0,
+    ),
+    scene(
+      4,
+      "picture-cloud-wind",
+      "Shamol barg yelkanli kemani suryapti, Zara uni kuzatib yuribdi.",
+      0,
+    ),
     scene(
       1,
       "cloud-folding",
@@ -128,7 +158,7 @@ const sceneArt: Record<string, StoryScene[]> = {
     ),
     scene(
       7,
-      "cloud-goodbye",
+      "picture-cloud-goodbye",
       "Zara va bobosi kechki osmonda kemaga o‘xshagan bulutga qo‘l silkishyapti.",
       0,
       true,
@@ -136,8 +166,20 @@ const sceneArt: Record<string, StoryScene[]> = {
   ],
   "dengiz-siri": [
     scene(
+      0,
+      "picture-sea-opening",
+      "Kitvoy quyosh tushgan suvda marjonlar ustidan suzyapti.",
+      0,
+    ),
+    scene(
+      7,
+      "picture-sea-home",
+      "Kitvoy tanish marjonlar yonidagi uyiga xursand qaytyapti.",
+      0,
+    ),
+    scene(
       1,
-      "sea-meeting",
+      "picture-sea-meeting",
       "Kitvoy marjonlar yonida qo‘shiq aytayotgan Toshbaqacha bilan tanishyapti.",
       1,
     ),
@@ -156,7 +198,7 @@ const sceneArt: Record<string, StoryScene[]> = {
     ),
     scene(
       4,
-      "sea-lights",
+      "picture-sea-lights",
       "Kitvoy va Toshbaqacha yulduzlarga o‘xshab yaltiragan mayda baliqlarni tomosha qilishyapti.",
       0,
       true,
@@ -175,22 +217,6 @@ const sceneArt: Record<string, StoryScene[]> = {
     ),
   ],
 };
-function textLeaves(text: string): [ReadingBlock[], ReadingBlock[]] {
-  const sentences = text.match(/[^.!?]+[.!?]+[»”"]?|[^.!?]+$/gu) || [text];
-  let split = Math.ceil(sentences.length / 2);
-  if (sentences.length === 1) {
-    const words = text.split(" ");
-    split = Math.ceil(words.length / 2);
-    return [
-      [{ type: "text", text: words.slice(0, split).join(" ") }],
-      [{ type: "text", text: words.slice(split).join(" ") }],
-    ];
-  }
-  return [
-    [{ type: "text", text: sentences.slice(0, split).join("").trim() }],
-    [{ type: "text", text: sentences.slice(split).join("").trim() }],
-  ];
-}
 function makeStory(
   id: string,
   title: string,
@@ -217,28 +243,22 @@ function makeStory(
     themes: ["classic", "forest", "ice", "holo"],
     status: "published",
     pages: paragraphs.map((text, i) => {
-      const leaves = textLeaves(text);
-      let illustration: string | undefined;
-      if (i === 0) {
-        leaves[0] = [
-          { type: "heading", text: title },
-          { type: "caption", text: subtitle },
-          { type: "illustration", src: art(id), alt: subtitle },
-        ];
-        leaves[1] = [{ type: "text", text }];
-        illustration = art(id);
-      }
-      const pageScene = sceneArt[id]?.find((s) => i === s.page);
-      if (pageScene) {
-        const block: ReadingBlock = {
+      // A complete passage has one obvious place to read. Pictures can change
+      // sides, but a sentence or dialogue is never split across the spine.
+      const textSide: 0 | 1 = i % 3 === 1 ? 0 : 1;
+      const imageSide = textSide === 0 ? 1 : 0;
+      const leaves: [ReadingBlock[], ReadingBlock[]] = [[], []];
+      if (i === 0)
+        leaves[textSide].push({ type: "heading", text: "Bir bor ekan..." });
+      leaves[textSide].push({ type: "text", text });
+      const pageScene = sceneArt[id]?.find((scene) => scene.page === i);
+      const illustration = pageScene?.src;
+      if (pageScene)
+        leaves[imageSide].push({
           type: "illustration",
           src: pageScene.src,
           alt: pageScene.alt,
-        };
-        if (pageScene.before) leaves[pageScene.side].unshift(block);
-        else leaves[pageScene.side].push(block);
-        illustration = pageScene.src;
-      }
+        });
       return { text, leaves, illustration, scene: `${title}: ${i + 1}-sahifa` };
     }),
     recap: {

@@ -26,11 +26,6 @@ export default function HologramReveal({
       return;
     }
     const leaves = [...current.children] as HTMLElement[];
-    const oldMinHeight = current.style.minHeight;
-    current.style.setProperty(
-      "min-height",
-      `${Math.max(current.offsetHeight, next.scrollHeight)}px`,
-    );
     let frame = 0;
     let started: number | undefined;
     let releaseStarted: number | undefined;
@@ -81,7 +76,6 @@ export default function HologramReveal({
     return () => {
       finished = true;
       cancelAnimationFrame(frame);
-      current.style.setProperty("min-height", oldMinHeight);
       leaves.forEach((leaf) => {
         leaf.style.removeProperty("opacity");
         leaf.style.removeProperty("transform");

@@ -50,13 +50,19 @@ test("reading, resume, completion, recap and separate quiz survive refresh", asy
         ].completedAt,
     ),
   ).toBe(completedAt);
+  await page.route("**/www.youtube-nocookie.com/embed/**", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: "<html lang='en'><title>Test video</title><body>Player fixture</body></html>",
+    }),
+  );
   await page
-    .getByRole("button", { name: "Recap animatsiyani boshlash" })
+    .getByRole("button", { name: "Videoni ko‘rish", exact: true })
     .click();
-  await expect(
-    page.getByRole("button", { name: "To‘xtatish", exact: true }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "To‘xtatish", exact: true }).click();
+  await expect(page.locator(".youtube-stage iframe")).toHaveAttribute(
+    "src",
+    /youtube-nocookie.com\/embed\/aqz-KE-bpKQ/,
+  );
   await page.getByRole("link", { name: "Savol-javob", exact: true }).click();
   await page.getByRole("link", { name: /3 TA SAVOL Oyga maktub/ }).click();
   const answers = ["Oyga", "Qog‘oz samolyot", "Do‘stlarining yonida bo‘lishi"];

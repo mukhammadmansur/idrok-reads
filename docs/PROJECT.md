@@ -34,9 +34,12 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/components/Reader.tsx` | Shared reader engine, pointer navigation, completion |
 | `src/components/PaperTurn.tsx` | Curved physical leaves for ClassicBook, ForestBook and IceBook |
 | `src/components/HologramReveal.tsx` | Drag-controlled light reveal on the stationary HoloBook glass |
+| `src/components/BookSizing.tsx` | Measure all spreads at the active width/type size to keep book height fixed |
 | `src/components/StoryPageContent.tsx` | Shared leaf/block renderer for readable text and optional inline scenes |
 | `src/components/ThemeVisual.tsx` | Theme icons, world thumbnails, and shared environment backdrop |
-| `src/components/Recap.tsx` | Curated illustration animation and video fallback |
+| `src/components/Recap.tsx` | YouTube link player, direct fallback, and legacy local animation/video support |
+| `src/data/videos.ts` | Replaceable YouTube demo links, titles and credits |
+| `src/lib/youtube.ts` | Strict video-link parsing and controlled iframe URLs |
 | `src/components/Quiz.tsx` | Independent quiz library, answers, feedback, results, retries |
 | `src/components/Progress.tsx` | Milestones, story badges, local parent activity |
 | `src/components/ui.tsx` | Reusable story card, artwork fallback, empty state, section title |
@@ -46,6 +49,7 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/lib/context.tsx` | Local persistence and route subscription |
 | `src/styles.css` | Base components, responsive rules, and paper motion |
 | `src/themes.css` | Persisted application palettes and story leaf layout |
+| `src/comfort.css` | Soft scenery crossfades, subtle motion, stable reader geometry and clear start/finish screens |
 | `src/worlds.css` | Full environment scenery, material surfaces, world selection and responsive glass |
 | `public/worlds/` | Generated WebP environments and matching selection thumbnails |
 | `public/art/` | Original SVG covers and generated story scenes |

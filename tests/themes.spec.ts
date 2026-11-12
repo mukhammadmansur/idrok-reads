@@ -81,11 +81,13 @@ for (const [id, name] of themes)
       new RegExp(`theme-${id}`),
     );
     if (id !== "classic") {
-      await expect(page.locator(".world-backdrop img")).toBeVisible();
+      await expect(
+        page.locator('.world-backdrop img[data-active="true"]'),
+      ).toBeVisible();
       await expect
         .poll(() =>
           page
-            .locator(".world-backdrop img")
+            .locator('.world-backdrop img[data-active="true"]')
             .evaluate(
               (e: HTMLImageElement) => e.complete && e.naturalWidth > 0,
             ),
@@ -95,13 +97,13 @@ for (const [id, name] of themes)
     }
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
     await expect(page.locator(".book-page .inline-scene")).toHaveCount(1);
-    await expect(page.locator(".leaf-left p")).toBeVisible();
-    await expect(page.locator(".leaf-right p")).toBeVisible();
+    await expect(page.locator(".live-book .leaf-left p")).toBeVisible();
+    await expect(page.locator(".live-book .leaf-right p")).toBeVisible();
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
     await page.getByRole("button", { name: "Keyingi", exact: true }).click();
     await expect(
       page.getByRole("img", {
-        name: "Timo va Lola maysalar ustida qog‘oz samolyot yasashyapti.",
+        name: "Tulkixon va Quyonvoy maysalar ustida qog‘oz samolyot yasashyapti.",
       }),
     ).toBeVisible();
     const scan = await new AxeBuilder({ page })

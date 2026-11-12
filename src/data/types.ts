@@ -34,7 +34,15 @@ export interface Story {
         duration: number;
         scenes: { text: string; illustration: string }[];
       }
-    | { kind: "video"; src: string; poster: string };
+    | { kind: "video"; src: string; poster: string }
+    | {
+        kind: "youtube";
+        url: string;
+        title: string;
+        credit: string;
+        poster: string;
+        demo: boolean;
+      };
   quiz: Question[];
   status: "published" | "draft";
   reward: string;

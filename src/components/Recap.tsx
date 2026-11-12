@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { ExternalLink, Pause, Play, RotateCcw } from "lucide-react";
 import type { Story } from "../data/types";
 import { Art } from "./ui";
+import { youtubeEmbed, youtubeId } from "../lib/youtube";
 export default function Recap({ story }: { story: Story }) {
   const media = story.recap;
   const [playing, setPlaying] = useState(false);
@@ -17,6 +18,76 @@ export default function Recap({ story }: { story: Story }) {
     return () => clearInterval(timer);
   }, [playing, duration]);
   const ended = elapsed >= duration;
+  if (media.kind === "youtube") {
+    const embed = youtubeEmbed(media.url);
+    const id = youtubeId(media.url);
+    return (
+      <section
+        className="recap youtube-recap"
+        aria-label="Hikoyadan keyingi video"
+      >
+        <div className="video-heading">
+          <div>
+            <span className="eyebrow">BIRGA TOMOSHA QILAMIZ</span>
+            <h2>{media.title}</h2>
+          </div>
+          <span className="video-demo">Sinov videosi</span>
+        </div>
+        <p className="video-description">
+          {media.demo
+            ? "Bu hikoyamizning videosi emas. Hozircha do‘stlik va yordam haqida multfilm tomosha qilamiz."
+            : "Hikoyani video orqali yana bir bor eslaymiz."}
+        </p>
+        <div className="youtube-stage">
+          {playing && embed && !failed ? (
+            <iframe
+              title={media.title}
+              src={embed}
+              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowFullScreen
+              referrerPolicy="strict-origin-when-cross-origin"
+              onError={() => setFailed(true)}
+            />
+          ) : (
+            <>
+              <Art src={media.poster} alt="Video uchun hikoya rasmi" />
+              {embed && (
+                <button
+                  className="youtube-start"
+                  onClick={() => {
+                    setFailed(false);
+                    setPlaying(true);
+                  }}
+                >
+                  <Play size={28} fill="currentColor" /> Videoni ko‘rish
+                </button>
+              )}
+              {failed && (
+                <p className="video-status" role="status">
+                  Video ochilmadi. Pastdagi YouTube tugmasidan foydalaning.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+        <div className="video-footer">
+          <span>{media.credit} · YouTube</span>
+          {id ? (
+            <a
+              className="text-link"
+              href={`https://www.youtube.com/watch?v=${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              YouTube’da ochish <ExternalLink size={16} />
+            </a>
+          ) : (
+            <span role="status">Video havolasi hozircha tayyor emas.</span>
+          )}
+        </div>
+      </section>
+    );
+  }
   if (media.kind === "video")
     return (
       <div className="recap">

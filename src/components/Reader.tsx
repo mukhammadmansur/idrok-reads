@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Home,
   Medal,
+  RotateCcw,
   Settings2,
   X,
 } from "lucide-react";
@@ -16,6 +17,7 @@ import { useProgress } from "../lib/context";
 import { completeStory, recordPage } from "../lib/progress";
 import { PageArtwork, PageText } from "./StoryPageContent";
 import PaperTurn from "./PaperTurn";
+import BookSizing from "./BookSizing";
 import HologramReveal from "./HologramReveal";
 import Recap from "./Recap";
 import { ThemeGlyph, WorldBackdrop } from "./ThemeVisual";
@@ -131,21 +133,35 @@ export default function Reader({
             <p>
               «{story.title}»ni o‘qib tugatding.
               <br />
-              Bu sarguzasht endi sening bir bo‘laging.
+              Endi boshqa kitob tanlashing yoki yana o‘qishing mumkin.
             </p>
             <div className="earned-badge">
               <Check size={17} /> «{story.reward}» nishoni seniki
             </div>
-            <h2>Hikoyani birga eslaymizmi?</h2>
-            <Recap story={story} />
             <div className="completion-actions">
               <a href="#/" className="button">
-                Keyingi hikoyani top <ArrowRight size={18} />
+                Boshqa kitob tanlash <ArrowRight size={18} />
               </a>
+              <button
+                className="button secondary-button"
+                onClick={() => {
+                  update((p) => ({
+                    ...p,
+                    reading: {
+                      ...p.reading,
+                      [story.id]: { ...p.reading[story.id], page: 0 },
+                    },
+                  }));
+                  window.location.hash = `/read/${story.slug}`;
+                }}
+              >
+                <RotateCcw size={18} /> Qayta o‘qish
+              </button>
               <a className="text-link" href="#/rewards">
                 Yutuqlarimni ko‘rish
               </a>
             </div>
+            <Recap story={story} />
             <p className="quiet-note">
               Savollarni istalgan payt alohida «Savol-javob» bo‘limida
               ishlashing mumkin.
@@ -234,12 +250,13 @@ export default function Reader({
         className={`book-stage ${turn ? "is-turning" : ""} ${turn?.dragging ? "is-dragging" : ""}`}
         {...drag.handlers}
         onDragStart={(event) => {
-          if (theme === "classic") event.preventDefault();
+          event.preventDefault();
         }}
       >
+        <BookSizing story={story} />
         <article
           ref={surface}
-          className="book-page"
+          className="book-page live-book"
           aria-busy={!!turn}
           onTouchStart={(e) => {
             if (drag.pointerActive()) return;
@@ -262,8 +279,8 @@ export default function Reader({
             touch.current = null;
           }}
         >
-          <PageArtwork story={story} page={page} />
-          <PageText key={page} story={story} page={page} />
+          <PageArtwork key={`left-${page}`} story={story} page={page} />
+          <PageText key={`right-${page}`} story={story} page={page} />
           {theme === "classic" && (
             <>
               {page > 0 && (

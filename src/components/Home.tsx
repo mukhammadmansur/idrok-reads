@@ -51,8 +51,8 @@ export default function Home() {
             Mingta <em>mo‘jiza.</em>
           </h2>
           <p>
-            Kichkina tulki, olisdagi Oy va do‘stlikka to‘la bir sarguzasht. Timo
-            bilan tanishishga tayyormisan?
+            Kichkina tulki, olisdagi Oy va do‘stlikka to‘la bir sarguzasht.
+            Tulkixon bilan tanishishga tayyormisan?
           </p>
           <a href={`#/story/${featured.slug}`} className="button button-cream">
             Hikoyani kashf et <ArrowRight size={18} />
@@ -68,7 +68,7 @@ export default function Home() {
         <div className="hero-visual">
           <Art
             src={featured.cover}
-            alt="Tulki Timo yulduzli o‘rmonda Oyga yozgan maktubini ushlab turibdi"
+            alt="Tulki Tulkixon yulduzli o‘rmonda Oyga yozgan maktubini ushlab turibdi"
           />
           <span className="hero-orbit orbit-one" />
           <span className="hero-orbit orbit-two" />

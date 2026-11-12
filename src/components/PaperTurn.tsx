@@ -51,11 +51,23 @@ export default function PaperTurn({
     const height = current.clientHeight;
     const portrait = window.matchMedia("(max-width: 600px)").matches;
     const leafWidth = portrait ? width : width / 2;
+    next.style.width = `${width}px`;
+    next.style.height = `${height}px`;
+    next.style.border = "0";
     const backward = direction === -1;
     const fromArt = current.querySelector<HTMLElement>(".page-art")!;
     const fromText = current.querySelector<HTMLElement>(".page-text")!;
     const toArt = next.querySelector<HTMLElement>(".paper-art")!;
     const toText = next.querySelector<HTMLElement>(".paper-text")!;
+    // Share the actual leaf boxes, including the mobile row split. The template
+    // is a preview of the same book, not a second layout with different padding.
+    for (const [live, preview] of [
+      [fromArt, toArt],
+      [fromText, toText],
+    ]) {
+      preview.style.height = `${live.offsetHeight}px`;
+      preview.style.minHeight = "0";
+    }
     const combined = (art: HTMLElement, text: HTMLElement) => {
       const spread = document.createElement("div");
       spread.className = "paper-mobile-content";

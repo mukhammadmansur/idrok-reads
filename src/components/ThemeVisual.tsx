@@ -28,19 +28,44 @@ export function ThemePreview({ theme }: { theme: ThemeId }) {
   );
 }
 export function WorldBackdrop({ theme }: { theme: ThemeId }) {
-  const [failed, setFailed] = useState<string | null>(null);
-  if (theme === "classic") return null;
+  const [ready, setReady] = useState<Partial<Record<ThemeId, boolean>>>({});
   return (
     <div className={`world-backdrop world-${theme}`} aria-hidden="true">
-      {failed !== theme && (
-        <img
-          key={theme}
-          src={worldImage(theme)}
-          alt=""
-          fetchPriority="high"
-          onError={() => setFailed(theme)}
-        />
-      )}
+      {(["classic", "forest", "ice", "holo"] as ThemeId[]).map((id) => (
+        <div
+          className={`world-layer scenery-${id}`}
+          key={id}
+          data-active={id === theme && !!ready[id]}
+        >
+          <img
+            src={worldImage(id)}
+            alt=""
+            data-active={id === theme}
+            fetchPriority={id === theme ? "high" : "low"}
+            onLoad={() =>
+              setReady((previous) =>
+                previous[id] ? previous : { ...previous, [id]: true },
+              )
+            }
+            onError={() =>
+              setReady((previous) => ({ ...previous, [id]: false }))
+            }
+          />
+        </div>
+      ))}
+      <div className="world-atmosphere" />
+      <div className="world-motes">
+        {Array.from({ length: 8 }, (_, i) => (
+          <i
+            key={i}
+            style={{
+              left: `${8 + i * 12}%`,
+              top: `${15 + ((i * 17) % 70)}%`,
+              animationDelay: `${-i * 1.8}s`,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -33,20 +33,22 @@ for (const width of [390, 1440])
           ),
       ).toBe(true);
       if (id !== "classic") {
-        await expect(page.locator(".world-backdrop img")).toHaveAttribute(
-          "src",
-          `/worlds/${id}.webp`,
-        );
+        await expect(
+          page.locator('.world-backdrop img[data-active="true"]'),
+        ).toHaveAttribute("src", `/worlds/${id}.webp`);
         await expect
           .poll(() =>
             page
-              .locator(".world-backdrop img")
+              .locator('.world-backdrop img[data-active="true"]')
               .evaluate(
                 (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
               ),
           )
           .toBe(true);
-      } else await expect(page.locator(".world-backdrop")).toHaveCount(0);
+      } else
+        await expect(
+          page.locator('.world-backdrop img[data-active="true"]'),
+        ).toHaveAttribute("src", "/worlds/classic.webp");
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -71,13 +73,13 @@ test("HoloBook is live transparent glass over the world, and missing scenery has
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#/story/oy-dosti?theme=holo");
   await page.getByRole("button", { name: "O‘qishni boshlash" }).click();
-  await expect(page.locator(".world-backdrop img")).toBeVisible();
-  const glass = await page
-    .locator(".book-page")
-    .evaluate((e) => ({
-      filter: getComputedStyle(e).backdropFilter,
-      background: getComputedStyle(e).backgroundColor,
-    }));
+  await expect(
+    page.locator('.world-backdrop img[data-active="true"]'),
+  ).toBeVisible();
+  const glass = await page.locator(".book-page").evaluate((e) => ({
+    filter: getComputedStyle(e).backdropFilter,
+    background: getComputedStyle(e).backgroundColor,
+  }));
   expect(glass.filter).toContain("blur");
   expect(glass.background).toContain("rgba");
   expect(glass.background).not.toContain(", 1)");

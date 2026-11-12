@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowRight, BookOpen, Check, Search, Sparkles, X } from "lucide-react";
+import { ThemePreview } from "./ThemeVisual";
 import { stories, themes } from "../data/stories";
 import { useProgress } from "../lib/context";
 import { Art, EmptyState, SectionTitle, StoryCard } from "./ui";
@@ -178,14 +179,7 @@ export default function Home() {
               key={t.id}
               className={`world-card theme-preview-${t.id}`}
             >
-              <div className="world-art">
-                <span className="world-symbol">{t.symbol}</span>
-                <span className="mini-book">
-                  <i />
-                  <i />
-                </span>
-                <span className="world-spark">✦</span>
-              </div>
+              <ThemePreview theme={t.id} />
               <div className="world-caption">
                 <span>
                   <strong>{t.label}</strong>

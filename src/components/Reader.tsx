@@ -17,6 +17,7 @@ import { completeStory, recordPage } from "../lib/progress";
 import { PageArtwork, PageText } from "./StoryPageContent";
 import PaperTurn from "./PaperTurn";
 import Recap from "./Recap";
+import { ThemeGlyph, themeFrame } from "./ThemeVisual";
 import PageTurnHint from "./PageTurnHint";
 import { usePaperDrag } from "../lib/usePaperDrag";
 export default function Reader({
@@ -165,7 +166,10 @@ export default function Reader({
     );
   }
   return (
-    <main className={`reader theme-${theme} ${large ? "large-type" : ""}`}>
+    <main
+      data-theme={theme}
+      className={`reader theme-${theme} ${large ? "large-type" : ""}`}
+    >
       <header className="reader-header">
         <a
           href={`#/story/${story.slug}`}
@@ -216,7 +220,7 @@ export default function Reader({
                 setShowThemes(false);
               }}
             >
-              <span>{t.symbol}</span>
+              <ThemeGlyph theme={t.id} size={18} />
               {t.label}
               {theme === t.id && <Check size={16} />}
             </button>
@@ -224,7 +228,7 @@ export default function Reader({
         </div>
       )}
       <div className="reader-world-label" aria-hidden="true">
-        {themes.find((t) => t.id === theme)?.symbol}{" "}
+        <ThemeGlyph theme={theme} size={15} />{" "}
         {themes.find((t) => t.id === theme)?.name}
       </div>
       <div
@@ -234,6 +238,14 @@ export default function Reader({
           if (theme === "classic") event.preventDefault();
         }}
       >
+        {themeFrame(theme) && (
+          <img
+            className="book-material-frame"
+            src={themeFrame(theme)}
+            alt=""
+            aria-hidden="true"
+          />
+        )}
         <article
           ref={surface}
           className="book-page"

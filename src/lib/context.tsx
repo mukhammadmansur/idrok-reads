@@ -23,6 +23,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   });
   const [storageError, setStorageError] = useState(false);
   useEffect(() => {
+    document.documentElement.dataset.theme = progress.theme;
+    document.documentElement.style.colorScheme =
+      progress.theme === "holo" ? "dark" : "light";
+  }, [progress.theme]);
+  useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
       setStorageError(false);

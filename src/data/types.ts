@@ -6,10 +6,14 @@ export interface Question {
   answer: number;
   explanation: string;
 }
+export type ReadingBlock =
+  | { type: "text" | "heading" | "caption"; text: string }
+  | { type: "illustration"; src: string; alt: string };
 export interface StoryPage {
   text: string;
-  illustration: string;
   scene: string;
+  illustration?: string;
+  leaves: [ReadingBlock[], ReadingBlock[]];
 }
 export interface Story {
   id: string;

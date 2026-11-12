@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { ProgressProvider } from "./lib/context";
 import "./styles.css";
+import "./themes.css";
 class ErrorBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }

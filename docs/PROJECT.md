@@ -18,7 +18,7 @@ React 19, TypeScript, Vite, npm lockfile, Lucide icons, CSS tokens, authored loc
 
 The route layer is a small hash router: library, story details, reader, completion, independent quiz library/session, rewards, and parent view. Unknown stories and destinations have a recovery action. Everything is client-side; no server credentials or API contract is implied.
 
-Story content is typed structured data, never HTML. The same pages feed one reader; themes control CSS custom properties and environmental details. Themes never own progress or story logic.
+Story content is typed structured data, never HTML. Each logical page contains two leaves of text, heading, caption, and optional illustration blocks. Pictures appear at their editorial moment, rather than being mandatory on one half of every page. The same pages feed one reader; themes control CSS custom properties and environmental details. Themes never own progress or story logic. Selecting a theme on story details updates the whole application immediately and persists it in the existing versioned profile.
 
 Progress functions are immutable and separated from rendering. Versioned storage parsing tolerates malformed data. Completion retains its original timestamp across refresh/replay. Quiz attempts are recorded only by an explicit completed attempt; refreshing results does not record another attempt. The best score is preserved. Local storage remains user-editable, so server-enforced anti-abuse and privacy are not claimed.
 
@@ -32,6 +32,8 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/components/Home.tsx` | Featured story, discovery, search, filters, resume, theme previews |
 | `src/components/StoryDetails.tsx` | Story description, theme selection, start/resume/replay |
 | `src/components/Reader.tsx` | Shared reader engine, navigation, completion |
+| `src/components/StoryPageContent.tsx` | Shared leaf/block renderer for readable text and optional inline scenes |
+| `src/components/ThemeVisual.tsx` | Theme icons, frame assets, and material previews |
 | `src/components/Recap.tsx` | Curated illustration animation and video fallback |
 | `src/components/Quiz.tsx` | Independent quiz library, answers, feedback, results, retries |
 | `src/components/Progress.tsx` | Milestones, story badges, local parent activity |
@@ -40,7 +42,8 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/data/stories.ts` | Original content, publication status, theme metadata, general questions |
 | `src/lib/progress.ts` | Storage validation and pure page/completion/quiz transitions |
 | `src/lib/context.tsx` | Local persistence and route subscription |
-| `src/styles.css` | Design tokens, components, theme layers, responsive rules, motion |
+| `src/styles.css` | Base components, responsive rules, and paper motion |
+| `src/themes.css` | Persisted application palettes, generated material frames, and story leaf layout |
 | `public/art/` | Original lightweight SVG story illustrations |
 | `src/lib/progress.test.ts` | State and content validation tests |
 | `tests/` | Functional, responsive, failure-state and accessibility browser checks |
@@ -57,7 +60,7 @@ Progress functions are immutable and separated from rendering. Versioned storage
 
 The frontend demonstrates the reading loop. The next production phase is authenticated parent accounts with child-profile ownership, server-side progress/quiz validation, database uniqueness constraints for completions and rewards, and integration tests for unauthorized cross-account access. There is no public endpoint to test for authorization in the current frontend.
 
-Further content work: editorial review, distinct scene illustrations per page, produced recap media/captions, and more stories. Reading duration is an estimate; actual reading time is deliberately not fabricated. Current badges are on-screen achievements, not downloadable signed certificates. The demo supports one local profile; profile IDs and family ownership must be introduced with authentication.
+Further content work: editorial review, more distinct scene illustrations where useful, produced recap media/captions, and more stories. Reading duration is an estimate; actual reading time is deliberately not fabricated. Current badges are on-screen achievements, not downloadable signed certificates. The demo supports one local profile; profile IDs and family ownership must be introduced with authentication.
 
 Automated checks are Chromium based. Axe checks help catch accessibility regressions but do not replace testing with children, assistive technology, or an editorial reading-level review.
 

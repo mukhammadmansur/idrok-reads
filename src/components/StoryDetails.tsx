@@ -6,11 +6,12 @@ import {
   Clock3,
   Sparkles,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect } from "react";
 import { themes } from "../data/stories";
-import type { Story, ThemeId } from "../data/types";
+import type { Story } from "../data/types";
 import { navigate, useProgress } from "../lib/context";
 import { Art } from "./ui";
+import { ThemeGlyph, themeFrame } from "./ThemeVisual";
 export default function StoryDetails({
   story,
   initialTheme,
@@ -19,9 +20,20 @@ export default function StoryDetails({
   initialTheme?: string;
 }) {
   const { progress, update } = useProgress();
-  const [theme, setTheme] = useState<ThemeId>(
-    themes.find((t) => t.id === initialTheme)?.id || progress.theme,
-  );
+  const theme = progress.theme;
+  useEffect(() => {
+    const requested = themes.find((t) => t.id === initialTheme)?.id;
+    if (requested)
+      update((p) => (p.theme === requested ? p : { ...p, theme: requested }));
+  }, [initialTheme, update]);
+  const selectTheme = (id: typeof theme) => {
+    update((p) => ({ ...p, theme: id }));
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}#/story/${story.slug}`,
+    );
+  };
   const record = progress.reading[story.id];
   const start = () => {
     update((p) => ({
@@ -41,6 +53,14 @@ export default function StoryDetails({
       <div className="details-layout">
         <div className="detail-art">
           <Art src={story.cover} alt={story.subtitle} />
+          {themeFrame(theme) && (
+            <img
+              className="detail-theme-frame"
+              src={themeFrame(theme)}
+              alt=""
+              aria-hidden="true"
+            />
+          )}
           <span className="art-label">IQRO ORIGINAL HIKOYA</span>
         </div>
         <div className="detail-copy">
@@ -72,11 +92,13 @@ export default function StoryDetails({
                     key={t.id}
                     type="button"
                     className={`theme-choice theme-preview-${t.id} ${theme === t.id ? "chosen" : ""}`}
-                    onClick={() => setTheme(t.id)}
+                    onClick={() => selectTheme(t.id)}
                     aria-pressed={theme === t.id}
                     aria-label={t.name}
                   >
-                    <span>{t.symbol}</span>
+                    <span>
+                      <ThemeGlyph theme={t.id} />
+                    </span>
                     <strong>{t.label}</strong>
                     {theme === t.id && <Check size={14} />}
                   </button>

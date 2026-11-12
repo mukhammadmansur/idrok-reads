@@ -1,4 +1,4 @@
-import type { Question, Story, ThemeId } from "./types";
+import type { Question, Story, ThemeId, ReadingBlock } from "./types";
 export const themes: {
   id: ThemeId;
   name: string;
@@ -43,6 +43,45 @@ const question = (
   explanation: string,
 ): Question => ({ id, prompt, options, answer, explanation });
 const art = (name: string) => `/art/${name}.svg`;
+const sceneArt: Record<
+  string,
+  { page: number; src: string; alt: string; side: 0 | 1 }
+> = {
+  "oy-dosti": {
+    page: 3,
+    src: "/art/moon-paper-plane.webp",
+    alt: "Timo va Lola maysalar ustida qog‘oz samolyot yasashyapti.",
+    side: 1,
+  },
+  "bulut-kemasi": {
+    page: 5,
+    src: "/art/cloud-ant-rescue.webp",
+    alt: "Yashil barg yelkanli qog‘oz kema ho‘l toshda qolgan chumolini qutqaryapti.",
+    side: 0,
+  },
+  "dengiz-siri": {
+    page: 5,
+    src: "/art/sea-friends.webp",
+    alt: "Kichkina kit Nuri va toshbaqa Marvarid xavfsiz tosh yonida oqim tinishini kutishyapti.",
+    side: 1,
+  },
+};
+function textLeaves(text: string): [ReadingBlock[], ReadingBlock[]] {
+  const sentences = text.match(/[^.!?]+[.!?]+[»”"]?|[^.!?]+$/gu) || [text];
+  let split = Math.ceil(sentences.length / 2);
+  if (sentences.length === 1) {
+    const words = text.split(" ");
+    split = Math.ceil(words.length / 2);
+    return [
+      [{ type: "text", text: words.slice(0, split).join(" ") }],
+      [{ type: "text", text: words.slice(split).join(" ") }],
+    ];
+  }
+  return [
+    [{ type: "text", text: sentences.slice(0, split).join("").trim() }],
+    [{ type: "text", text: sentences.slice(split).join("").trim() }],
+  ];
+}
 function makeStory(
   id: string,
   title: string,
@@ -68,11 +107,29 @@ function makeStory(
     difficulty: "Oson o‘qish",
     themes: ["classic", "forest", "ice", "holo"],
     status: "published",
-    pages: paragraphs.map((text, i) => ({
-      text,
-      illustration: art(id),
-      scene: `${title}: ${i + 1}-sahifa`,
-    })),
+    pages: paragraphs.map((text, i) => {
+      const leaves = textLeaves(text);
+      let illustration: string | undefined;
+      if (i === 0) {
+        leaves[0] = [
+          { type: "heading", text: title },
+          { type: "caption", text: subtitle },
+          { type: "illustration", src: art(id), alt: subtitle },
+        ];
+        leaves[1] = [{ type: "text", text }];
+        illustration = art(id);
+      }
+      const scene = sceneArt[id];
+      if (scene && i === scene.page) {
+        leaves[scene.side].push({
+          type: "illustration",
+          src: scene.src,
+          alt: scene.alt,
+        });
+        illustration = scene.src;
+      }
+      return { text, leaves, illustration, scene: `${title}: ${i + 1}-sahifa` };
+    }),
     recap: {
       kind: "animation",
       duration: 32,

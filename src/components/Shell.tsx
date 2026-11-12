@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { themes } from "../data/stories";
+import { ThemeGlyph } from "./ThemeVisual";
 import { useProgress } from "../lib/context";
 const links = [
   { href: "/", label: "Kutubxona", icon: Compass },
@@ -21,7 +23,7 @@ export default function Shell({
   path: string;
   children: ReactNode;
 }) {
-  const { storageError } = useProgress();
+  const { storageError, progress } = useProgress();
   const current = path.startsWith("/quiz")
     ? "/quiz"
     : path === "/rewards"
@@ -30,7 +32,7 @@ export default function Shell({
         ? "/parent"
         : "/";
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-theme={progress.theme}>
       <a
         className="skip-link"
         href="#main-content"
@@ -109,7 +111,8 @@ export default function Shell({
             </strong>
           </span>
           <span className="topbar-note">
-            <span className="tiny-sun">✳</span> Kichik qadam, katta kashfiyot
+            <ThemeGlyph theme={progress.theme} size={19} />{" "}
+            {themes.find((t) => t.id === progress.theme)?.label} olami
           </span>
           <span className="mobile-avatar">K</span>
         </header>

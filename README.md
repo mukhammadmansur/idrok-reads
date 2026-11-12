@@ -22,6 +22,7 @@ The repository has no required environment variables, external API services, or 
 - Searchable, filterable library with three original eight-page stories and original SVG cover illustrations.
 - Story details and theme choice; **one reader engine** for ClassicBook, ForestBook, IceBook, and HoloBook.
 - Previous/next pages, arrow keys, swipe, larger text, and reduced-motion support.
+- ClassicBook turns a curved, two-sided paper leaf with moving shadows. Page corners, buttons, arrow keys, and horizontal swipes share the same turn; progress updates after the leaf settles.
 - Reading progress, resume, idempotent completion, badges, and milestones.
 - 32-second illustrated recap animations with play/pause/replay controls. The media model also supports curated video and an error fallback.
 - A **separate Savol-javob section**: questions about completed books or general questions available immediately. No forced quiz after reading.

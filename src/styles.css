@@ -1336,7 +1336,7 @@ fieldset {
   color: var(--reader-muted);
   padding: 24px 0 20px;
 }
-.book-page {
+:is(.book-page, .paper-spread) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   background: var(--page-bg);
@@ -1354,22 +1354,22 @@ fieldset {
   position: relative;
   overflow: hidden;
 }
-.theme-holo .book-page {
+.theme-holo :is(.book-page, .paper-spread) {
   box-shadow:
     0 0 40px #6ec8b412,
     0 20px 60px #0002;
   border-color: #6faba4;
 }
-.page-art {
+:is(.page-art, .paper-art) {
   position: relative;
   min-height: 440px;
 }
-.page-art img {
+:is(.page-art, .paper-art) img {
   position: absolute;
   inset: 0;
   object-position: center;
 }
-.page-art-mark {
+:is(.page-art-mark, .paper-art-mark) {
   position: absolute;
   bottom: 20px;
   left: 24px;
@@ -1377,7 +1377,7 @@ fieldset {
   font-family: Georgia, serif;
   font-size: 48px;
 }
-.page-text {
+:is(.page-text, .paper-text) {
   position: relative;
   padding: 60px 42px 40px;
   display: flex;
@@ -1393,14 +1393,14 @@ fieldset {
   display: block;
   margin-bottom: 28px;
 }
-.page-text p {
+:is(.page-text, .paper-text) p {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 25px;
   line-height: 1.8;
   max-width: 30ch;
   animation: page-in 0.3s ease both;
 }
-.large-type .page-text p {
+.large-type :is(.page-text, .paper-text) p {
   font-size: 30px;
 }
 .page-flourish {
@@ -1410,7 +1410,7 @@ fieldset {
   text-align: center;
   opacity: 0.7;
 }
-.page-number {
+:is(.page-number, .paper-page-number) {
   position: absolute;
   bottom: 18px;
   left: 0;
@@ -2397,13 +2397,13 @@ progress::-moz-progress-bar {
   .detail-meta {
     gap: 11px;
   }
-  .page-text {
+  :is(.page-text, .paper-text) {
     padding: 38px 30px;
   }
-  .page-text p {
+  :is(.page-text, .paper-text) p {
     font-size: 23px;
   }
-  .page-art {
+  :is(.page-art, .paper-art) {
     min-height: 420px;
   }
   .badge-grid {
@@ -2616,22 +2616,22 @@ progress::-moz-progress-bar {
   .reader-header {
     height: 82px;
   }
-  .book-page {
+  :is(.book-page, .paper-spread) {
     min-height: 400px;
   }
-  .page-art {
+  :is(.page-art, .paper-art) {
     min-height: 400px;
   }
-  .page-text {
+  :is(.page-text, .paper-text) {
     padding: 32px 25px;
   }
-  .page-text p {
+  :is(.page-text, .paper-text) p {
     font-size: 21px;
   }
-  .large-type .page-text p {
+  .large-type :is(.page-text, .paper-text) p {
     font-size: 26px;
   }
-  .page-text .chapter-label {
+  :is(.page-text, .paper-text) .chapter-label {
     letter-spacing: 1px;
     font-size: 7px;
   }
@@ -3163,7 +3163,7 @@ progress::-moz-progress-bar {
     font-size: 8px;
     padding: 17px 0 14px;
   }
-  .book-page {
+  :is(.book-page, .paper-spread) {
     grid-template-columns: 1fr;
     border-radius: 12px;
     box-shadow:
@@ -3171,32 +3171,32 @@ progress::-moz-progress-bar {
       0 4px 0 -1px var(--page-bg),
       0 5px 0 -1px var(--reader-line);
   }
-  .page-art {
+  :is(.page-art, .paper-art) {
     min-height: 0;
     height: 190px;
     overflow: hidden;
   }
-  .page-art img {
+  :is(.page-art, .paper-art) img {
     object-position: 50% 43%;
     position: static;
   }
-  .page-art-mark {
+  :is(.page-art-mark, .paper-art-mark) {
     font-size: 30px;
     bottom: 12px;
     left: 16px;
   }
-  .page-text {
+  :is(.page-text, .paper-text) {
     padding: 28px 26px 35px;
     min-height: 285px;
     justify-content: flex-start;
     background: none;
   }
-  .page-text p {
+  :is(.page-text, .paper-text) p {
     font-size: 21px;
     line-height: 1.8;
     max-width: 100%;
   }
-  .page-text .chapter-label {
+  :is(.page-text, .paper-text) .chapter-label {
     margin-bottom: 16px;
     font-size: 7px;
     letter-spacing: 1.6px;
@@ -3205,7 +3205,7 @@ progress::-moz-progress-bar {
     margin-top: 13px;
     font-size: 24px;
   }
-  .page-number {
+  :is(.page-number, .paper-page-number) {
     bottom: 12px;
     font-size: 10px;
   }
@@ -3611,10 +3611,10 @@ progress::-moz-progress-bar {
   .reader-title {
     margin-left: 15px;
   }
-  .page-text {
+  :is(.page-text, .paper-text) {
     padding: 25px 21px 34px;
   }
-  .page-text p {
+  :is(.page-text, .paper-text) p {
     font-size: 20px;
   }
   .quiz-tabs {
@@ -3665,5 +3665,162 @@ progress::-moz-progress-bar {
   }
   .locked {
     display: none;
+  }
+}
+
+/* ClassicBook: paper geometry is a visual layer; the single article stays
+   accessible, and Reader commits its new page only when the leaf settles. */
+.book-stage {
+  position: relative;
+  max-width: 1040px;
+  margin: 0 auto;
+  touch-action: pan-y;
+}
+.theme-classic .page-text p,
+.paper-text p {
+  animation: none;
+}
+.paper-turn {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.paper-template {
+  visibility: hidden;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  margin: 0;
+  box-shadow: none;
+}
+.paper-turn-visual {
+  position: absolute;
+  inset: 1px;
+  perspective: 2200px;
+  perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+}
+.paper-underlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  background: var(--page-bg);
+  border-radius: 4px 14px 14px 4px;
+}
+.paper-underlay > :is(.paper-art, .paper-text) {
+  height: 100%;
+}
+.paper-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.paper-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--page-bg);
+}
+.paper-face-back {
+  transform: rotateY(180deg);
+}
+.paper-face > :first-child {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.paper-lighting {
+  position: absolute;
+  inset: 0;
+  background: #58412b;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.paper-falling-shadow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 20%,
+    #422e1e 48%,
+    #422e1e 52%,
+    transparent 80%
+  );
+  filter: blur(12px);
+  z-index: 1;
+  pointer-events: none;
+}
+.paper-mobile-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  height: 100%;
+  background: var(--page-bg);
+}
+.page-corner {
+  position: absolute;
+  bottom: 0;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  z-index: 2;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+  border-radius: 0;
+}
+.page-corner-next {
+  right: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 53%,
+    #e5d8b850 54%,
+    #f4ead6 68%,
+    #d6c8a6 69%,
+    #f7f0df 85%
+  );
+  border-radius: 0 0 13px 0;
+}
+.page-corner-previous {
+  left: 0;
+  background: linear-gradient(
+    225deg,
+    transparent 53%,
+    #e5d8b850 54%,
+    #f4ead6 68%,
+    #d6c8a6 69%,
+    #f7f0df 85%
+  );
+  border-radius: 0 0 0 4px;
+}
+.page-corner:hover,
+.page-corner:focus-visible {
+  opacity: 1;
+}
+.is-turning .page-corner {
+  visibility: hidden;
+}
+@media (max-width: 600px) {
+  .paper-turn-visual {
+    perspective: 1600px;
+    perspective-origin: 20% 45%;
+  }
+  .paper-underlay {
+    grid-template-columns: 1fr;
+    border-radius: 11px;
+  }
+  .paper-mobile-content {
+    grid-template-rows: 190px 1fr;
+  }
+  .paper-mobile-content > .paper-art {
+    height: 190px;
+  }
+  .paper-mobile-content > .paper-text {
+    min-height: 0;
   }
 }

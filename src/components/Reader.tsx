@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,7 +14,8 @@ import { themes } from "../data/stories";
 import type { Story } from "../data/types";
 import { useProgress } from "../lib/context";
 import { completeStory, recordPage } from "../lib/progress";
-import { Art } from "./ui";
+import { PageArtwork, PageText } from "./StoryPageContent";
+import PaperTurn from "./PaperTurn";
 import Recap from "./Recap";
 export default function Reader({
   story,
@@ -29,15 +30,41 @@ export default function Reader({
   );
   const [showThemes, setShowThemes] = useState(false);
   const [large, setLarge] = useState(false);
-  const touch = useRef<number | null>(null);
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  const surface = useRef<HTMLElement>(null);
+  const turnLock = useRef(false);
+  const [turn, setTurn] = useState<{
+    target: number;
+    direction: -1 | 1;
+  } | null>(null);
   const theme = progress.theme;
   useEffect(() => {
     if (!completed) update((p) => recordPage(p, story.id, page));
   }, [page, story.id, completed, update]);
-  const changePage = (direction: number) =>
-    setPage((p) =>
-      Math.max(0, Math.min(story.pages.length - 1, p + direction)),
-    );
+  const changePage = useCallback(
+    (direction: number) => {
+      if (turnLock.current || completed) return;
+      const target = Math.max(
+        0,
+        Math.min(story.pages.length - 1, page + direction),
+      );
+      if (target === page) return;
+      if (
+        theme === "classic" &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        turnLock.current = true;
+        setTurn({ target, direction: direction > 0 ? 1 : -1 });
+      } else setPage(target);
+    },
+    [page, story.pages.length, theme, completed],
+  );
+  const finishTurn = useCallback(() => {
+    if (!turn) return;
+    turnLock.current = false;
+    setPage(turn.target);
+    setTurn(null);
+  }, [turn]);
   useEffect(() => {
     if (completed) return;
     const key = (e: KeyboardEvent) => {
@@ -45,15 +72,20 @@ export default function Reader({
         setShowThemes(false);
         return;
       }
-      if ((e.target as HTMLElement).closest("button,input,select,textarea"))
+      if (
+        (e.target as HTMLElement).closest(
+          "input,select,textarea,[contenteditable=true],.reader-theme-menu",
+        )
+      )
         return;
-      if (e.key === "ArrowRight")
-        setPage((p) => Math.min(story.pages.length - 1, p + 1));
-      if (e.key === "ArrowLeft") setPage((p) => Math.max(0, p - 1));
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (!e.repeat) changePage(e.key === "ArrowRight" ? 1 : -1);
+      }
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [story.pages.length, completed]);
+  }, [changePage, completed]);
   const finish = () => {
     update((p) => completeStory(p, story.id, story.pages.length - 1));
     window.location.hash = `/completed/${story.slug}`;
@@ -126,6 +158,7 @@ export default function Reader({
           <button
             className={`icon-button type-button ${large ? "selected" : ""}`}
             aria-label="Katta matn"
+            disabled={!!turn}
             aria-pressed={large}
             onClick={() => setLarge(!large)}
           >
@@ -134,6 +167,7 @@ export default function Reader({
           <button
             className="icon-button"
             aria-label="O‘qish muhitini tanlash"
+            disabled={!!turn}
             aria-expanded={showThemes}
             onClick={() => setShowThemes(!showThemes)}
           >
@@ -150,6 +184,7 @@ export default function Reader({
           {themes.map((t) => (
             <button
               key={t.id}
+              disabled={!!turn}
               aria-pressed={theme === t.id}
               onClick={() => {
                 update((p) => ({ ...p, theme: t.id }));
@@ -167,48 +202,69 @@ export default function Reader({
         {themes.find((t) => t.id === theme)?.symbol}{" "}
         {themes.find((t) => t.id === theme)?.name}
       </div>
-      <article
-        className="book-page"
-        onTouchStart={(e) => {
-          touch.current = e.touches[0].clientX;
-        }}
-        onTouchEnd={(e) => {
-          if (touch.current !== null) {
-            const difference = touch.current - e.changedTouches[0].clientX;
-            if (Math.abs(difference) > 65) changePage(difference > 0 ? 1 : -1);
+      <div className={`book-stage ${turn ? "is-turning" : ""}`}>
+        <article
+          ref={surface}
+          className="book-page"
+          aria-busy={!!turn}
+          onTouchStart={(e) => {
+            if (e.touches.length === 1)
+              touch.current = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+              };
+          }}
+          onTouchEnd={(e) => {
+            if (touch.current) {
+              const dx = touch.current.x - e.changedTouches[0].clientX;
+              const dy = touch.current.y - e.changedTouches[0].clientY;
+              if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.2)
+                changePage(dx > 0 ? 1 : -1);
+            }
             touch.current = null;
-          }
-        }}
-      >
-        <div className="page-art">
-          <Art
-            src={story.pages[page].illustration}
-            alt={story.pages[page].scene}
+          }}
+          onTouchCancel={() => {
+            touch.current = null;
+          }}
+        >
+          <PageArtwork story={story} page={page} />
+          <PageText key={page} story={story} page={page} />
+          {theme === "classic" && (
+            <>
+              {page > 0 && (
+                <button
+                  className="page-corner page-corner-previous"
+                  aria-label="Oldingi sahifani varaqlash"
+                  onClick={() => changePage(-1)}
+                  disabled={!!turn}
+                />
+              )}
+              {page < story.pages.length - 1 && (
+                <button
+                  className="page-corner page-corner-next"
+                  aria-label="Keyingi sahifani varaqlash"
+                  onClick={() => changePage(1)}
+                  disabled={!!turn}
+                />
+              )}
+            </>
+          )}
+        </article>
+        {turn && (
+          <PaperTurn
+            source={surface}
+            story={story}
+            target={turn.target}
+            direction={turn.direction}
+            onComplete={finishTurn}
           />
-          <span className="page-art-mark">
-            {String(page + 1).padStart(2, "0")}
-          </span>
-        </div>
-        <div className="page-text" key={page}>
-          <span className="chapter-label">
-            {page === 0
-              ? "BIR BOR EKAN..."
-              : page === story.pages.length - 1
-                ? "VA SHUNDAY QILIB..."
-                : "SARGUZASHT DAVOM ETADI"}
-          </span>
-          <p aria-live="polite">{story.pages[page].text}</p>
-          <span className="page-flourish" aria-hidden="true">
-            ❧
-          </span>
-          <span className="page-number">{page + 1}</span>
-        </div>
-      </article>
+        )}
+      </div>
       <nav className="reader-navigation" aria-label="Sahifa boshqaruvi">
         <button
           className="reader-prev"
           onClick={() => changePage(-1)}
-          disabled={page === 0}
+          disabled={page === 0 || !!turn}
         >
           <ChevronLeft size={20} />
           <span>Oldingi</span>
@@ -224,11 +280,15 @@ export default function Reader({
           />
         </div>
         {page === story.pages.length - 1 ? (
-          <button className="button" onClick={finish}>
+          <button className="button" onClick={finish} disabled={!!turn}>
             Yakunlash <Check size={19} />
           </button>
         ) : (
-          <button className="button" onClick={() => changePage(1)}>
+          <button
+            className="button"
+            onClick={() => changePage(1)}
+            disabled={!!turn}
+          >
             Keyingi <ChevronRight size={20} />
           </button>
         )}

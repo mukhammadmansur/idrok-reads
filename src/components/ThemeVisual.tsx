@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Leaf, Orbit, Snowflake, Sun } from "lucide-react";
 import type { ThemeId } from "../data/types";
-export const worldImage = (theme: ThemeId) => `/worlds/${theme}.webp`;
+const worldAssets: Record<ThemeId, string> = {
+  classic: "/worlds/classic.webp",
+  forest: "/worlds/forest.webp",
+  ice: "/worlds/ice-garden.webp",
+  holo: "/worlds/holo-garden.webp",
+};
+export const worldImage = (theme: ThemeId) => worldAssets[theme];
 export function ThemeGlyph({
   theme,
   size = 22,

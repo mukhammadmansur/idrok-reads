@@ -35,7 +35,10 @@ for (const width of [390, 1440])
       if (id !== "classic") {
         await expect(
           page.locator('.world-backdrop img[data-active="true"]'),
-        ).toHaveAttribute("src", `/worlds/${id}.webp`);
+        ).toHaveAttribute(
+          "src",
+          `/worlds/${id === "ice" || id === "holo" ? `${id}-garden` : id}.webp`,
+        );
         await expect
           .poll(() =>
             page

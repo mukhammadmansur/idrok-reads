@@ -6,8 +6,8 @@ These assets were generated with Image Gen for this project on 2026-11-12 and en
 | --- | --- | --- |
 | `public/worlds/classic.webp` | ClassicBook selection thumbnail | Sunny reading nook, wooden desk and illustrated book. The ClassicBook reading canvas stays calm. |
 | `public/worlds/forest.webp` | ForestBook environment and thumbnail | Deep enchanted woodland, real bark, climbing ivy, fireflies and a wooden reading table. |
-| `public/worlds/ice.webp` | IceBook environment and thumbnail | Crystalline palace, icy columns, frozen lake and distant snowy mountains. |
-| `public/worlds/holo.webp` | HoloBook environment and thumbnail | Clear glass orbital observatory, curved transparent stairs and a large blue planet visible behind the reading surface. |
+| `public/worlds/ice-garden.webp` | IceBook environment and thumbnail | Enchanted snow garden: frosted birches, crystal flowers, a translucent ice path and a warmly lit crystal arch. |
+| `public/worlds/holo-garden.webp` | HoloBook environment and thumbnail | Dreamlike holographic glass garden: iridescent ribbons, floating glass walkway and a luminous portal, without the former giant planet. |
 | `public/art/moon-paper-plane.webp` | Oyga maktub, logical page 4 | Timo and Lola making a paper airplane. |
 | `public/art/cloud-ant-rescue.webp` | Bulutlar kemasi, logical page 6 | A paper boat with a leaf sail rescuing the ant. |
 | `public/art/sea-friends.webp` | Dengizning kichik siri, logical page 6 | Nuri and Marvarid waiting safely beside a rock. |
@@ -29,3 +29,7 @@ Twelve additional scenes were generated as three 2×2 illustration sheets with c
 | `sea-meeting.webp`, `sea-courage.webp`, `sea-lights.webp`, `sea-song.webp` | Meeting Marvarid, encouragement, glowing fish and the grateful goodbye/song. |
 
 All main quoted dialogue pages have illustrations. The gathering and courage scenes span two connected dialogue pages each; descriptive alt text matches the current passage. No story sentence is removed or duplicated. Recap scenes now use corresponding scene artwork when available.
+
+## Replaced ice and hologram backgrounds
+
+The founder rejected the original ice-palace and orbital-observatory pictures. Two new Image Gen environments replace the actual artwork in both cards and full-page scenery; this revision is not a tint of the rejected pictures. Production files use new names so existing browser caches cannot continue showing the old artwork. The previous assets are retained only under `docs/visual-review/archive/worlds/`. New images use FFmpeg WebP quality 87, compression level 6. Their original generated PNGs remain outside the repository in `/workspace/generated_images/`. ClassicBook and ForestBook artwork is unchanged.

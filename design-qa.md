@@ -38,4 +38,12 @@ YouTube link parsing and iframe integration are verified using controlled browse
 
 No outstanding P0/P1/P2 implementation or visual issue was identified in the requested scope. Live third-party media playback remains the stated verification limit.
 
+## Latest revision: replace the rejected IceBook and HoloBook artwork
+
+The founder rejected the actual ice-palace and giant-planet pictures. New Image Gen artwork now replaces both production sources: `public/worlds/ice-garden.webp` and `public/worlds/holo-garden.webp`. Ice is a frosted storybook garden with birches, crystal flowers and an ice path; Holo is an iridescent glass garden and portal with no planet. The previous assets are archived outside `public/`. Both cards and full-page scenery share the new asset mapping. New filenames avoid showing the rejected files from browser caches.
+
+Reviewed source art at full composition, then actual Chromium card/reader captures at 1440 × 1050 and mobile 390 × 1000. [New cards and reader worlds](docs/visual-review/new-worlds.webp). Raw captures: `/tmp/iqro-new-worlds/`. Image crop and modest filtering were adjusted for the new compositions; contrast and reader controls remain clear. No page logic, story text or other world artwork was changed in this revision.
+
+Production build and lint passed, plus 9 targeted browser checks covering selection/persistence, theme changes, actual image loading, missing-image fallback, transparent glass and axe contrast across the four themes and completed-book states. Browser captures reported no uncaught page errors. Existing whole-reader verification above belongs to the preceding implementation; it was not rerun for this artwork-only revision.
+
 final result: passed

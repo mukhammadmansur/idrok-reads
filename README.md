@@ -1,18 +1,21 @@
-# Iqro — interactive stories for small readers
+# WBooks — interactive stories for small readers
 
-An Uzbek-language frontend MVP for ages 6–10. The working name follows this repository's Iqro identity.
+An Uzbek-language frontend MVP for ages 6–10. The current application retains its Iqro branding; the intended private GitHub repository is `mukhammadmaqsud/wbooks`.
 
 ## Run locally
 
 Node.js 22.12+ or 24 LTS and npm are required. This environment was validated with Node 24.22.1.
 
 ```sh
-cd /workspace/iqro_kids_reads
+git clone https://github.com/mukhammadmaqsud/wbooks.git
+cd wbooks
 npm ci
 npm run dev -- --port 5173
 ```
 
-The repository has no required environment variables, external API services, or database. Use the existing checkout; a separate worktree is unnecessary.
+Access to the private repository requires GitHub authorization. In the existing cloud checkout, use `/workspace/iqro_kids_reads` and skip the clone step. A separate worktree is unnecessary.
+
+The repository has no required environment variables, external API services, or database. `.env.example` documents this; copying it to `.env` is optional. Never put real credentials in the template or any `VITE_*` variable, which becomes public browser code. Authenticate to GitHub through `gh auth login`, never through a password or token stored in this project.
 
 ## What works
 
@@ -48,3 +51,5 @@ There is no login, secure parent gate, account isolation, cross-device sync, API
 Current art supplies one reusable illustration per story; per-page bespoke artwork and editorial review are content work still to do. Recaps use curated illustrations and text rather than produced video files. Only three stories are published, so 5/10/20-story milestones remain future goals.
 
 See [architecture and audit](docs/PROJECT.md) for the module map, decisions, and next production phase.
+
+For the first private GitHub push, see [the safe push procedure](docs/FIRST_PUSH.md). It preserves the current branch and `origin`, refuses an existing destination, and verifies privacy and the uploaded commit.

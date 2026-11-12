@@ -32,7 +32,7 @@ export const themes: {
     id: "holo",
     name: "HoloBook",
     label: "Kelajak",
-    description: "Shisha ortidagi koinot.",
+    description: "Neon shahar va fazoviy kemalar.",
     symbol: "✧",
   },
 ];

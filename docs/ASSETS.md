@@ -7,7 +7,7 @@ These assets were generated with Image Gen for this project on 2026-11-12 and en
 | `public/worlds/classic.webp` | ClassicBook selection thumbnail | Sunny reading nook, wooden desk and illustrated book. The ClassicBook reading canvas stays calm. |
 | `public/worlds/forest.webp` | ForestBook environment and thumbnail | Deep enchanted woodland, real bark, climbing ivy, fireflies and a wooden reading table. |
 | `public/worlds/ice-garden.webp` | IceBook environment and thumbnail | Enchanted snow garden: frosted birches, crystal flowers, a translucent ice path and a warmly lit crystal arch. |
-| `public/worlds/holo-garden.webp` | HoloBook environment and thumbnail | Dreamlike holographic glass garden: iridescent ribbons, floating glass walkway and a luminous portal, without the former giant planet. |
+| `public/worlds/holo-spaceport.webp` | HoloBook environment and thumbnail | Cyberpunk alien metropolis: neon towers, skybridges, a flying exploration ship and a friendly alien on a glass observation deck. |
 | `public/art/moon-paper-plane.webp` | Oyga maktub, logical page 4 | Timo and Lola making a paper airplane. |
 | `public/art/cloud-ant-rescue.webp` | Bulutlar kemasi, logical page 6 | A paper boat with a leaf sail rescuing the ant. |
 | `public/art/sea-friends.webp` | Dengizning kichik siri, logical page 6 | Nuri and Marvarid waiting safely beside a rock. |
@@ -33,3 +33,7 @@ All main quoted dialogue pages have illustrations. The gathering and courage sce
 ## Replaced ice and hologram backgrounds
 
 The founder rejected the original ice-palace and orbital-observatory pictures. Two new Image Gen environments replace the actual artwork in both cards and full-page scenery; this revision is not a tint of the rejected pictures. Production files use new names so existing browser caches cannot continue showing the old artwork. The previous assets are retained only under `docs/visual-review/archive/worlds/`. New images use FFmpeg WebP quality 87, compression level 6. Their original generated PNGs remain outside the repository in `/workspace/generated_images/`. ClassicBook and ForestBook artwork is unchanged.
+
+## Founder clarification: future means science fiction
+
+The founder clarified that Kelajak means alien civilizations, cyberpunk cities and spaceships, supported by their supplied futuristic image-search reference. `holo-spaceport.webp` is new Image Gen artwork in that direction; the superseded fairy glass garden is now archived outside `public/`. The HoloBook reader remains transparent glass with its existing reveal animation. The new asset name also avoids stale browser images. Ice, Forest and Classic production artwork is unchanged by this clarification.

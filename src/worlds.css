@@ -457,7 +457,7 @@
   --reader-muted: #315b73;
 }
 .world-card .material-holo img {
-  object-position: 72% center;
+  object-position: center;
 }
 @supports not (backdrop-filter: blur(10px)) {
   .reader.theme-holo .book-page {

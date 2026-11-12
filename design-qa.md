@@ -46,4 +46,10 @@ Reviewed source art at full composition, then actual Chromium card/reader captur
 
 Production build and lint passed, plus 9 targeted browser checks covering selection/persistence, theme changes, actual image loading, missing-image fallback, transparent glass and axe contrast across the four themes and completed-book states. Browser captures reported no uncaught page errors. Existing whole-reader verification above belongs to the preceding implementation; it was not rerun for this artwork-only revision.
 
+## Latest founder clarification: cyberpunk, aliens and spaceships
+
+The supplied sci-fi image-search reference and explicit founder clarification replace the garden interpretation of Kelajak. New production artwork `public/worlds/holo-spaceport.webp` depicts a neon alien city, flying exploration spacecraft, holographic navigation shapes and a friendly alien explorer on a glass deck. The previous glass garden is archived outside `public/`. Both thumbnail and full scenery use the new file. Transparent reader glass and its reveal animation remain intact; the other three worlds are unchanged.
+
+Source art and real Chromium captures at 1440 × 1050 and 390 × 1000 were opened and inspected. [Actual future reader](docs/visual-review/future-spaceport.webp) and [selection cards](docs/visual-review/future-spaceport-cards.webp). Raw screenshots: `/tmp/iqro-spaceport-review/`. Desktop framing visibly retains the alien at the left edge and the spacecraft at the upper-right, with clear text on glass. The image is a new sci-fi composition rather than a recolor of the rejected garden. Build, lint and 9 targeted world/theme/contrast browser tests passed for this revision.
+
 final result: passed

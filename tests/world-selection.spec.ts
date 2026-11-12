@@ -37,7 +37,7 @@ for (const width of [390, 1440])
           page.locator('.world-backdrop img[data-active="true"]'),
         ).toHaveAttribute(
           "src",
-          `/worlds/${id === "ice" || id === "holo" ? `${id}-garden` : id}.webp`,
+          `/worlds/${id === "ice" ? "ice-garden" : id === "holo" ? "holo-spaceport" : id}.webp`,
         );
         await expect
           .poll(() =>

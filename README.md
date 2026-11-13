@@ -1,10 +1,10 @@
 # WBooks — interactive stories for small readers
 
-An Uzbek-language frontend MVP for ages 6–10. The current application retains its Iqro branding; the private GitHub repository is `mukhammadmaqsud/iqro_kids_reads`.
+An Uzbek-language reading MVP for ages 6–10, with parent accounts and server-backed child profiles. The current application retains its Iqro branding; the private GitHub repository is `mukhammadmaqsud/iqro_kids_reads`.
 
 ## Run locally
 
-Node.js 22.12+ or 24 LTS and npm are required. This environment was validated with Node 24.22.1.
+**Node.js 24+** and npm are required for the built-in SQLite backend. Validated with Node 24.22.1.
 
 ```sh
 git clone https://github.com/mukhammadmaqsud/iqro_kids_reads.git
@@ -15,7 +15,18 @@ npm run dev -- --port 5173
 
 Access to the private repository requires GitHub authorization. In the existing cloud checkout, use `/workspace/iqro_kids_reads` and skip the clone step. A separate worktree is unnecessary.
 
-The repository has no required environment variables, external API services, or database. `.env.example` documents this; copying it to `.env` is optional. Never put real credentials in the template or any `VITE_*` variable, which becomes public browser code. Authenticate to GitHub through `gh auth login`, never through a password or token stored in this project.
+`npm run dev` starts both Vite (http://localhost:5173) and the account API (127.0.0.1:3001); Vite proxies `/api` to it. SQLite creates `data/wbooks.db` automatically. Keep using the same browser hostname for cookies. No external service, API key, or mandatory environment setting is needed. Copying `.env.example` to `.env` is optional. Never put real credentials in the template or any `VITE_*` variable, which becomes public browser code. Authenticate to GitHub through `gh auth login`, never through a password or token stored in this project.
+
+For Windows PowerShell, the equivalent npm commands are `npm.cmd ci` and `npm.cmd run dev`. To update an existing checkout, stop its server and run `git pull --ff-only origin main`, then those commands. Do not run a second development API on the same port.
+
+To run the built application locally instead of the Vite development server:
+
+```sh
+npm run build
+npm start
+```
+
+Open http://127.0.0.1:3001. This Node process serves both `dist/` and `/api`. A static-only host or `vite preview` alone cannot provide account persistence. Running these commands is local execution, not a production deployment.
 
 ## What works
 
@@ -29,7 +40,9 @@ The repository has no required environment variables, external API services, or 
 - Click-to-load YouTube videos configured with ordinary links in `src/data/videos.ts`, with a direct YouTube fallback. Three temporary films are clearly marked as demo viewing rather than original story recaps. The earlier animation/local-video model remains supported.
 - A **separate Savol-javob section**: questions about completed books or general questions available immediately. No forced quiz after reading.
 - Supportive answer feedback, best score persistence, and explicit retries.
-- A parent-oriented view of this browser's profile and actual reading/quiz activity.
+- Parent registration/login, up to six child nickname/avatar profiles, profile switching, and server-stored reading and quiz results. Use **Ota-onalar uchun → Ro‘yxatdan o‘tish** to begin; children need no email or password.
+- Resume on another browser connected to the **same backend**, per-child progress, retryable offline event queues, and an explicit option to copy guest reading into the selected profile.
+- A parent view of the selected child's actual reading/quiz activity, with visible saving/error/retry status.
 
 ## Checks
 
@@ -41,15 +54,19 @@ npm run build
 npm run test:e2e
 ```
 
-Playwright uses `/usr/bin/chromium` by default. On another machine set `CHROMIUM_PATH` to an installed Chromium executable. It starts Vite automatically unless a server is already running. Automated accessibility checks use axe-core. Unit tests validate content and persistence; browser tests exercise reading, replay, recap, independent quizzes, rewards, failure states, keyboard/touch navigation, responsive layouts, and accessibility.
+Playwright uses `/usr/bin/chromium` by default. On another machine set `CHROMIUM_PATH` to an installed Chromium executable. Run browser tests with port 5173 free, or set `CI=1` to refuse an existing server: Playwright starts the combined development runner with API port 3101 and an isolated in-memory database. Automated accessibility checks use axe-core. `npm test` includes frontend unit tests and real HTTP/SQLite integration tests. Browser tests cover the reader plus account isolation, multiple browsers, profile switching, outage recovery, expired sessions, and multiple tabs.
 
-Use `npm run format` for source formatting. `npm run build` creates static files in `dist/`; the hash router requires no server rewrites.
+Use `npm run format` for source formatting. The hash router requires no frontend route rewrites. See [account architecture and operations](docs/ACCOUNTS.md) for configuration, API contracts, test coverage, and hosting requirements.
 
 ## Data boundary
 
-This is a single-device demo. Progress is stored in `localStorage` under `iqro.progress.v1`; blocked storage displays a warning and corrupt records are handled defensively. No child names, emails, or other personal data are collected. Dates are displayed in Asia/Tashkent.
+Guest reading stays in `localStorage` under `iqro.progress.v1`. Signed-in data lives in private SQLite: parent email, password hash, child nickname/avatar, reading, and quiz results. Only progress events waiting for synchronization are stored in account/child-scoped browser queues; passwords and session tokens are never stored in localStorage. Session cookies are HttpOnly. Dates are displayed in Asia/Tashkent.
 
-There is no login, secure parent gate, account isolation, cross-device sync, API, or database yet. The parent view intentionally identifies itself as local demo data. Client-side records and reward checks are not a security boundary. They must move behind authenticated, authorized server mutations before shared accounts or real private family data are introduced.
+The API checks parent ownership on every child operation, grades submitted answer indices, and records its own timestamps. Retried events do not count twice. Guest reading transfers only when explicitly requested; guest quiz scores cannot be imported without answers. Local browser storage is user-editable and is not an access-control boundary. Server validation does not prove a child actually read a page.
+
+**Different installations have different databases.** Actual devices must reach one shared Node backend to share accounts. Public hosting has not been configured or deployed. Before internet use, configure HTTPS with Secure cookies, persistent storage, protected backups, and an account lifecycle/privacy policy. Email verification, password recovery, account deletion UI, and a separate parent PIN inside an already signed-in family session are not implemented. Do not treat this MVP as a completed public launch.
+
+`data/`, database sidecars/backups, `.env`, credentials, and generated output are ignored. Never commit or publicly serve the database. See [ACCOUNTS.md](docs/ACCOUNTS.md) before operating it with real family data.
 
 Pages use two physical leaves with one complete reading passage and a large original scene. Dialogue stays together in one block; illustration and narration change sides between pages. All eight pages in each published story are illustrated. Openings use real watercolor scene art rather than small repeated discovery covers. Story text appears exactly once, checked against the current simplified copy. More scene artwork and editorial review remain future content work. Videos currently link to temporary third-party YouTube films. They are labeled as demo material; original story videos are not yet produced. Third-party availability and embedding permissions can change. Only three stories are published, so 5/10/20-story milestones remain future goals.
 

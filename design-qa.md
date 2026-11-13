@@ -50,3 +50,17 @@ No deployment or hosted preview is claimed. Actual executor Chromium rendered th
 - [x] Combined visual comparisons opened and reviewed.
 
 final result: passed
+
+# Parent accounts and server progress — 2026-11-13
+
+This is a functional extension of the existing interface. The reader, story artwork, world selection and independent quiz flow are preserved. The account form and child picker use the existing palette and responsive shell.
+
+Reviewed actual application captures: [desktop sign-in](docs/visual-review/accounts-login.webp), [parent progress](docs/visual-review/accounts-parent.webp), and [mobile account](docs/visual-review/accounts-mobile.webp). Desktop viewport: 1440×1050; mobile: 390×1000, DPR 1. Captures came from the built Node application with its real SQLite API, using a synthetic `.invalid` email and child nickname. The private preview database is ignored and is not part of the commit. The captures showed no uncaught page errors; the mobile form/profile controls also passed automated axe checks.
+
+The parent can register, sign in, choose or add a child, read, see that child's progress and sign out. Child nickname and icon are visible when switching; each child's reader and quiz state are reset on selection. Saving, outage and retry feedback reflects API responses. Guest data stays separate until an explicit transfer; guest quiz scores are not silently promoted to server results.
+
+Verification includes two independent browser sessions continuing the same child, denial of another parent's child ID, sibling isolation, restart persistence, offline/reload replay exactly once, server-graded quiz retry, expiry recovery and two-tab pending queues. Passwords and session tokens are hashed server-side; cookies are HttpOnly; foreign-origin writes are rejected. These checks establish the implemented boundaries, not a completed public-launch security review.
+
+Hosting is not deployed. Actual devices must share the same backend/database. Account recovery, verified email, a separate parent PIN and account deletion UI remain future work; setup and operating limits are documented in [ACCOUNTS.md](docs/ACCOUNTS.md).
+
+Final checks on 2026-11-13: production build, lint, all 15 frontend unit tests, all 9 HTTP/SQLite integration tests, and the complete 56-scenario Chromium suite passed. No application source changed after this run.

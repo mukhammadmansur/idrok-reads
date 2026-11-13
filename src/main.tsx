@@ -7,6 +7,7 @@ import "./themes.css";
 import "./worlds.css";
 import "./comfort.css";
 import "./picturebook.css";
+import "./account.css";
 class ErrorBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }

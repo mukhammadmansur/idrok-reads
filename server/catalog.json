@@ -1,0 +1,8 @@
+{
+  "stories": {
+    "oy-dosti": { "pages": 8, "answers": [1, 0, 2], "options": [3, 3, 3] },
+    "bulut-kemasi": { "pages": 8, "answers": [1, 0, 2], "options": [3, 3, 3] },
+    "dengiz-siri": { "pages": 8, "answers": [0, 1, 2], "options": [3, 3, 3] }
+  },
+  "general": { "answers": [1, 0, 2], "options": [3, 3, 3] }
+}

@@ -14,13 +14,13 @@ The provisional product name is Iqro. No billing, social features, leaderboard, 
 
 ## Current stack and boundaries
 
-React 19, TypeScript, Vite, npm lockfile, Lucide icons, CSS tokens, authored local SVG artwork, Vitest, Playwright/Chromium, ESLint, and axe-core.
+React 19, TypeScript, Vite, npm lockfile, Lucide icons, CSS tokens, authored local SVG artwork, Node.js 24+ HTTP/SQLite backend, Vitest, Node integration tests, Playwright/Chromium, ESLint, and axe-core. The backend adds no third-party runtime dependency.
 
-The route layer is a small hash router: library, story details, reader, completion, independent quiz library/session, rewards, and parent view. Unknown stories and destinations have a recovery action. Everything is client-side; no server credentials or API contract is implied.
+The route layer is a small hash router: library, story details, reader, completion, independent quiz library/session, rewards, parent view, and account. Unknown stories and destinations have a recovery action. A same-origin `/api` provides parent sessions, owned child profiles, and progress events. Node serves the built frontend; Vite proxies the API during development.
 
 Story content is typed structured data, never HTML. Each logical page contains two physical leaves with a complete passage in one reading block and a large illustration. Sentences and dialogue are never automatically split at the spine. Image and narration sides vary between scenes; all current published pages have scene artwork. The same pages feed one reader; themes control CSS custom properties and environmental details. Themes never own progress or story logic. Selecting a world on the home page stays on that page; selecting it on story details also updates the whole application immediately. Both persist the choice in the existing versioned profile. Nonclassic worlds use full environment artwork behind readable surfaces; HoloBook uses translucent leaves and backdrop blur with local text backing.
 
-Progress functions are immutable and separated from rendering. Versioned storage parsing tolerates malformed data. Completion retains its original timestamp across refresh/replay. Quiz attempts are recorded only by an explicit completed attempt; refreshing results does not record another attempt. The best score is preserved. Local storage remains user-editable, so server-enforced anti-abuse and privacy are not claimed.
+Progress functions are immutable and separated from rendering. Guest storage remains separate from authenticated data. Account events have durable per-parent/per-child queues and idempotency receipts. SQLite transactions preserve first completion dates and best quiz scores; the server grades answer indices and checks child ownership. Versioned storage parsing tolerates malformed data. Browser refresh does not create another quiz attempt. The reading resume point follows the last successfully synchronized reading event; it is not a distributed ordering of offline client clocks. See [ACCOUNTS.md](ACCOUNTS.md) for guarantees and limits.
 
 ## File / module map
 
@@ -41,12 +41,21 @@ Progress functions are immutable and separated from rendering. Versioned storage
 | `src/data/videos.ts` | Replaceable YouTube demo links, titles and credits |
 | `src/lib/youtube.ts` | Strict video-link parsing and controlled iframe URLs |
 | `src/components/Quiz.tsx` | Independent quiz library, answers, feedback, results, retries |
-| `src/components/Progress.tsx` | Milestones, story badges, local parent activity |
+| `src/components/Progress.tsx` | Milestones, story badges, selected child's parent activity |
+| `src/components/Account.tsx` | Parent login/registration, child picker, guest transfer, sync status |
 | `src/components/ui.tsx` | Reusable story card, artwork fallback, empty state, section title |
 | `src/data/types.ts` | Story, pages, themes, media, questions, progress contracts |
 | `src/data/stories.ts` | Original content, publication status, theme metadata, general questions |
 | `src/lib/progress.ts` | Storage validation and pure page/completion/quiz transitions |
-| `src/lib/context.tsx` | Local persistence and route subscription |
+| `src/lib/context.tsx` | Session lifecycle, guest persistence, child hydration and event synchronization |
+| `src/lib/api.ts` | Typed same-origin account/progress client |
+| `src/lib/outbox.ts` | Validated account/child-scoped pending events and optimistic progress |
+| `server/store.mjs` | SQLite schema, password/session hashes, ownership, event transactions and grading |
+| `server/app.mjs` | HTTP API, cookies, write-origin checks, safe built-file serving |
+| `server/index.mjs` | Server settings, private database permissions and graceful shutdown |
+| `server/catalog.json` | Server-owned story bounds and quiz answer keys, checked against frontend content |
+| `scripts/dev.mjs` | Starts and stops the API and Vite together on Linux/Windows |
+| `src/account.css` | Responsive account forms, profile picker and sync feedback |
 | `src/styles.css` | Base components, responsive rules, and paper motion |
 | `src/themes.css` | Persisted application palettes and story leaf layout |
 | `src/picturebook.css` | Large illustrated-book composition, intact narration and living scenery motion |
@@ -64,12 +73,13 @@ Progress functions are immutable and separated from rendering. Versioned storage
 3. Added one reader and four theme layers, progress/resume, completion, and recap animation.
 4. Added independent book/general quizzes and lightweight completion rewards.
 5. Added the local parent view; tested core flows, failure recovery, responsive layouts, and accessibility.
+6. Added parent accounts, child ownership, SQLite persistence, server grading and retryable synchronization. Kept the independent quiz flow and original guest data. Tested real HTTP authorization and independent browser sessions.
 
 ## Known limits and next phase
 
-The frontend demonstrates the reading loop. The next production phase is authenticated parent accounts with child-profile ownership, server-side progress/quiz validation, database uniqueness constraints for completions and rewards, and integration tests for unauthorized cross-account access. There is no public endpoint to test for authorization in the current frontend.
+Parent accounts and server-backed profiles now work against one Node/SQLite instance. Public hosting has not been deployed. A public release still needs HTTPS/Secure cookies, a persistent private database with tested backups, email verification/recovery, account deletion and privacy/retention decisions. The family session has no separate parent PIN. SQLite is a single-instance MVP; horizontally scaled writes and advanced conflict resolution are outside this phase.
 
-Further content work: editorial review, more distinct scene illustrations where useful, produced recap media/captions, and more stories. Reading duration is an estimate; actual reading time is deliberately not fabricated. Current badges are on-screen achievements, not downloadable signed certificates. The demo supports one local profile; profile IDs and family ownership must be introduced with authentication.
+Further content work: editorial review, more distinct scene illustrations where useful, produced recap media/captions, and more stories. Reading duration is an estimate; actual reading time is deliberately not fabricated. Current badges are on-screen achievements, not downloadable signed certificates. Up to six owned child profiles per account are supported; the account stores nicknames rather than requesting full names or birth dates.
 
 Automated checks are Chromium based. Axe checks help catch accessibility regressions but do not replace testing with children, assistive technology, or an editorial reading-level review.
 

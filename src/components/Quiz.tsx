@@ -14,7 +14,6 @@ import {
 import { generalQuiz, stories } from "../data/stories";
 import type { Question } from "../data/types";
 import { useProgress } from "../lib/context";
-import { recordQuiz } from "../lib/progress";
 import { Art, EmptyState, SectionTitle } from "./ui";
 export function QuizLibrary() {
   const { progress } = useProgress();
@@ -138,7 +137,7 @@ export function QuizSession({
   questions: Question[];
   title: string;
 }) {
-  const { progress, update } = useProgress();
+  const { progress, answerQuiz } = useProgress();
   const previous = progress.quizzes[id];
   const [result, setResult] = useState(!!previous);
   const [page, setPage] = useState(0);
@@ -146,6 +145,7 @@ export function QuizSession({
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [thisScore, setThisScore] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<number[]>([]);
   const q = questions[page];
   const submit = () => {
     if (selected === null) return;
@@ -156,9 +156,10 @@ export function QuizSession({
     const newScore = score + (selected === q.answer ? 1 : 0);
     if (page === questions.length - 1) {
       setThisScore(newScore);
-      update((p) => recordQuiz(p, id, newScore, questions.length));
+      answerQuiz(id, [...answers, selected]);
       setResult(true);
     } else {
+      setAnswers([...answers, selected]);
       setScore(newScore);
       setPage(page + 1);
       setSelected(null);
@@ -170,6 +171,7 @@ export function QuizSession({
     setSelected(null);
     setChecked(false);
     setScore(0);
+    setAnswers([]);
     setThisScore(null);
     setResult(false);
   };

@@ -12,9 +12,11 @@ import {
 } from "lucide-react";
 import { stories } from "../data/stories";
 import { useProgress } from "../lib/context";
+import { AccountPanel, ChildAvatar } from "./Account";
 import { Art, EmptyState, SectionTitle } from "./ui";
 export default function Progress({ parent = false }: { parent?: boolean }) {
-  const { progress } = useProgress();
+  const { progress, user, children, selectedChildId } = useProgress();
+  const child = children.find((profile) => profile.id === selectedChildId);
   const started = stories.filter((s) => progress.reading[s.id]);
   const completed = started.filter((s) => progress.reading[s.id].completedAt);
   const quizScores = Object.values(progress.quizzes);
@@ -129,21 +131,33 @@ export default function Progress({ parent = false }: { parent?: boolean }) {
         <h1>Mutolaa sari birga.</h1>
         <p>Farzandingizning o‘qish sayohatiga bir nazar.</p>
       </div>
-      <div className="local-notice">
-        <LockKeyhole size={19} />
-        <p>
-          <strong>Shu brauzerdagi demo profil.</strong> Natijalar shu qurilmada
-          saqlanadi. Hisob, bulut bilan sinxronlash va alohida ota-ona kirishi
-          hali ulanmagan.
-        </p>
-      </div>
+      {user ? (
+        <AccountPanel />
+      ) : (
+        <div className="local-notice">
+          <LockKeyhole size={19} />
+          <div>
+            <p>
+              <strong>Mehmon profili.</strong> Hozir natijalar shu brauzerda
+              saqlanadi.
+            </p>
+            <a className="text-link" href="#/account">
+              Akkauntga kirish va saqlash <ArrowRight size={16} />
+            </a>
+          </div>
+        </div>
+      )}
       <div className="parent-profile">
-        <span className="avatar">K</span>
+        <span className="avatar">
+          {child ? <ChildAvatar avatar={child.avatar} /> : "K"}
+        </span>
         <div>
-          <h2>Kichik kitobxon</h2>
+          <h2>{child?.name ?? "Kichik kitobxon"}</h2>
           <p>Bir hikoya, bir yangi kashfiyot.</p>
         </div>
-        <span className="profile-label">Mahalliy profil</span>
+        <span className="profile-label">
+          {user ? "Bola profili" : "Mahalliy profil"}
+        </span>
       </div>
       <div className="stat-grid">
         {[

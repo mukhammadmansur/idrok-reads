@@ -5,6 +5,10 @@ import globals from "globals";
 export default tseslint.config(
   { ignores: ["dist", "node_modules", "playwright-report", "test-results"] },
   js.configs.recommended,
+  {
+    files: ["server/**/*.mjs", "scripts/**/*.mjs"],
+    languageOptions: { globals: globals.node },
+  },
   ...tseslint.configs.recommended,
   {
     files: ["**/*.{ts,tsx}"],

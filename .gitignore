@@ -57,3 +57,7 @@ yarn-error.log*
 *.bak
 *.swp
 .DS_Store
+
+# Private account database and backups
+data/
+*.db.backup*

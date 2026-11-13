@@ -23,12 +23,19 @@ export default function Shell({
   path: string;
   children: ReactNode;
 }) {
-  const { storageError, progress } = useProgress();
+  const {
+    storageError,
+    progress,
+    user,
+    children: profiles,
+    selectedChildId,
+  } = useProgress();
+  const child = profiles.find((profile) => profile.id === selectedChildId);
   const current = path.startsWith("/quiz")
     ? "/quiz"
     : path === "/rewards"
       ? "/rewards"
-      : path === "/parent"
+      : path === "/parent" || path === "/account"
         ? "/parent"
         : "/";
   return (
@@ -88,14 +95,16 @@ export default function Shell({
           <span>Ota-onalar uchun</span>
           <ArrowUpRight size={16} />
         </a>
-        <div className="sidebar-profile">
+        <a href="#/account" className="sidebar-profile">
           <span className="avatar">K</span>
           <div>
-            <strong>Kichik kitobxon</strong>
-            <span>Bugun ham birga o‘qiymiz</span>
+            <strong>{child?.name ?? "Kichik kitobxon"}</strong>
+            <span>
+              {user ? "Profil va akkaunt" : "Ota-ona akkauntiga kirish"}
+            </span>
           </div>
           <span className="online-dot" />
-        </div>
+        </a>
       </aside>
       <div className="main-shell">
         <header className="topbar">

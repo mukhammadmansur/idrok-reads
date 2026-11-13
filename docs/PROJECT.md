@@ -51,6 +51,12 @@ Progress functions are immutable and separated from rendering. Guest storage rem
 | `src/lib/api.ts` | Typed same-origin account/progress client |
 | `src/lib/outbox.ts` | Validated account/child-scoped pending events and optimistic progress |
 | `server/store.mjs` | SQLite schema, password/session hashes, ownership, event transactions and grading |
+| `server/family.mjs` | Additive v2 migration, parent PIN gate, family monitoring, active-time intervals and Google identities |
+| `server/google.mjs` | Google RS256 token verification, audience/issuer/expiry/nonce validation and cached signing keys |
+| `src/components/ParentGate.tsx` | Parent verification, six-digit code settings and child-mode locking |
+| `src/components/ParentDashboard.tsx` | Whole-family cards, per-child detail, weekly time chart and recent activity |
+| `src/components/GoogleButton.tsx` | Official Google button when configured, clear unavailable/retry states otherwise |
+| `src/lib/useReadingActivity.ts` | Foreground reader heartbeat with idle/visibility pauses |
 | `server/app.mjs` | HTTP API, cookies, write-origin checks, safe built-file serving |
 | `server/index.mjs` | Server settings, private database permissions and graceful shutdown |
 | `server/catalog.json` | Server-owned story bounds and quiz answer keys, checked against frontend content |
@@ -74,12 +80,13 @@ Progress functions are immutable and separated from rendering. Guest storage rem
 4. Added independent book/general quizzes and lightweight completion rewards.
 5. Added the local parent view; tested core flows, failure recovery, responsive layouts, and accessibility.
 6. Added parent accounts, child ownership, SQLite persistence, server grading and retryable synchronization. Kept the independent quiz flow and original guest data. Tested real HTTP authorization and independent browser sessions.
+7. Added parent password/PIN verification, distinct login/registration routes, optional Google Identity Services, named children and whole-family monitoring with measured active reading time. The database upgrades existing records additively.
 
 ## Known limits and next phase
 
-Parent accounts and server-backed profiles now work against one Node/SQLite instance. Public hosting has not been deployed. A public release still needs HTTPS/Secure cookies, a persistent private database with tested backups, email verification/recovery, account deletion and privacy/retention decisions. The family session has no separate parent PIN. SQLite is a single-instance MVP; horizontally scaled writes and advanced conflict resolution are outside this phase.
+Parent accounts and server-backed profiles now work against one Node/SQLite instance. Public hosting has not been deployed. A public release still needs HTTPS/Secure cookies, a persistent private database with tested backups, email verification/recovery, account deletion and privacy/retention decisions. Parent controls now require password/PIN verification, expire after 30 minutes, and lock on child-mode entry. Google sign-in is implemented but awaits a configured Web Client ID. SQLite is a single-instance MVP; horizontally scaled writes and advanced conflict resolution are outside this phase.
 
-Further content work: editorial review, more distinct scene illustrations where useful, produced recap media/captions, and more stories. Reading duration is an estimate; actual reading time is deliberately not fabricated. Current badges are on-screen achievements, not downloadable signed certificates. Up to six owned child profiles per account are supported; the account stores nicknames rather than requesting full names or birth dates.
+Further content work: editorial review, more distinct scene illustrations where useful, produced recap media/captions, and more stories. Reading duration is an estimate; actual reading time is deliberately not fabricated. Current badges are on-screen achievements, not downloadable signed certificates. Up to six owned child profiles per account are supported; the account requests each child’s first name and avatar, without requiring surname or birth date.
 
 Automated checks are Chromium based. Axe checks help catch accessibility regressions but do not replace testing with children, assistive technology, or an editorial reading-level review.
 

@@ -1,3 +1,4 @@
+import { createGoogleVerifier } from "./google.mjs";
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { resolve, extname, sep } from "node:path";
@@ -18,12 +19,12 @@ const contentTypes = {
   ".mp4": "video/mp4",
   ".webm": "video/webm",
 };
-function tokenFrom(req) {
+function cookieFrom(req, name = cookieName) {
   const raw = req.headers.cookie
     ?.split(";")
     .map((value) => value.trim())
-    .find((value) => value.startsWith(cookieName + "="));
-  return raw?.slice(cookieName.length + 1) ?? null;
+    .find((value) => value.startsWith(name + "="));
+  return raw?.slice(name.length + 1) ?? null;
 }
 async function jsonBody(req) {
   if (!req.headers["content-type"]?.startsWith("application/json"))
@@ -60,8 +61,14 @@ export function createApp({
   secureCookies = false,
   distPath = resolve("dist"),
   storeOptions = {},
+  googleOptions = {},
 }) {
   const store = createStore(databasePath, storeOptions);
+  const googleClientId = googleOptions.clientId ?? "";
+  const verifyGoogle = createGoogleVerifier({
+    ...googleOptions,
+    clientId: googleClientId,
+  });
   const server = createServer(async (req, res) => {
     let url;
     try {
@@ -73,6 +80,7 @@ export function createApp({
     }
     const api = url.pathname.startsWith("/api/");
     res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
     const json = (status, body) => {
       res.writeHead(status, {
@@ -88,13 +96,65 @@ export function createApp({
       );
     try {
       if (api) {
-        const token = tokenFrom(req),
+        const token = cookieFrom(req),
           method = req.method ?? "GET";
         if (method === "GET" && url.pathname === "/api/health")
           return json(200, { ok: true });
+        if (method === "GET" && url.pathname === "/api/auth/options") {
+          const nonce = googleClientId ? store.googleChallenge() : null;
+          if (nonce)
+            res.setHeader(
+              "Set-Cookie",
+              `wbooks_google_nonce=${nonce}; Path=/api; HttpOnly; SameSite=Lax; Max-Age=600${secureCookies ? "; Secure" : ""}`,
+            );
+          return json(200, { googleClientId, nonce });
+        }
+        if (method === "GET" && url.pathname === "/api/parent/status")
+          return json(200, store.parentState(token));
+        if (method === "GET" && url.pathname === "/api/parent/overview")
+          return json(200, store.familySummary(token));
         if (method === "GET" && url.pathname === "/api/session")
           return json(200, store.sessionView(token));
         if (!["GET", "HEAD"].includes(method)) writeCheck(req);
+        if (method === "POST" && url.pathname === "/api/auth/google") {
+          store.googleRate(req.socket.remoteAddress ?? "unknown");
+          const body = await jsonBody(req);
+          if (
+            !body ||
+            typeof body !== "object" ||
+            Object.keys(body).some(
+              (key) => !["credential", "link"].includes(key),
+            ) ||
+            (body.link !== undefined && typeof body.link !== "boolean")
+          )
+            throw new ApiError(400, "So‘rov noto‘g‘ri.");
+          const nonce = cookieFrom(req, "wbooks_google_nonce");
+          const claims = await verifyGoogle(body.credential, nonce);
+          const result = store.googleLogin(
+            token,
+            claims,
+            nonce,
+            body.link === true,
+          );
+          if (body.link) return json(200, result);
+          const { token: sessionToken, ...view } = result;
+          setCookie(sessionToken, store.sessionDays * 86400);
+          return json(200, view);
+        }
+        if (method === "POST" && url.pathname === "/api/parent/unlock")
+          return json(
+            200,
+            await store.unlockParent(token, await jsonBody(req)),
+          );
+        if (method === "POST" && url.pathname === "/api/parent/lock") {
+          await jsonBody(req);
+          return json(200, store.lockParent(token));
+        }
+        if (method === "POST" && url.pathname === "/api/parent/pin")
+          return json(
+            200,
+            await store.setParentPin(token, await jsonBody(req)),
+          );
         if (
           method === "POST" &&
           ["/api/auth/register", "/api/auth/login"].includes(url.pathname)
@@ -116,7 +176,7 @@ export function createApp({
         if (method === "POST" && url.pathname === "/api/children")
           return json(201, store.createChild(token, await jsonBody(req)));
         const match = url.pathname.match(
-          /^\/api\/children\/([a-f0-9-]{36})\/(progress|events|select)$/,
+          /^\/api\/children\/([a-f0-9-]{36})\/(progress|events|select|activity)$/,
         );
         if (match) {
           const [, id, action] = match;
@@ -126,6 +186,8 @@ export function createApp({
             await jsonBody(req);
             return json(200, store.selectChild(token, id));
           }
+          if (method === "POST" && action === "activity")
+            return json(200, store.activity(token, id, await jsonBody(req)));
           if (method === "POST" && action === "events")
             return json(200, store.applyEvents(token, id, await jsonBody(req)));
         }
@@ -167,7 +229,7 @@ export function createApp({
       }
       res.setHeader(
         "Content-Security-Policy",
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; frame-src https://www.youtube-nocookie.com; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+        "default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; media-src 'self'; frame-src https://www.youtube-nocookie.com https://accounts.google.com; connect-src 'self' https://accounts.google.com; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
       );
       res.writeHead(200, {
         "Content-Type":

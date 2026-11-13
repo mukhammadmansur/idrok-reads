@@ -14,7 +14,9 @@ import {
   Sun,
   UserRound,
 } from "lucide-react";
-import { useProgress, navigate } from "../lib/context";
+import { useProgress, navigate, useRoute } from "../lib/context";
+import GoogleButton from "./GoogleButton";
+import { ParentSecurity } from "./ParentGate";
 import type { ChildProfile } from "../lib/api";
 const avatars = { sun: Sun, leaf: Leaf, snow: Snowflake, rocket: Rocket };
 export function ChildAvatar({
@@ -150,7 +152,7 @@ export function AccountPanel() {
       )}
       {(creating || children.length === 0) && (
         <form className="child-form" onSubmit={add}>
-          <label htmlFor="child-name">Bolaning taxallusi</label>
+          <label htmlFor="child-name">Bolaning ismi</label>
           <input
             id="child-name"
             value={name}
@@ -158,9 +160,12 @@ export function AccountPanel() {
             maxLength={30}
             required
             autoComplete="off"
-            placeholder="Masalan, Kitobxon"
+            placeholder="Masalan, Azizbek"
           />
-          <p>To‘liq ism va tug‘ilgan sana kerak emas.</p>
+          <p>
+            Farzandingizning ismini yozing. Familiya va tug‘ilgan sana kerak
+            emas.
+          </p>
           <fieldset className="avatar-options">
             <legend>Belgi tanlang</legend>
             {(Object.keys(avatars) as ChildProfile["avatar"][]).map(
@@ -239,16 +244,22 @@ export function AccountPanel() {
   );
 }
 export default function Account() {
-  const { user, login, register, syncError } = useProgress();
-  const [mode, setMode] = useState<"login" | "register">("login"),
-    [email, setEmail] = useState(""),
+  const route = useRoute();
+  const mode = route.startsWith("/account/register") ? "register" : "login";
+  const { user, login, register, googleLogin, syncError } = useProgress();
+  const [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
+    [confirmPassword, setConfirmPassword] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    setBusy(true);
     setError("");
+    if (mode === "register" && password !== confirmPassword) {
+      setError("Parollar bir xil bo‘lsin.");
+      return;
+    }
+    setBusy(true);
     try {
       await (mode === "login" ? login : register)(email.trim(), password);
       setPassword("");
@@ -277,38 +288,65 @@ export default function Account() {
         </p>
       </div>
       {user ? (
-        <AccountPanel />
+        <>
+          <AccountPanel />
+          <ParentSecurity />
+        </>
       ) : (
         <section className="account-panel auth-card">
           <div
-            className="account-tabs"
+            className="account-tabs auth-choices"
             role="group"
             aria-label="Akkauntga kirish usuli"
           >
             <button
+              aria-label="Kirish"
               aria-pressed={mode === "login"}
               onClick={() => {
-                setMode("login");
+                navigate("/account/login");
+                setPassword("");
+                setConfirmPassword("");
                 setError("");
               }}
             >
-              Kirish
+              <span>AKKAUNTIM BOR</span>
+              <strong>Kirish</strong>
+              <small>O‘qishni davom ettirish</small>
             </button>
             <button
+              aria-label="Ro‘yxatdan o‘tish"
               aria-pressed={mode === "register"}
               onClick={() => {
-                setMode("register");
+                navigate("/account/register");
+                setPassword("");
+                setConfirmPassword("");
                 setError("");
               }}
             >
-              Ro‘yxatdan o‘tish
+              <span>BIRINCHI MARTA</span>
+              <strong>Ro‘yxatdan o‘tish</strong>
+              <small>Yangi akkaunt yaratish</small>
             </button>
           </div>
           <h2>
             {mode === "login"
-              ? "Yana xush kelibsiz"
-              : "Ota-ona akkauntini oching"}
+              ? "Mavjud akkauntga kirish"
+              : "Yangi akkaunt yaratish"}
           </h2>
+          <p className="auth-description">
+            {mode === "login"
+              ? "Avval ro‘yxatdan o‘tgan bo‘lsangiz, e-mail va parolingizni kiriting."
+              : "Birinchi marta kelgan bo‘lsangiz, e-mailingizni yozib yangi parol yarating."}
+          </p>
+          <GoogleButton
+            onCredential={async (c) => {
+              await googleLogin(c);
+              navigate("/account");
+            }}
+          />
+          <div className="auth-divider">
+            <span>yoki e-mail orqali</span>
+          </div>
           <form className="auth-form" onSubmit={(event) => void submit(event)}>
             <label htmlFor="parent-email">Ota-onaning e-maili</label>
             <input
@@ -334,7 +372,20 @@ export default function Account() {
               onChange={(e) => setPassword(e.target.value)}
             />
             {mode === "register" && (
-              <p>Kamida 12 belgi. Parolni boshqa odamga bermang.</p>
+              <>
+                <p>Kamida 12 belgi. Bu — yangi akkauntingiz uchun parol.</p>
+                <label htmlFor="confirm-password">Parolni qayta kiriting</label>
+                <input
+                  id="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={12}
+                  maxLength={128}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </>
             )}
             <button className="button" disabled={busy}>
               {busy

@@ -1,3 +1,4 @@
+import { createFamily } from "./family.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
@@ -70,7 +71,12 @@ async function passwordMatches(value, hash) {
 
 export function createStore(
   filename,
-  { sessionDays = 7, loginLimit = 20, registerLimit = 10 } = {},
+  {
+    sessionDays = 7,
+    loginLimit = 20,
+    registerLimit = 10,
+    clock = () => Date.now(),
+  } = {},
 ) {
   if (filename !== ":memory:")
     mkdirSync(dirname(filename), { recursive: true, mode: 0o700 });
@@ -84,7 +90,7 @@ export function createStore(
     CREATE TABLE IF NOT EXISTS quizzes(child_id TEXT NOT NULL REFERENCES children(id) ON DELETE CASCADE,quiz_id TEXT NOT NULL,score INTEGER NOT NULL,total INTEGER NOT NULL,attempts INTEGER NOT NULL,attempted_at TEXT NOT NULL,PRIMARY KEY(child_id,quiz_id));
     CREATE TABLE IF NOT EXISTS events(child_id TEXT NOT NULL REFERENCES children(id) ON DELETE CASCADE,event_id TEXT NOT NULL,payload_hash TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(child_id,event_id));
     CREATE TABLE IF NOT EXISTS rate_limits(bucket TEXT PRIMARY KEY,count INTEGER NOT NULL,reset_at INTEGER NOT NULL);
-    PRAGMA user_version=1;`);
+    `);
   const run = (sql, ...args) => db.prepare(sql).run(...args);
   const get = (sql, ...args) => db.prepare(sql).get(...args);
   const all = (sql, ...args) => db.prepare(sql).all(...args);
@@ -152,13 +158,15 @@ export function createStore(
   }
   function sessionView(token) {
     const current = session(token);
-    if (!current) return { user: null, children: [], selectedChildId: null };
+    if (!current)
+      return { user: null, children: [], selectedChildId: null, parent: null };
     const children = all(
       "SELECT * FROM children WHERE user_id=? ORDER BY created_at,id",
       current.user_id,
     );
     return {
       user: { id: current.user_id, email: current.email },
+      parent: family.parentState(token),
       children: children.map(publicChild),
       selectedChildId: children.some(
         (child) => child.id === current.selected_child_id,
@@ -176,6 +184,7 @@ export function createStore(
       userId,
       Date.now() + sessionDays * 86400000,
     );
+    family.unlockSession(token);
     return { token, ...sessionView(token) };
   }
   function progress(token, id) {
@@ -244,7 +253,30 @@ export function createStore(
   }
   const dummyHash =
     "00000000000000000000000000000000:" + Buffer.alloc(64).toString("hex");
+  const family = createFamily({
+    db,
+    run,
+    get,
+    all,
+    atomic,
+    authenticated,
+    owned,
+    progress,
+    publicChild,
+    sessionView,
+    issueSession,
+    rate,
+    passwordHash,
+    passwordMatches,
+    digest,
+    ApiError,
+    requireValue,
+    keys,
+    storyById,
+    clock,
+  });
   return {
+    ...family,
     close: () => db.close(),
     sessionDays,
     sessionView,
@@ -256,7 +288,13 @@ export function createStore(
       const hash = await passwordHash(secret);
       const id = randomUUID();
       try {
-        run("INSERT INTO users VALUES(?,?,?,?)", id, address, hash, now());
+        run(
+          "INSERT INTO users(id,email,password_hash,created_at) VALUES(?,?,?,?)",
+          id,
+          address,
+          hash,
+          now(),
+        );
       } catch (error) {
         if (get("SELECT id FROM users WHERE email=?", address))
           throw new ApiError(
@@ -280,9 +318,9 @@ export function createStore(
       const user = get("SELECT * FROM users WHERE email=?", address);
       const matches = await passwordMatches(
         secret,
-        user?.password_hash ?? dummyHash,
+        user?.password_enabled ? user.password_hash : dummyHash,
       );
-      if (!user || !matches)
+      if (!user || !user.password_enabled || !matches)
         throw new ApiError(
           401,
           "E-mail yoki parol noto‘g‘ri.",
@@ -295,13 +333,13 @@ export function createStore(
     },
     createChild(token, body) {
       keys(body, ["name", "avatar"]);
-      const current = authenticated(token);
+      const current = family.requireParent(token);
       requireValue(
         typeof body.name === "string" &&
           body.name.trim().length >= 1 &&
           body.name.trim().length <= 30 &&
           !/\p{Cc}/u.test(body.name),
-        "Taxallus 1–30 belgidan iborat bo‘lsin.",
+        "Ism 1–30 belgidan iborat bo‘lsin.",
       );
       requireValue(avatars.includes(body.avatar), "Belgi tanlang.");
       return atomic(() => {
@@ -331,6 +369,7 @@ export function createStore(
     },
     selectChild(token, id) {
       const { current } = owned(token, id);
+      family.requireParent(token);
       run(
         "UPDATE sessions SET selected_child_id=? WHERE token_hash=?",
         id,
@@ -410,6 +449,27 @@ export function createStore(
               time,
             );
           }
+          family.logEvent(
+            id,
+            event.type === "quiz"
+              ? {
+                  ...event,
+                  attemptScore: event.answers.reduce(
+                    (sum, answer, index) =>
+                      sum +
+                      Number(
+                        answer ===
+                          (event.quizId === "general"
+                            ? catalog.general
+                            : storyById(event.quizId)
+                          ).answers[index],
+                      ),
+                    0,
+                  ),
+                }
+              : event,
+            time,
+          );
           run(
             "INSERT INTO events VALUES(?,?,?,?)",
             id,

@@ -2,17 +2,34 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 const password = "browser-fixture-only-long-passphrase";
 const address = () => `parent-${crypto.randomUUID()}@example.invalid`;
+async function openAccount(page: Page) {
+  await page.goto("http://127.0.0.1:5173/#/account");
+  await page
+    .locator(".parent-gate input, #parent-email, .account-heading")
+    .first()
+    .waitFor();
+  if (await page.getByLabel("Akkaunt paroli", { exact: true }).isVisible()) {
+    await page.getByLabel("Akkaunt paroli", { exact: true }).fill(password);
+    await page
+      .getByRole("button", { name: "Bo‘limni ochish", exact: true })
+      .click();
+    await page.locator(".account-heading").waitFor();
+  }
+}
 async function register(page: Page, email: string, name = "Kitobxon") {
-  await page.goto("/#/account");
+  await openAccount(page);
   await page
     .getByRole("button", { name: "Ro‘yxatdan o‘tish", exact: true })
     .click();
   await page.getByLabel("Ota-onaning e-maili").fill(email);
   await page.getByLabel("Parol", { exact: true }).fill(password);
   await page
+    .getByLabel("Parolni qayta kiriting", { exact: true })
+    .fill(password);
+  await page
     .getByRole("button", { name: "Akkaunt yaratish", exact: true })
     .click();
-  await page.getByLabel("Bolaning taxallusi").fill(name);
+  await page.getByLabel("Bolaning ismi").fill(name);
   await page
     .getByRole("button", { name: "Profilni yaratish", exact: true })
     .click();
@@ -48,7 +65,7 @@ test("a parent can continue the same child on an independent device and logout r
   await expect.poll(() => savedPage(page, child)).toBe(3);
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const second = await context.newPage();
-  await second.goto("http://127.0.0.1:5173/#/account");
+  await openAccount(second);
   await second.getByLabel("Ota-onaning e-maili").fill(email);
   await second.getByLabel("Parol", { exact: true }).fill(password);
   await second
@@ -69,7 +86,7 @@ test("a parent can continue the same child on an independent device and logout r
       ),
     ),
   ).toBe(false);
-  await second.goto("http://127.0.0.1:5173/#/account");
+  await openAccount(second);
   await second.getByRole("button", { name: "Chiqish", exact: true }).click();
   await expect(
     second.getByRole("button", { name: "Akkauntga kirish", exact: true }),
@@ -95,11 +112,11 @@ test("switching siblings resets the reader and another parent cannot load their 
   const first = (await session(page)).selectedChildId;
   await readingPage(page, 3);
   await expect.poll(() => savedPage(page, first)).toBe(2);
-  await page.goto("/#/account");
+  await openAccount(page);
   await page
     .getByRole("button", { name: "Bola qo‘shish", exact: true })
     .click();
-  await page.getByLabel("Bolaning taxallusi").fill("Ikkinchi");
+  await page.getByLabel("Bolaning ismi").fill("Ikkinchi");
   await page
     .getByRole("button", { name: "Profilni yaratish", exact: true })
     .click();
@@ -108,19 +125,22 @@ test("switching siblings resets the reader and another parent cannot load their 
   ).toHaveAttribute("aria-pressed", "true");
   await page.goto("/#/read/oy-dosti");
   await expect(page.locator(".page-number")).toHaveText("1");
-  await page.goto("/#/account");
+  await openAccount(page);
   await page.getByRole("button", { name: "Birinchi", exact: true }).click();
   await page.goto("/#/read/oy-dosti");
   await expect(page.locator(".page-number")).toHaveText("3");
   const context = await browser.newContext();
   const stranger = await context.newPage();
   await stranger.goto("http://127.0.0.1:5173");
-  await stranger.goto("http://127.0.0.1:5173/#/account");
+  await openAccount(stranger);
   await stranger
     .getByRole("button", { name: "Ro‘yxatdan o‘tish", exact: true })
     .click();
   await stranger.getByLabel("Ota-onaning e-maili").fill(address());
   await stranger.getByLabel("Parol", { exact: true }).fill(password);
+  await stranger
+    .getByLabel("Parolni qayta kiriting", { exact: true })
+    .fill(password);
   await stranger
     .getByRole("button", { name: "Akkaunt yaratish", exact: true })
     .click();
@@ -230,7 +250,7 @@ test("account forms and signed-in profile controls remain accessible at mobile w
 }) => {
   await page.setViewportSize({ width: 390, height: 1000 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/#/account");
+  await openAccount(page);
   await expect(page.getByLabel("Ota-onaning e-maili")).toBeVisible();
   expect(
     (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze())
@@ -298,7 +318,7 @@ test("an expired session never exposes its child as the guest and pending work r
   });
   await page.getByRole("button", { name: "Keyingi", exact: true }).click();
   await expect.poll(async () => !(await session(page)).user).toBe(true);
-  await page.goto("/#/account");
+  await openAccount(page);
   await expect(page.getByLabel("Ota-onaning e-maili")).toBeVisible();
   await expect(page.getByText("SirliProfil", { exact: true })).toHaveCount(0);
   await page.getByLabel("Ota-onaning e-maili").fill(email);
@@ -335,4 +355,197 @@ test("one tab cannot discard another tab’s durable pending reading events", as
   await page.unroute("**/api/children/*/events");
   await page.evaluate(() => dispatchEvent(new Event("online")));
   await expect.poll(() => savedPage(page, child)).toBe(2);
+});
+
+test("parent section requires a six-digit PIN after returning to children and also protects the server endpoint", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await register(page, address(), "Azizbek");
+  await page.getByText("Ota-onalar himoyasi", { exact: true }).click();
+  await page
+    .getByLabel("6 xonali kod yarating", { exact: true })
+    .fill("482619");
+  await page.getByLabel("Kodni qayta kiriting", { exact: true }).fill("482619");
+  await page
+    .getByRole("button", { name: "Kodni saqlash", exact: true })
+    .click();
+  await expect(
+    page.getByText("Ota-ona kodi saqlandi.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Kitob o‘qish", exact: true }).click();
+  await expect
+    .poll(
+      async () =>
+        (await (await page.request.get("/api/parent/status")).json()).unlocked,
+    )
+    .toBe(false);
+  expect((await page.request.get("/api/parent/overview")).status()).toBe(403);
+  await page.goto("/#/parent");
+  await expect(
+    page.getByRole("heading", { name: "Bu bo‘lim faqat ota-onalar uchun" }),
+  ).toBeVisible();
+  await expect(page.locator(".family-grid")).toHaveCount(0);
+  await page.getByLabel("6 xonali ota-ona kodi").fill("111111");
+  await page.getByRole("button", { name: "Bo‘limni ochish" }).click();
+  await expect(page.getByRole("alert")).toContainText("noto‘g‘ri");
+  await page.getByLabel("6 xonali ota-ona kodi").fill("482619");
+  await page.getByRole("button", { name: "Bo‘limni ochish" }).click();
+  await expect(
+    page.getByRole("button", { name: "Azizbek — batafsil natijalar" }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Azizbek — batafsil natijalar" }),
+  ).toBeVisible();
+});
+
+test("four named children have clear separate monitoring and accessible mobile details", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await register(page, address(), "Azizbek");
+  const headers = { Origin: "http://127.0.0.1:5173", "X-WBooks-Client": "web" };
+  const first = (await session(page)).selectedChildId;
+  await page.request.post(`/api/children/${first}/events`, {
+    headers,
+    data: {
+      events: [
+        {
+          id: "family-first-completion-0001",
+          type: "reading",
+          storyId: "oy-dosti",
+          page: 7,
+          complete: true,
+        },
+      ],
+    },
+  });
+  for (const name of ["Madina", "Yusuf", "Soliha"]) {
+    await page
+      .getByRole("button", { name: "Bola qo‘shish", exact: true })
+      .click();
+    await page.getByLabel("Bolaning ismi", { exact: true }).fill(name);
+    await page
+      .getByRole("button", { name: "Profilni yaratish", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name, exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+  }
+  await page.goto("/#/parent");
+  await expect(page.locator(".family-child-card")).toHaveCount(4);
+  const aziz = page.getByRole("button", {
+    name: "Azizbek — batafsil natijalar",
+  });
+  await expect(aziz).toContainText("1");
+  await aziz.click();
+  await expect(
+    page.getByRole("region", { name: "Azizbek natijalari" }),
+  ).toContainText("O‘qib tugatilgan");
+  await page
+    .getByRole("button", { name: "Madina — batafsil natijalar" })
+    .click();
+  const madina = page.getByRole("region", { name: "Madina natijalari" });
+  await expect(madina).toContainText("Hali boshlanmagan");
+  await expect(
+    madina.getByRole("heading", { name: "Madina", exact: true }),
+  ).toBeInViewport();
+  await expect(madina).not.toContainText("O‘qib tugatilgan");
+  expect(
+    (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze())
+      .violations,
+  ).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.goto("/#/");
+  await expect
+    .poll(
+      async () =>
+        (await (await page.request.get("/api/parent/status")).json()).unlocked,
+    )
+    .toBe(false);
+  await page.goto("/#/parent");
+  expect(
+    (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze())
+      .violations,
+  ).toEqual([]);
+});
+
+test("sign-in and sign-up have distinct routes, descriptions and confirmed new passwords", async ({
+  page,
+}) => {
+  await page.goto("/#/account/login");
+  await expect(
+    page.getByRole("heading", { name: "Mavjud akkauntga kirish" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Parolni qayta kiriting")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Ro‘yxatdan o‘tish", exact: true })
+    .click();
+  await expect(page).toHaveURL(/account\/register/);
+  await expect(
+    page.getByRole("heading", { name: "Yangi akkaunt yaratish" }),
+  ).toBeVisible();
+  await page.getByLabel("Ota-onaning e-maili").fill(address());
+  await page.getByLabel("Parol", { exact: true }).fill(password);
+  await page
+    .getByLabel("Parolni qayta kiriting")
+    .fill("another-test-only-passphrase");
+  await page
+    .getByRole("button", { name: "Akkaunt yaratish", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("bir xil");
+  await expect(
+    page.getByRole("button", { name: "Google orqali davom etish" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText(
+      "Google orqali kirish hozircha mavjud emas. E-mail orqali davom eting.",
+    ),
+  ).toBeVisible();
+});
+
+test("reading activity stops in hidden and idle tabs and restarts on interaction", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await register(page, address(), "Faol kitobxon");
+  const phases: string[] = [];
+  await page.route("**/api/children/*/activity", async (route) => {
+    phases.push(route.request().postDataJSON().phase);
+    await route.continue();
+  });
+  await page.clock.install();
+  await page.goto("/#/read/oy-dosti");
+  await expect.poll(() => phases.includes("start")).toBe(true);
+  await page.clock.fastForward(16000);
+  await expect.poll(() => phases.at(-1)).toBe("pulse");
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => "hidden",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect.poll(() => phases.at(-1)).toBe("stop");
+  const hiddenCount = phases.length;
+  await page.clock.fastForward(60000);
+  expect(phases.length).toBe(hiddenCount);
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => "visible",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect.poll(() => phases.at(-1)).toBe("start");
+  await page.clock.fastForward(91000);
+  await expect.poll(() => phases.at(-1)).toBe("stop");
+  await page.mouse.click(10, 10);
+  await expect.poll(() => phases.at(-1)).toBe("start");
 });

@@ -40,9 +40,11 @@ Open http://127.0.0.1:3001. This Node process serves both `dist/` and `/api`. A 
 - Click-to-load YouTube videos configured with ordinary links in `src/data/videos.ts`, with a direct YouTube fallback. Three temporary films are clearly marked as demo viewing rather than original story recaps. The earlier animation/local-video model remains supported.
 - A **separate Savol-javob section**: questions about completed books or general questions available immediately. No forced quiz after reading.
 - Supportive answer feedback, best score persistence, and explicit retries.
-- Parent registration/login, up to six child nickname/avatar profiles, profile switching, and server-stored reading and quiz results. Use **Ota-onalar uchun → Ro‘yxatdan o‘tish** to begin; children need no email or password.
+- Parent registration/login, up to six child name/avatar profiles, profile switching, and server-stored reading and quiz results. Use **Ota-onalar uchun → Ro‘yxatdan o‘tish** to begin; children need no email or password.
 - Resume on another browser connected to the **same backend**, per-child progress, retryable offline event queues, and an explicit option to copy guest reading into the selected profile.
-- A parent view of the selected child's actual reading/quiz activity, with visible saving/error/retry status.
+- A protected parent dashboard comparing all children, with per-child books, best quiz results, attempt history, last activity, and seven days of active reading time.
+- Parent password confirmation or an optional six-digit PIN; returning to child reading locks parent controls. PINs are hashed and failed attempts are limited.
+- Separate, clearly labeled sign-in/sign-up routes with password confirmation for new accounts. Google Identity Services is implemented but disabled until a Web Client ID and authorized origins are configured; no live Google sign-in is claimed without that setup.
 
 ## Checks
 
@@ -60,11 +62,11 @@ Use `npm run format` for source formatting. The hash router requires no frontend
 
 ## Data boundary
 
-Guest reading stays in `localStorage` under `iqro.progress.v1`. Signed-in data lives in private SQLite: parent email, password hash, child nickname/avatar, reading, and quiz results. Only progress events waiting for synchronization are stored in account/child-scoped browser queues; passwords and session tokens are never stored in localStorage. Session cookies are HttpOnly. Dates are displayed in Asia/Tashkent.
+Guest reading stays in `localStorage` under `iqro.progress.v1`. Signed-in data lives in private SQLite: parent email, password hash, child first name/avatar, reading, and quiz results. Only progress events waiting for synchronization are stored in account/child-scoped browser queues; passwords and session tokens are never stored in localStorage. Session cookies are HttpOnly. Dates are displayed in Asia/Tashkent.
 
 The API checks parent ownership on every child operation, grades submitted answer indices, and records its own timestamps. Retried events do not count twice. Guest reading transfers only when explicitly requested; guest quiz scores cannot be imported without answers. Local browser storage is user-editable and is not an access-control boundary. Server validation does not prove a child actually read a page.
 
-**Different installations have different databases.** Actual devices must reach one shared Node backend to share accounts. Public hosting has not been configured or deployed. Before internet use, configure HTTPS with Secure cookies, persistent storage, protected backups, and an account lifecycle/privacy policy. Email verification, password recovery, account deletion UI, and a separate parent PIN inside an already signed-in family session are not implemented. Do not treat this MVP as a completed public launch.
+**Different installations have different databases.** Actual devices must reach one shared Node backend to share accounts. Public hosting has not been configured or deployed. Before internet use, configure HTTPS with Secure cookies, persistent storage, protected backups, and an account lifecycle/privacy policy. Email verification for password accounts, password recovery and account deletion UI are not implemented. The PIN protects parent controls; children still use a shared family login rather than independent child credentials. Do not treat this MVP as a completed public launch.
 
 `data/`, database sidecars/backups, `.env`, credentials, and generated output are ignored. Never commit or publicly serve the database. See [ACCOUNTS.md](docs/ACCOUNTS.md) before operating it with real family data.
 
@@ -75,3 +77,5 @@ See [generated asset provenance](docs/ASSETS.md) and [architecture and audit](do
 For the first private GitHub push, see [the safe push procedure](docs/FIRST_PUSH.md). It preserves the current branch and `origin`, refuses an existing destination, and verifies privacy and the uploaded commit.
 
 For the latest flow review, fixed-size reader checks, animation consistency and video limitations, see [reading comfort review](docs/READING_COMFORT.md).
+
+The parent dashboard is under **Ota-onalar uchun**. To add or change its six-digit code, open **Farzandlar va sozlamalar → Ota-onalar himoyasi**. Without a PIN, the account password opens it. Active-time measurement starts with this update; old reading records are preserved without inventing historical minutes. See [Google setup](docs/GOOGLE_SIGN_IN.md) when ready to enable Google.

@@ -92,11 +92,12 @@ test("reading, resume, completion, recap and separate quiz survive refresh", asy
   await page
     .getByRole("link", { name: "Ota-onalar uchun", exact: true })
     .click();
-  await expect(page.locator(".activity-title")).toContainText("Tugatilgan");
-  await expect(page.locator(".quiz-results-list")).toContainText("3 / 3");
-  await expect(page.locator(".stat-card").nth(1).locator("strong")).toHaveText(
-    "1",
-  );
+  await expect(
+    page.getByRole("heading", { name: "Mavjud akkauntga kirish" }),
+  ).toBeVisible();
+  await expect(page.locator(".family-grid")).toHaveCount(0);
+  await page.getByRole("link", { name: "Yutuqlarim", exact: true }).click();
+  await expect(page.locator(".badge-card.unlocked")).toHaveCount(1);
 });
 test("general quiz is independent, wrong answers are supportive and retry preserves best", async ({
   page,

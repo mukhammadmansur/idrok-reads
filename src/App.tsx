@@ -8,6 +8,8 @@ import Progress from "./components/Progress";
 import { EmptyState } from "./components/ui";
 import { stories } from "./data/stories";
 import { useRoute, useProgress } from "./lib/context";
+import ParentGate, { ChildArea } from "./components/ParentGate";
+import ParentDashboard from "./components/ParentDashboard";
 import Account from "./components/Account";
 export default function App() {
   const path = useRoute();
@@ -51,13 +53,17 @@ export default function App() {
   if (section === "read" && story)
     return user && !selectedChildId ? (
       <Shell path="/account">
-        <Account />
+        <ParentGate>
+          <Account />
+        </ParentGate>
       </Shell>
     ) : (
-      <Reader key={`${profileKey}:${story.id}`} story={story} />
+      <ChildArea>
+        <Reader key={`${profileKey}:${story.id}`} story={story} />
+      </ChildArea>
     );
   let content;
-  if (pathname === "/account" || (user && !selectedChildId))
+  if (section === "account" || (user && !selectedChildId))
     content = <Account />;
   else if (pathname === "/") content = <Home />;
   else if (section === "story" && story)
@@ -74,7 +80,7 @@ export default function App() {
     content = <Quiz key={`${profileKey}:${slug || "library"}`} id={slug} />;
   else if (pathname === "/rewards") content = <Progress key={profileKey} />;
   else if (pathname === "/parent")
-    content = <Progress key={profileKey} parent />;
+    content = user ? <ParentDashboard /> : <Account />;
   else
     content = (
       <div className="page">
@@ -90,5 +96,21 @@ export default function App() {
         />
       </div>
     );
-  return <Shell path={pathname}>{content}</Shell>;
+  const isParent =
+    section === "account" ||
+    section === "parent" ||
+    !!(user && !selectedChildId);
+  return (
+    <Shell path={pathname}>
+      {isParent ? (
+        user ? (
+          <ParentGate key={user.id}>{content}</ParentGate>
+        ) : (
+          content
+        )
+      ) : (
+        <ChildArea>{content}</ChildArea>
+      )}
+    </Shell>
+  );
 }

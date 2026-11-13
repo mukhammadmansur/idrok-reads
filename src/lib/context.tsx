@@ -47,6 +47,7 @@ interface ProgressContext extends State {
   update: (change: (p: ProfileProgress) => ProfileProgress) => void;
   answerQuiz: (id: string, answers: number[]) => void;
   login: (email: string, password: string) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   createChild: (name: string, avatar: ChildProfile["avatar"]) => Promise<void>;
@@ -60,6 +61,7 @@ const anonymous: AccountSession = {
   user: null,
   children: [],
   selectedChildId: null,
+  parent: null,
 };
 function guestData() {
   try {
@@ -372,6 +374,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       hydrate(await api.login(email, password)),
     [hydrate],
   );
+  const googleLogin = useCallback(
+    async (credential: string) => hydrate(await api.google(credential)),
+    [hydrate],
+  );
   const register = useCallback(
     async (email: string, password: string) =>
       hydrate(await api.register(email, password)),
@@ -433,6 +439,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         answerQuiz,
         login,
         register,
+        googleLogin,
         logout,
         createChild,
         selectChild,

@@ -22,6 +22,7 @@ import HologramReveal from "./HologramReveal";
 import Recap from "./Recap";
 import { ThemeGlyph, WorldBackdrop } from "./ThemeVisual";
 import PageTurnHint from "./PageTurnHint";
+import { useReadingActivity } from "../lib/useReadingActivity";
 import { usePaperDrag } from "../lib/usePaperDrag";
 export default function Reader({
   story,
@@ -31,6 +32,7 @@ export default function Reader({
   completed?: boolean;
 }) {
   const { progress, update } = useProgress();
+  useReadingActivity(story.id, completed);
   const [page, setPage] = useState(() =>
     Math.min(progress.reading[story.id]?.page || 0, story.pages.length - 1),
   );

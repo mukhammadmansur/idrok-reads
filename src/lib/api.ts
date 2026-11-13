@@ -9,10 +9,49 @@ export interface ChildProfile {
   avatar: "sun" | "leaf" | "snow" | "rocket";
   createdAt: string;
 }
+export interface ParentAccess {
+  unlocked: boolean;
+  pinSet: boolean;
+  canUsePassword: boolean;
+  googleLinked: boolean;
+}
+export interface FamilyChild {
+  profile: ChildProfile;
+  progress: ProfileProgress;
+  metrics: {
+    started: number;
+    completed: number;
+    quizAttempts: number;
+    accuracy: number | null;
+    todaySeconds: number;
+    weekSeconds: number;
+    totalSeconds: number;
+    lastActiveAt: string | null;
+  };
+  week: {
+    date: string;
+    seconds: number;
+    readingEvents: number;
+    quizAttempts: number;
+  }[];
+  recent: {
+    type: "reading" | "completed" | "quiz";
+    storyId: string;
+    page: number | null;
+    score: number | null;
+    total: number | null;
+    at: string;
+  }[];
+}
+export interface FamilyOverview {
+  generatedAt: string;
+  children: FamilyChild[];
+}
 export interface AccountSession {
   user: ParentAccount | null;
   children: ChildProfile[];
   selectedChildId: string | null;
+  parent: ParentAccess | null;
 }
 export interface ServerProgress {
   revision: number;
@@ -37,12 +76,18 @@ export class ApiError extends Error {
     super(message);
   }
 }
-async function request<T>(path: string, body?: unknown): Promise<T> {
+async function request<T>(
+  path: string,
+  body?: unknown,
+  keepalive = false,
+): Promise<T> {
   let response: Response;
   try {
     response = await fetch("/api" + path, {
       method: body === undefined ? "GET" : "POST",
       credentials: "same-origin",
+      signal: AbortSignal.timeout(15000),
+      keepalive,
       headers:
         body === undefined
           ? {}
@@ -75,6 +120,32 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
   return result as T;
 }
 export const api = {
+  authOptions: () =>
+    request<{ googleClientId: string; nonce: string | null }>("/auth/options"),
+  google: (credential: string) =>
+    request<AccountSession>("/auth/google", { credential }),
+  linkGoogle: (credential: string) =>
+    request<{ linked: boolean }>("/auth/google", { credential, link: true }),
+  parentStatus: () => request<ParentAccess>("/parent/status"),
+  parentUnlock: (method: "pin" | "password", secret: string) =>
+    request<ParentAccess>("/parent/unlock", { method, secret }),
+  parentLock: () => request<ParentAccess>("/parent/lock", {}),
+  setParentPin: (pin: string) => request<ParentAccess>("/parent/pin", { pin }),
+  family: () => request<FamilyOverview>("/parent/overview"),
+  activity: (
+    id: string,
+    body: {
+      streamId: string;
+      storyId: string;
+      phase: "start" | "pulse" | "stop";
+    },
+    keepalive = false,
+  ) =>
+    request<{ ok: boolean; creditedSeconds: number }>(
+      `/children/${id}/activity`,
+      body,
+      keepalive,
+    ),
   session: () => request<AccountSession>("/session"),
   register: (email: string, password: string) =>
     request<AccountSession>("/auth/register", { email, password }),

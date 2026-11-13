@@ -35,7 +35,7 @@ export default function Shell({
     ? "/quiz"
     : path === "/rewards"
       ? "/rewards"
-      : path === "/parent" || path === "/account"
+      : path === "/parent" || path.startsWith("/account")
         ? "/parent"
         : "/";
   return (

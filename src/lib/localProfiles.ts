@@ -128,6 +128,7 @@ export function updateActiveProfileProgress(
   profiles[index] = {
     ...currentProfile,
     progress: nextProgress,
+    syncedToParentId: undefined,
   };
   saveLocalProfiles(profiles);
 

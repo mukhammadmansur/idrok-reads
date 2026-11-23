@@ -124,19 +124,32 @@ export function createFamily({
       const current = authenticated(token);
       rate("parent-unlock", current.user_id, 5, 15 * 60000);
       requireValue(
-        ["pin", "password"].includes(body.method) &&
+        ["pin", "password", "math"].includes(body.method) &&
           typeof body.secret === "string" &&
           body.secret.length <= 128,
         "Kod yoki parolni kiriting.",
       );
       const user = get("SELECT * FROM users WHERE id=?", current.user_id);
+      if (body.method === "math") {
+        if (user.pin_hash)
+          throw new ApiError(
+            403,
+            "PIN-kod o‘rnatilgan. PIN-kodni kiriting.",
+            "pin_required",
+          );
+        run(
+          "DELETE FROM rate_limits WHERE bucket=?",
+          digest(`parent-unlock:${current.user_id}`),
+        );
+        return unlockSession(token);
+      }
       const hash =
         body.method === "pin"
           ? user.pin_hash
           : user.password_enabled
             ? user.password_hash
             : null;
-      const validFormat = body.method !== "pin" || /^\d{6}$/.test(body.secret);
+      const validFormat = body.method !== "pin" || /^\d{4,6}$/.test(body.secret);
       if (!hash || !validFormat || !(await passwordMatches(body.secret, hash)))
         throw new ApiError(
           403,
@@ -161,8 +174,8 @@ export function createFamily({
       keys(body, ["pin"]);
       const current = requireParent(token);
       requireValue(
-        typeof body.pin === "string" && /^\d{6}$/.test(body.pin),
-        "Kod aynan 6 ta raqamdan iborat bo‘lsin.",
+        typeof body.pin === "string" && /^\d{4,6}$/.test(body.pin),
+        "Kod 4 yoki 6 ta raqamdan iborat bo‘lsin.",
       );
       const hash = await passwordHash(body.pin);
       // Parent permission may expire while a slow request is in flight.

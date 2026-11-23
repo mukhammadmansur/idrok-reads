@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Delete, LockKeyhole, ShieldCheck } from "lucide-react";
 import { api, type ParentAccess } from "../../lib/api";
+import { useProgress } from "../../lib/context";
 import styles from "./ParentalGateModal.module.css";
 
 interface ParentalGateModalProps {
@@ -11,6 +12,7 @@ interface ParentalGateModalProps {
 }
 
 const LOCAL_PARENT_UNLOCKED_KEY = "iqro.parent_session_unlocked.v1";
+const GUEST_PIN_KEY = "iqro.guest_pin.v1";
 
 export function isParentSessionUnlocked(): boolean {
   try {
@@ -38,11 +40,14 @@ export function ParentalGateModal({
   onSuccess,
   parentStatus,
 }: ParentalGateModalProps) {
-  const pinSet = parentStatus?.pinSet ?? false;
+  const { user } = useProgress();
+  const guestPin = !user ? (typeof localStorage !== "undefined" ? localStorage.getItem(GUEST_PIN_KEY) : null) : null;
+  const pinSet = Boolean(parentStatus?.pinSet || guestPin);
   const [digits, setDigits] = useState("");
   const [error, setError] = useState("");
   const [shaking, setShaking] = useState(false);
   const [busy, setBusy] = useState(false);
+  const shakeTimer = useRef<number | undefined>(undefined);
 
   // Math challenge state for fallback when no PIN is set
   const [mathProblem, setMathProblem] = useState<{
@@ -50,6 +55,12 @@ export function ParentalGateModal({
     b: number;
     answer: number;
   }>({ a: 7, b: 8, answer: 56 });
+
+  useEffect(() => {
+    return () => {
+      if (shakeTimer.current) clearTimeout(shakeTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
@@ -74,7 +85,8 @@ export function ParentalGateModal({
     setError(msg);
     setShaking(true);
     setDigits("");
-    setTimeout(() => setShaking(false), 500);
+    if (shakeTimer.current) clearTimeout(shakeTimer.current);
+    shakeTimer.current = window.setTimeout(() => setShaking(false), 500);
   };
 
   const handleVerify = async (code: string) => {
@@ -82,21 +94,40 @@ export function ParentalGateModal({
     setBusy(true);
 
     if (pinSet) {
-      try {
-        await api.parentUnlock("pin", code);
-        setParentSessionUnlocked(true);
-        onSuccess();
-      } catch (cause) {
-        triggerError("PIN-kod noto‘g‘ri, qayta urinib ko‘ring.");
-      } finally {
-        setBusy(false);
+      if (guestPin) {
+        if (code === guestPin) {
+          setParentSessionUnlocked(true);
+          setBusy(false);
+          onSuccess();
+        } else {
+          setBusy(false);
+          triggerError("PIN-kod noto‘g‘ri, qayta urinib ko‘ring.");
+        }
+      } else {
+        try {
+          await api.parentUnlock("pin", code);
+          setParentSessionUnlocked(true);
+          onSuccess();
+        } catch {
+          triggerError("PIN-kod noto‘g‘ri, qayta urinib ko‘ring.");
+        } finally {
+          setBusy(false);
+        }
       }
     } else {
       // Math challenge verification
       if (parseInt(code, 10) === mathProblem.answer) {
-        setParentSessionUnlocked(true);
-        setBusy(false);
-        onSuccess();
+        try {
+          if (user) {
+            await api.parentUnlock("math" as any, "ok");
+          }
+          setParentSessionUnlocked(true);
+          onSuccess();
+        } catch (cause) {
+          triggerError(cause instanceof Error ? cause.message : "Xatolik yuz berdi.");
+        } finally {
+          setBusy(false);
+        }
       } else {
         setBusy(false);
         triggerError("Noto‘g‘ri javob, qayta hisoblab ko‘ring.");
@@ -136,6 +167,24 @@ export function ParentalGateModal({
     setDigits((prev) => prev.slice(0, -1));
     setError("");
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key >= "0" && e.key <= "9") {
+        e.preventDefault();
+        handleKeyClick(e.key);
+      } else if (e.key === "Backspace") {
+        e.preventDefault();
+        handleBackspace();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, digits, busy, pinSet, mathProblem, onClose]);
 
   return (
     <div

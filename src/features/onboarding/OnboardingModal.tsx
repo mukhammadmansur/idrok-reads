@@ -79,7 +79,12 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
   };
 
   return (
-    <div className={styles.backdrop} role="dialog" aria-modal="true">
+    <div
+      className={styles.backdrop}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="onboarding-modal-title"
+    >
       <div className={styles.card}>
         <div className={styles.stepIndicator}>
           <div className={`${styles.stepDot} ${styles.stepDotActive}`} />
@@ -95,7 +100,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
                 <Sparkles size={14} style={{ display: "inline", marginRight: 4 }} />
                 Salom! Tanishib olaylik
               </span>
-              <h1>IdrokReads olamiga xush kelibsan!</h1>
+              <h1 id="onboarding-modal-title">IdrokReads olamiga xush kelibsan!</h1>
               <p className={styles.subtitle}>
                 Qahramoningni tanla va sehrli kitoblar sayohatini boshla.
               </p>
@@ -172,7 +177,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
                 <ShieldCheck size={14} style={{ display: "inline", marginRight: 4 }} />
                 Ota-ona uchun — ixtiyoriy
               </span>
-              <h1>Natijalar yo‘qolmasin</h1>
+              <h1 id="onboarding-modal-title">Natijalar yo‘qolmasin</h1>
               <p className={styles.subtitle}>
                 Farzandingizning natijalari yo‘qolib ketmasligi va boshqa
                 qurilmalarda ham ko‘rinishi uchun hisob ulashingiz mumkin.

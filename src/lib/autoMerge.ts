@@ -115,6 +115,7 @@ export async function executeBackgroundAutoMerge(
   let serverChildren: ChildProfile[] = [...session.children];
   let mergedCount = 0;
   const mergedNames: string[] = [];
+  const mergedLocalIds = new Set<string>();
   const activeLocalId = getActiveLocalProfileId();
   let serverSelectedId = session.selectedChildId;
 
@@ -172,7 +173,11 @@ export async function executeBackgroundAutoMerge(
       const events = progressToEvents(local);
       if (events.length > 0) {
         try {
-          await apiClient.events(targetServerChild.id, events);
+          const CHUNK_SIZE = 50;
+          for (let i = 0; i < events.length; i += CHUNK_SIZE) {
+            const chunk = events.slice(i, i + CHUNK_SIZE);
+            await apiClient.events(targetServerChild.id, chunk);
+          }
         } catch {
           // Keep unsynced flag so it can retry later
           continue;
@@ -185,6 +190,7 @@ export async function executeBackgroundAutoMerge(
 
       mergedCount++;
       mergedNames.push(local.name);
+      mergedLocalIds.add(local.id);
     }
   }
 
@@ -199,7 +205,7 @@ export async function executeBackgroundAutoMerge(
 
   // Mark merged local profiles as synced
   const updatedLocals = localProfiles.map((p) => {
-    if (mergedNames.includes(p.name)) {
+    if (mergedLocalIds.has(p.id)) {
       return { ...p, syncedToParentId: user.id };
     }
     return p;
@@ -209,7 +215,7 @@ export async function executeBackgroundAutoMerge(
   // Generate warm toast message
   let toastMessage: string | null = null;
   if (mergedCount === 1) {
-    toastMessage = `[${mergedNames[0]}]ning natijalari oilangiz hisobiga saqlandi ✓`;
+    toastMessage = `${mergedNames[0]}ning natijalari oilangiz hisobiga saqlandi ✓`;
   } else if (mergedCount > 1) {
     toastMessage = "Oilangiz profillari saqlandi ✓";
   }

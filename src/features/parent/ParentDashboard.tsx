@@ -42,6 +42,19 @@ function localToFamilyOverview(locals: ReturnType<typeof getLocalProfiles>): Fam
       ).length;
       const started = Object.keys(local.progress.reading).length;
       const quizAttempts = Object.keys(local.progress.quizzes).length;
+      const quizEntries = Object.values(local.progress.quizzes);
+      let totalScore = 0;
+      let totalQuestions = 0;
+      for (const q of quizEntries) {
+        if (q.total > 0) {
+          totalScore += q.score;
+          totalQuestions += q.total;
+        }
+      }
+      const accuracy =
+        totalQuestions > 0
+          ? Math.round((totalScore / totalQuestions) * 100)
+          : null;
       const totalSeconds = local.activeReadingSeconds ?? 0;
 
       return {
@@ -56,7 +69,7 @@ function localToFamilyOverview(locals: ReturnType<typeof getLocalProfiles>): Fam
           started,
           completed,
           quizAttempts,
-          accuracy: null,
+          accuracy,
           todaySeconds: totalSeconds,
           weekSeconds: totalSeconds,
           totalSeconds,
@@ -254,8 +267,8 @@ export function ParentDashboard() {
               <h2>{child.profile.name}</h2>
               <p className={styles.summaryLead}>
                 {child.metrics.completed > 0
-                  ? `[${child.profile.name}] shu kungacha ${child.metrics.completed} ta kitob o‘qidi.`
-                  : `[${child.profile.name}] birinchi kitobini boshlashga tayyor.`}
+                  ? `${child.profile.name} shu kungacha ${child.metrics.completed} ta kitob o‘qidi.`
+                  : `${child.profile.name} birinchi kitobini boshlashga tayyor.`}
               </p>
             </div>
             <span>

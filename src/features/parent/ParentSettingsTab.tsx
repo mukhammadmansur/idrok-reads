@@ -67,6 +67,8 @@ export function ParentSettingsTab() {
       if (user) {
         await api.setParentPin(pin);
         await parentAccess?.refresh();
+      } else {
+        localStorage.setItem("iqro.guest_pin.v1", pin);
       }
       setPinMsg("4 xonali PIN-kod muvaffaqiyatli saqlandi.");
       setPin("");
@@ -88,7 +90,7 @@ export function ParentSettingsTab() {
     setChildBusy(true);
     try {
       await createChild(childName.trim(), childAvatar);
-      setChildMsg(`[${childName.trim()}] profili qo‘shildi.`);
+      setChildMsg(`${childName.trim()} profili qo‘shildi.`);
       setChildName("");
     } catch (cause) {
       setChildError(
@@ -100,10 +102,10 @@ export function ParentSettingsTab() {
   };
 
   const handleDeleteChild = async (id: string, name: string) => {
-    if (!confirm(`Haqiqatan ham [${name}] profilini o‘chirmoqchimisiz?`)) return;
+    if (!confirm(`Haqiqatan ham ${name} profilini o‘chirmoqchimisiz?`)) return;
     try {
       await deleteChild(id);
-      setChildMsg(`[${name}] profili o‘chirildi.`);
+      setChildMsg(`${name} profili o‘chirildi.`);
     } catch (cause) {
       setChildError(
         cause instanceof Error ? cause.message : "Profil o‘chirilmadi.",

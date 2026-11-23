@@ -2,10 +2,13 @@ import { useEffect } from "react";
 import { api } from "./api";
 import { eventId } from "./outbox";
 import { useProgress } from "./context";
+import { addActiveReadingSeconds } from "./localProfiles";
+
 export function useReadingActivity(storyId: string, completed: boolean) {
   const { user, selectedChildId } = useProgress();
   useEffect(() => {
-    if (!user || !selectedChildId || completed) return;
+    if (completed) return;
+    if (user && !selectedChildId) return;
     const childId = selectedChildId,
       streamId = eventId();
     let lastInteraction = Date.now(),
@@ -13,12 +16,18 @@ export function useReadingActivity(storyId: string, completed: boolean) {
       disposed = false;
     let sending = Promise.resolve();
     const send = (phase: "start" | "pulse" | "stop", keepalive = false) => {
-      sending = sending
-        .then(() =>
-          api.activity(childId, { streamId, storyId, phase }, keepalive),
-        )
-        .then(() => {})
-        .catch(() => {});
+      if (user && childId) {
+        sending = sending
+          .then(() =>
+            api.activity(childId, { streamId, storyId, phase }, keepalive),
+          )
+          .then(() => {})
+          .catch(() => {});
+      } else if (!user) {
+        if (phase === "pulse") {
+          addActiveReadingSeconds(15);
+        }
+      }
     };
     const tick = () => {
       const active =

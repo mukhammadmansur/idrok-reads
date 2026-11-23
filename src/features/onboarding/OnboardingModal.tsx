@@ -136,8 +136,13 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
                       className={`${styles.avatarOption} ${avatar === item.id ? styles.avatarActive : ""}`}
                       onClick={() => setAvatar(item.id)}
                     >
-                      <Avatar avatar={item.id} size={42} />
+                      <Avatar avatar={item.id} size={50} />
                       <span className={styles.avatarLabel}>{item.label}</span>
+                      {avatar === item.id && (
+                        <span className={styles.avatarCheckBadge} aria-hidden="true">
+                          ✓
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>

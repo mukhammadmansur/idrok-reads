@@ -179,8 +179,9 @@ export function ProfileSwitcherModal({
                   className={`${styles.avatarPickBtn} ${avatar === item.id ? styles.avatarPickActive : ""}`}
                   onClick={() => setAvatar(item.id)}
                   aria-label={item.label}
+                  title={item.label}
                 >
-                  <Avatar avatar={item.id} size={36} />
+                  <Avatar avatar={item.id} size={42} />
                 </button>
               ))}
             </div>

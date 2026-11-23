@@ -179,15 +179,18 @@
   box-shadow: 0 6px 16px rgba(32, 54, 45, 0.07);
 }
 
-.worldEmoji {
-  font-size: 1.75rem;
-  line-height: 1;
+.worldIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.worldTile:hover .worldEmoji {
-  transform: scale(1.15) rotate(4deg);
+.worldTile:hover .worldIconWrap {
+  transform: scale(1.15) rotate(-3deg);
 }
 
 .worldText {
@@ -729,8 +732,14 @@
     gap: 0.5rem;
   }
 
-  .worldEmoji {
-    font-size: 1.25rem;
+  .worldIconWrap {
+    width: 28px;
+    height: 28px;
+  }
+
+  .worldIconWrap svg {
+    width: 26px !important;
+    height: 26px !important;
   }
 
   .worldLabel {

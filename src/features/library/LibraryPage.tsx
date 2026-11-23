@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import {
   BookOpen,
   Clock3,
@@ -11,50 +12,56 @@ import { Link, useSearchParams } from "react-router-dom";
 import { stories } from "../../content";
 import { useProgress } from "../../lib/context";
 import { ProgressBar } from "../../design-system/ProgressBar";
+import {
+  BookSticker,
+  LionSticker,
+  FoxSticker,
+  WhaleSticker,
+} from "../../design-system/Avatar";
 import { AhaMomentBanner } from "../onboarding/AhaMomentBanner";
 import styles from "./LibraryPage.module.css";
 
 interface WorldTopic {
   id: string;
   category: string;
-  emoji: string;
   label: string;
   sublabel: string;
   theme: "all" | "adventure" | "friendship" | "nature";
+  icon: ComponentType<{ size?: number }>;
 }
 
 const WORLD_TOPICS: WorldTopic[] = [
   {
     id: "all",
     category: "all",
-    emoji: "🌈",
     label: "Barchasi",
-    sublabel: "Barcha olamlar",
+    sublabel: "Barcha ertaklar",
     theme: "all",
+    icon: BookSticker,
   },
   {
     id: "Sarguzasht",
     category: "Sarguzasht",
-    emoji: "🦁",
     label: "Jasur sarguzasht",
     sublabel: "Jasorat va sayohat",
     theme: "adventure",
+    icon: LionSticker,
   },
   {
     id: "Do‘stlik",
     category: "Do‘stlik",
-    emoji: "🦊",
     label: "Do‘stlik va mehr",
     sublabel: "Mehr-oqibat ertaklari",
     theme: "friendship",
+    icon: FoxSticker,
   },
   {
     id: "Tabiat",
     category: "Tabiat",
-    emoji: "🌊",
     label: "Sehrli tabiat",
     sublabel: "Dengiz va tabiat sirlari",
     theme: "nature",
+    icon: WhaleSticker,
   },
 ];
 
@@ -117,8 +124,10 @@ export function LibraryPage() {
       <header className={styles.libraryHeader}>
         <div className={styles.headerLeft}>
           <h1 className={styles.pageTitle}>
-            <span className={styles.titleIcon}>📚</span>
-            Sehrli kitoblar javoni
+            <span className={styles.titleIcon}>
+              <BookSticker size={32} />
+            </span>
+            <span>Sehrli kitoblar javoni</span>
           </h1>
           <p className={styles.pageSubtitle}>
             O‘zingga yoqqan ertakni tanla va sehrli sayohatga chiq!
@@ -171,6 +180,7 @@ export function LibraryPage() {
             const isActive =
               normalize(topic) === normalize(item.category) ||
               (item.id === "all" && topic === "all");
+            const Icon = item.icon;
             return (
               <button
                 key={item.id}
@@ -181,7 +191,9 @@ export function LibraryPage() {
                 }`}
                 aria-pressed={isActive}
               >
-                <span className={styles.worldEmoji}>{item.emoji}</span>
+                <div className={styles.worldIconWrap}>
+                  <Icon size={34} />
+                </div>
                 <div className={styles.worldText}>
                   <strong className={styles.worldLabel}>{item.label}</strong>
                   <span className={styles.worldSublabel}>{item.sublabel}</span>
@@ -232,7 +244,8 @@ export function LibraryPage() {
                 setParams(next, { replace: true });
               }}
             >
-              🌈 Barcha ertaklarni ko‘rish
+              <BookSticker size={20} />
+              <span>Barcha ertaklarni ko‘rish</span>
             </button>
           </div>
         ) : (
@@ -275,10 +288,10 @@ export function LibraryPage() {
                     {/* Floating Top Badges */}
                     <div className={styles.coverTopBadges}>
                       <span className={styles.categoryBadge}>
-                        {cardTheme === "adventure" && "🦁 "}
-                        {cardTheme === "friendship" && "🦊 "}
-                        {cardTheme === "nature" && "🌊 "}
-                        {story.category}
+                        {cardTheme === "adventure" && <LionSticker size={16} />}
+                        {cardTheme === "friendship" && <FoxSticker size={16} />}
+                        {cardTheme === "nature" && <WhaleSticker size={16} />}
+                        <span>{story.category}</span>
                       </span>
 
                       {isCompleted ? (

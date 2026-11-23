@@ -64,6 +64,64 @@ export const AVATAR_COLORS: Record<
    ORGANIC, ROUNDED, TELEGRAM-STYLE STICKERS (ZERO SHARP POLYGONS!)
    ========================================================================== */
 
+/** 0. Sehrli Kitob — Magical open storybook with gold sparkles */
+export function BookSticker({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={styles.stickerSvg}>
+      {/* Outer warm glow aura */}
+      <circle cx="32" cy="34" r="24" fill="#FEF3C7" opacity="0.6" />
+
+      {/* Floating golden magic sparkles */}
+      <path d="M10 15 L11.5 18 L14.5 19.5 L11.5 21 L10 24 L8.5 21 L5.5 19.5 L8.5 18 Z" fill="#F59E0B" />
+      <path d="M54 12 L55.2 14.5 L58 15.5 L55.2 16.5 L54 19 L52.8 16.5 L50 15.5 L52.8 14.5 Z" fill="#F59E0B" />
+      <circle cx="19" cy="9" r="2" fill="#FBBF24" />
+      <circle cx="45" cy="8" r="1.8" fill="#FBBF24" />
+
+      {/* Book hardcover back (thick white sticker outline) */}
+      <path
+        d="M6 50 C16 47 25 48 32 52 C39 48 48 47 58 50 L58 19 C48 16 39 17 32 21 C25 17 16 16 6 19 Z"
+        fill="#047857"
+        stroke="#FFFFFF"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+
+      {/* Inner spine / cover bevel */}
+      <path
+        d="M7 48.5 C16 45.5 25 46.5 32 50.5 C39 46.5 48 45.5 57 48.5 L57 20 C48 17.5 39 18.5 32 22 C25 18.5 16 17.5 7 20 Z"
+        fill="#065F46"
+      />
+
+      {/* Left cream pages */}
+      <path
+        d="M9 45.5 C17 42.5 25 43.5 31 47 L31 21 C25 18 17 17 9 19.5 Z"
+        fill="#FFFBEB"
+        stroke="#E2D9C8"
+        strokeWidth="1.3"
+      />
+      {/* Left page text lines */}
+      <path d="M13 25 Q21 23.5 27 25 M13 30 Q21 28.5 27 30 M13 35 Q21 33.5 25 35" stroke="#D1C7B7" strokeWidth="1.8" strokeLinecap="round" />
+
+      {/* Right cream pages */}
+      <path
+        d="M55 45.5 C47 42.5 39 43.5 33 47 L33 21 C39 18 47 17 55 19.5 Z"
+        fill="#FFFBEB"
+        stroke="#E2D9C8"
+        strokeWidth="1.3"
+      />
+      {/* Right page magical star & lines */}
+      <path d="M44 24 L45.2 26.5 L48 27.5 L45.2 28.5 L44 31 L42.8 28.5 L40 27.5 L42.8 26.5 Z" fill="#F59E0B" />
+      <path d="M37 34 Q45 32.5 51 34 M37 39 Q43 37.5 48 39" stroke="#D1C7B7" strokeWidth="1.8" strokeLinecap="round" />
+
+      {/* Silk ruby ribbon dangling down */}
+      <path d="M32 22 V54 L35 51 L38 54 V22 Z" fill="#EF4444" stroke="#B91C1C" strokeWidth="0.8" />
+
+      {/* Golden book spine badge */}
+      <ellipse cx="32" cy="22" rx="2.5" ry="1.5" fill="#FBBF24" />
+    </svg>
+  );
+}
+
 /** 1. Jasur Sher — Chubby cartoon lion with rounded flower mane */
 export function LionSticker({ size = 48 }: { size?: number }) {
   return (
@@ -282,33 +340,62 @@ export function FoxSticker({ size = 48 }: { size?: number }) {
 export function WhaleSticker({ size = 48 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={styles.stickerSvg}>
-      {/* Smooth rounded water droplets */}
-      <circle cx="26" cy="8" r="2" fill="#67E8F9" />
-      <circle cx="32" cy="5" r="2.4" fill="#38BDF8" />
-      <circle cx="38" cy="8" r="2" fill="#67E8F9" />
-      <path d="M32 16 Q32 10 28 8 M32 16 Q32 9 32 6 M32 16 Q32 10 36 8" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" fill="none" />
+      {/* Bubbling water fountain */}
+      <path d="M30 18 Q30 9 24 7 M30 18 Q30 7 30 4 M30 18 Q30 9 36 7" stroke="#38BDF8" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+      <circle cx="22" cy="7" r="2.6" fill="#67E8F9" stroke="#FFFFFF" strokeWidth="1" />
+      <circle cx="30" cy="3.5" r="3" fill="#38BDF8" stroke="#FFFFFF" strokeWidth="1" />
+      <circle cx="38" cy="7" r="2.6" fill="#67E8F9" stroke="#FFFFFF" strokeWidth="1" />
 
-      {/* Whale body: smooth organic curve */}
-      <path d="M14 36 C14 25 24 21 37 21 C47 21 53 27 53 35 C53 43 42 46 32 46 C21 46 14 43 14 36 Z" fill="#0EA5E9" stroke="#FFFFFF" strokeWidth="2.5" />
+      {/* Whale tail (chubby rounded fluke) */}
+      <path
+        d="M18 41 C12 43 7 48 9 53 C13 52 17 48 20 44 C22 47 26 50 29 48 C27 44 24 42 20 41 Z"
+        fill="#0284C7"
+        stroke="#FFFFFF"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
 
-      {/* Rounded tail */}
-      <path d="M15 39 C10 42 8 46 10 49 C13 47 16 44 18 41 Z" fill="#0284C7" stroke="#FFFFFF" strokeWidth="1.5" />
+      {/* Whale body: chubby, friendly, filling 50x36 area */}
+      <path
+        d="M12 37 C12 23 24 18 40 18 C52 18 58 26 58 36 C58 46 46 51 32 51 C19 51 12 46 12 37 Z"
+        fill="#0284C7"
+        stroke="#FFFFFF"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+
+      {/* Top body highlight (soft cyan) */}
+      <path
+        d="M15 35 C15 25 25 20 39 20 C49 20 54 26 55 34 C49 28 36 26 24 30 C18 32 15 34 15 35 Z"
+        fill="#38BDF8"
+        opacity="0.6"
+      />
 
       {/* White rounded underbelly */}
-      <path d="M22 37 C28 37 38 38 45 43 C38 46 22 46 17 42 C19 39 21 37 22 37 Z" fill="#E0F2FE" />
+      <path
+        d="M20 40 C28 39 40 40 50 46 C44 50 26 51 16 45 C17 42 19 40 20 40 Z"
+        fill="#F0F9FF"
+      />
+      <path d="M26 44 Q30 43 34 44 M37 44 Q41 43 45 45" stroke="#BAE6FD" strokeWidth="1.2" strokeLinecap="round" />
 
-      {/* Smiling eye */}
-      <circle cx="43" cy="31" r="3" fill="#0F172A" />
-      <circle cx="42" cy="30" r="1.1" fill="#FFFFFF" />
+      {/* Big shiny cartoon eye */}
+      <circle cx="46" cy="32" r="3.6" fill="#0F172A" />
+      <circle cx="44.8" cy="30.5" r="1.4" fill="#FFFFFF" />
+      <circle cx="47.2" cy="33.2" r="0.7" fill="#FFFFFF" />
 
       {/* Sweet smile */}
-      <path d="M41 36 Q44 38 47 36" stroke="#0369A1" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+      <path d="M43 38 Q47 41 51 38" stroke="#0369A1" strokeWidth="2.2" strokeLinecap="round" fill="none" />
 
       {/* Rosy blush */}
-      <circle cx="37" cy="36" r="3" fill="#F472B6" opacity="0.65" />
+      <circle cx="39" cy="38" r="3.5" fill="#FB7185" opacity="0.75" />
 
       {/* Little side fin */}
-      <ellipse cx="31" cy="39" rx="4.5" ry="2.2" fill="#0284C7" transform="rotate(-15 31 39)" />
+      <path
+        d="M32 41 C28 41 26 44 28 46 C32 46 36 43 37 42 C35 41 33 41 32 41 Z"
+        fill="#0369A1"
+        stroke="#FFFFFF"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

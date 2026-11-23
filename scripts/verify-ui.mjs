@@ -74,8 +74,14 @@ async function runVerification() {
       }
     }
 
-    // Check Library Page
+    // Check Home Page
+    console.log("Checking Desktop Home Page...");
+    await desktopPage.screenshot({ path: `${ARTIFACT_DIR}/desktop-03-home.png` });
+
+    // Navigate to Library Page
     console.log("Checking Desktop Library Page...");
+    await desktopPage.goto("http://localhost:5173/library");
+    await desktopPage.waitForTimeout(600);
     await desktopPage.screenshot({ path: `${ARTIFACT_DIR}/desktop-03-library.png` });
     
     // Check horizontal overflow
@@ -84,10 +90,10 @@ async function runVerification() {
     });
     if (desktopOverflow) results.desktop.overflows.push("Library page has horizontal overflow");
 
-    // Check Topic Filter Pills
-    const dostlikPill = desktopPage.locator("button:has-text('Do‘stlik')");
-    if (await dostlikPill.isVisible()) {
-      await dostlikPill.click();
+    // Check Topic Filter World Tiles
+    const sarguzashtPill = desktopPage.locator("button:has-text('Jasur sarguzasht')");
+    if (await sarguzashtPill.isVisible()) {
+      await sarguzashtPill.click();
       await desktopPage.waitForTimeout(400);
       await desktopPage.screenshot({ path: `${ARTIFACT_DIR}/desktop-04-library-filtered.png` });
       // Reset to all
@@ -173,7 +179,7 @@ async function runVerification() {
 
     // Check Reader Page Spread
     console.log("Checking Desktop Reader Spread...");
-    await desktopPage.goto("http://localhost:5173/read/ayiqchaning-yulduzi");
+    await desktopPage.goto("http://localhost:5173/read/oy-dosti");
     await desktopPage.waitForTimeout(1000);
     await desktopPage.screenshot({ path: `${ARTIFACT_DIR}/desktop-11-reader-spread.png` });
 
@@ -227,8 +233,14 @@ async function runVerification() {
       }
     }
 
-    // Check Mobile Library
+    // Check Mobile Home
+    console.log("Checking Mobile Home View...");
+    await mobilePage.screenshot({ path: `${ARTIFACT_DIR}/mobile-01-home.png` });
+
+    // Navigate to Mobile Library
     console.log("Checking Mobile Library View...");
+    await mobilePage.goto("http://localhost:5173/library");
+    await mobilePage.waitForTimeout(600);
     await mobilePage.screenshot({ path: `${ARTIFACT_DIR}/mobile-01-library.png` });
 
     // Check horizontal overflow on mobile
@@ -294,7 +306,7 @@ async function runVerification() {
 
     // Check Mobile Reader
     console.log("Checking Mobile Reader View...");
-    await mobilePage.goto("http://localhost:5173/read/ayiqchaning-yulduzi");
+    await mobilePage.goto("http://localhost:5173/read/oy-dosti");
     await mobilePage.waitForTimeout(1000);
     await mobilePage.screenshot({ path: `${ARTIFACT_DIR}/mobile-05-reader.png` });
 

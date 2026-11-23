@@ -1,41 +1,94 @@
 import {
-  ArrowRight,
   BookOpen,
   Clock3,
+  Play,
+  RotateCcw,
   Search,
   Sparkles,
   X,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Button } from "../../design-system/Button";
-import { IconButton } from "../../design-system/IconButton";
-import { PageIntro } from "../../design-system/PageIntro";
-import { ProgressBar } from "../../design-system/ProgressBar";
 import { stories } from "../../content";
 import { useProgress } from "../../lib/context";
+import { ProgressBar } from "../../design-system/ProgressBar";
 import { AhaMomentBanner } from "../onboarding/AhaMomentBanner";
 import styles from "./LibraryPage.module.css";
+
+interface WorldTopic {
+  id: string;
+  category: string;
+  emoji: string;
+  label: string;
+  sublabel: string;
+  theme: "all" | "adventure" | "friendship" | "nature";
+}
+
+const WORLD_TOPICS: WorldTopic[] = [
+  {
+    id: "all",
+    category: "all",
+    emoji: "🌈",
+    label: "Barchasi",
+    sublabel: "Barcha olamlar",
+    theme: "all",
+  },
+  {
+    id: "Sarguzasht",
+    category: "Sarguzasht",
+    emoji: "🦁",
+    label: "Jasur sarguzasht",
+    sublabel: "Jasorat va sayohat",
+    theme: "adventure",
+  },
+  {
+    id: "Do‘stlik",
+    category: "Do‘stlik",
+    emoji: "🦊",
+    label: "Do‘stlik va mehr",
+    sublabel: "Mehr-oqibat ertaklari",
+    theme: "friendship",
+  },
+  {
+    id: "Tabiat",
+    category: "Tabiat",
+    emoji: "🌊",
+    label: "Sehrli tabiat",
+    sublabel: "Dengiz va tabiat sirlari",
+    theme: "nature",
+  },
+];
+
+const STATUS_OPTIONS = [
+  { id: "all", label: "Barcha kitoblar", emoji: "✨" },
+  { id: "reading", label: "O‘qilayotganlar", emoji: "📖" },
+  { id: "completed", label: "Tugatilganlar", emoji: "🏆" },
+];
 
 export function LibraryPage() {
   const { progress, children: profiles, selectedChildId, user } = useProgress();
   const child = profiles.find((profile) => profile.id === selectedChildId);
   const [params, setParams] = useSearchParams();
+
   const query = params.get("q") ?? "";
   const topic = params.get("topic") ?? "all";
   const status = ["reading", "completed"].includes(params.get("status") ?? "")
     ? params.get("status")!
     : "all";
+
   const changeFilter = (key: string, value: string) => {
     const next = new URLSearchParams(params);
     if (value && value !== "all") next.set(key, value);
     else next.delete(key);
     setParams(next, { replace: true });
   };
+
   const normalize = (value: string) =>
     value
       .toLocaleLowerCase("uz")
       .normalize("NFKC")
-      .replace(/[‘’ʻʼ`']/g, "");
+      .replace(/[‘’ʻʼ`']/g, "")
+      .trim();
+
   const filtered = stories.filter((story) => {
     const record = progress.reading[story.id];
     const matchesStatus =
@@ -53,150 +106,124 @@ export function LibraryPage() {
       )
     );
   });
-  const reading = stories
-    .filter(
-      (story) =>
-        progress.reading[story.id] && !progress.reading[story.id].completedAt,
-    )
-    .sort(
-      (a, b) =>
-        Date.parse(progress.reading[b.id].startedAt) -
-        Date.parse(progress.reading[a.id].startedAt),
-    )[0];
+
   const completed = stories.filter(
     (story) => progress.reading[story.id]?.completedAt,
   ).length;
 
   return (
     <div className={styles.page}>
-      <PageIntro
-        eyebrow="Kichik kitobxonlar olami"
-        title="Kutubxona"
-        description="O‘zingga yoqqan ertakni tanla va sehrli sayohatni boshla."
-        size="page"
-        actions={
-          <span className={styles.stat}>
-            <BookOpen size={16} />
-            {stories.length} ta ertak
-          </span>
-        }
-      />
-
-      {!user && completed > 0 && (
-        <AhaMomentBanner childName={child?.name ?? "Kitobxon"} />
-      )}
-
-      {reading && (
-        <Link to={`/read/${reading.slug}`} className={styles.continueCard}>
-          <img src={reading.cover} alt="" className={styles.continueArt} />
-          <span className={styles.continueBody}>
-            <span className={styles.continueEyebrow}>DAVOM ETISH</span>
-            <strong>{reading.title}</strong>
-            <span className={styles.continueMeta}>
-              {progress.reading[reading.id].page + 1} / {reading.pages.length}{" "}
-              sahifa
-            </span>
-            <ProgressBar
-              value={progress.reading[reading.id].page + 1}
-              max={reading.pages.length}
-              label={`${reading.title} o‘qish jarayoni`}
-              className={styles.continueProgress}
-            />
-          </span>
-          <span className={styles.continueAction}>
-            Davom etish <ArrowRight size={19} />
-          </span>
-        </Link>
-      )}
-
-      <section aria-labelledby="library-title" className={styles.library}>
-        <div className={styles.sectionHead}>
-          <h2 id="library-title">Hikoyalar</h2>
-          <span>{stories.length} ta original hikoya</span>
+      {/* 1. TOP BAR: Compact, joyful, child-centric */}
+      <header className={styles.libraryHeader}>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.pageTitle}>
+            <span className={styles.titleIcon}>📚</span>
+            Sehrli kitoblar javoni
+          </h1>
+          <p className={styles.pageSubtitle}>
+            O‘zingga yoqqan ertakni tanla va sehrli sayohatga chiq!
+          </p>
         </div>
-        <div className={styles.libraryTools}>
-          <div className={styles.search}>
-            <Search size={20} aria-hidden="true" />
+
+        <div className={styles.headerRight}>
+          <div className={styles.searchBox}>
+            <Search size={18} aria-hidden="true" className={styles.searchIcon} />
             <label htmlFor="story-search" className="sr-only">
-              Hikoya qidirish
+              Ertak qidirish
             </label>
             <input
               id="story-search"
               type="search"
               value={query}
               onChange={(event) => changeFilter("q", event.target.value)}
-              placeholder="Hikoya nomini yoz…"
+              placeholder="Ertak nomini yoz..."
               autoComplete="off"
             />
             {query && (
-              <IconButton
-                label="Qidiruvni tozalash"
-                icon={<X size={18} />}
+              <button
+                type="button"
+                className={styles.clearSearchBtn}
                 onClick={() => changeFilter("q", "")}
-              />
+                aria-label="Qidiruvni tozalash"
+              >
+                <X size={15} />
+              </button>
             )}
           </div>
-          <div
-            className={styles.topicFilters}
-            role="group"
-            aria-label="Mavzu bo‘yicha filtr"
-          >
-            {[
-              { id: "all", label: "Barchasi" },
-              { id: "Do‘stlik", label: "Do‘stlik" },
-              { id: "Sarguzasht", label: "Sarguzasht" },
-              { id: "Tabiat", label: "Tabiat" },
-            ].map((topicItem) => (
-              <button
-                key={topicItem.id}
-                type="button"
-                className={`${styles.topicPill} ${topic === topicItem.id ? styles.topicPillActive : ""}`}
-                aria-pressed={topic === topicItem.id}
-                onClick={() => changeFilter("topic", topicItem.id)}
-              >
-                {topicItem.label}
-              </button>
-            ))}
-          </div>
-          <div
-            className={styles.filters}
-            role="group"
-            aria-label="O‘qish holati"
-          >
-            {[
-              { id: "all", label: "Barchasi" },
-              { id: "reading", label: "Boshlangan" },
-              { id: "completed", label: "Tugatilgan" },
-            ].map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                aria-pressed={status === filter.id}
-                onClick={() => changeFilter("status", filter.id)}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
+
+          <span className={styles.storyCounter}>
+            <Sparkles size={15} style={{ color: "var(--gold)" }} />
+            {stories.length} ta ertak
+          </span>
         </div>
-        <p className={styles.results} role="status">
-          {query || status !== "all" || topic !== "all"
-            ? `${filtered.length} ta hikoya topildi`
-            : "Hikoyani tanla va sayohatni boshlaymiz."}
-        </p>
-        {filtered.length === 0 && (
-          <div className={styles.empty}>
-            <Search size={28} aria-hidden="true" />
-            <h3>Hikoya topilmadi</h3>
+      </header>
+
+      {/* Soft Aha-Moment Banner if applicable */}
+      {!user && completed > 0 && (
+        <AhaMomentBanner childName={child?.name ?? "Kitobxon"} />
+      )}
+
+      {/* 2. CONTROLS BAR: Playful Themed Worlds + Reading Status */}
+      <section className={styles.filterBar} aria-label="Ertaklar filtri">
+        {/* World / Topic Tiles */}
+        <div className={styles.worldList} role="group" aria-label="Sehrli olamlar">
+          {WORLD_TOPICS.map((item) => {
+            const isActive =
+              normalize(topic) === normalize(item.category) ||
+              (item.id === "all" && topic === "all");
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => changeFilter("topic", item.id)}
+                className={`${styles.worldTile} ${styles[`theme_${item.theme}`]} ${
+                  isActive ? styles.worldTileActive : ""
+                }`}
+                aria-pressed={isActive}
+              >
+                <span className={styles.worldEmoji}>{item.emoji}</span>
+                <div className={styles.worldText}>
+                  <strong className={styles.worldLabel}>{item.label}</strong>
+                  <span className={styles.worldSublabel}>{item.sublabel}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Status Pills */}
+        <div className={styles.statusGroup} role="group" aria-label="O‘qish holati">
+          {STATUS_OPTIONS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => changeFilter("status", item.id)}
+              className={`${styles.statusPill} ${
+                status === item.id ? styles.statusPillActive : ""
+              }`}
+              aria-pressed={status === item.id}
+            >
+              <span>{item.emoji}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. STORY CARDS GRID / EMPTY STATE */}
+      <section className={styles.bookshelfSection} aria-label="Kitoblar javoni">
+        {filtered.length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>🔍</div>
+            <h3>Ertak topilmadi</h3>
             <p>
-              {status === "completed" && !query
-                ? "Hikoyani o‘qib tugatganingdan keyin shu yerda ko‘rinadi."
-                : status === "reading" && !query
-                  ? "Hali boshlagan hikoyang yo‘q. Kutubxonadan birini tanla."
-                  : "Boshqa nom bilan qidir yoki barcha hikoyalarni ko‘r."}
+              {query
+                ? `«${query}» bo‘yicha hech qanday ertak chiqmadi. Boshqa so‘z bilan qidirib ko‘r!`
+                : "Bu bo‘limda hozircha kitob yo‘q. Barcha ertaklarni ochishing mumkin."}
             </p>
-            <Button
-              variant="secondary"
+            <button
+              type="button"
+              className={styles.resetFiltersBtn}
               onClick={() => {
                 const next = new URLSearchParams(params);
                 next.delete("q");
@@ -205,72 +232,131 @@ export function LibraryPage() {
                 setParams(next, { replace: true });
               }}
             >
-              Barcha hikoyalar
-            </Button>
+              🌈 Barcha ertaklarni ko‘rish
+            </button>
+          </div>
+        ) : (
+          <div className={styles.booksGrid}>
+            {filtered.map((story) => {
+              const record = progress.reading[story.id];
+              const isCompleted = !!record?.completedAt;
+              const percent = isCompleted
+                ? 100
+                : record
+                  ? Math.min(
+                      99,
+                      Math.round(((record.page + 1) / story.pages.length) * 100),
+                    )
+                  : 0;
+              const currentStep = record ? record.page + 1 : 0;
+
+              const normCat = normalize(story.category);
+              const cardTheme = normCat.includes("sarguzasht")
+                ? "adventure"
+                : normCat.includes("dost")
+                  ? "friendship"
+                  : "nature";
+
+              return (
+                <Link
+                  key={story.id}
+                  to={`/story/${story.slug}`}
+                  className={`${styles.bookCard} ${styles[`card_${cardTheme}`]}`}
+                >
+                  {/* Cover Art Container */}
+                  <div className={styles.coverFrame}>
+                    <img
+                      src={story.cover}
+                      alt={`${story.title} muqovasi`}
+                      className={styles.coverImage}
+                      loading="lazy"
+                    />
+
+                    {/* Floating Top Badges */}
+                    <div className={styles.coverTopBadges}>
+                      <span className={styles.categoryBadge}>
+                        {cardTheme === "adventure" && "🦁 "}
+                        {cardTheme === "friendship" && "🦊 "}
+                        {cardTheme === "nature" && "🌊 "}
+                        {story.category}
+                      </span>
+
+                      {isCompleted ? (
+                        <span className={styles.ribbonCompleted}>
+                          <Sparkles size={13} /> O‘qib bo‘lindi
+                        </span>
+                      ) : percent > 0 ? (
+                        <span className={styles.ribbonReading}>
+                          {percent}% o‘qildi
+                        </span>
+                      ) : (
+                        <span className={styles.ribbonAge}>
+                          {story.age[0]}–{story.age[1]} yosh
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Floating Bottom Metadata */}
+                    <div className={styles.coverBottomMeta}>
+                      <span className={styles.timeBadge}>
+                        <Clock3 size={13} /> {story.minutes} daqiqa
+                      </span>
+                      {percent > 0 && !isCompleted && (
+                        <span className={styles.pageBadge}>
+                          {currentStep} / {story.pages.length} sahifa
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Book Details Container */}
+                  <div className={styles.bookInfo}>
+                    <h2 className={styles.bookTitle}>{story.title}</h2>
+                    <p className={styles.bookSubtitle}>{story.subtitle}</p>
+
+                    {/* Reading Progress Bar (if in progress) */}
+                    {percent > 0 && (
+                      <div className={styles.progressContainer}>
+                        <ProgressBar
+                          value={percent}
+                          max={100}
+                          label={`${story.title} jarayoni`}
+                        />
+                      </div>
+                    )}
+
+                    {/* Big KidTech Call-To-Action Button */}
+                    <div className={styles.actionWrap}>
+                      <span
+                        className={`${styles.actionButton} ${
+                          isCompleted
+                            ? styles.btnCompleted
+                            : percent > 0
+                              ? styles.btnContinue
+                              : styles.btnStart
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <>
+                            <RotateCcw size={16} /> Qayta o‘qish
+                          </>
+                        ) : percent > 0 ? (
+                          <>
+                            <Play size={16} fill="currentColor" /> Davom ettirish
+                          </>
+                        ) : (
+                          <>
+                            <BookOpen size={16} /> Ertakni o‘qish
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
-        <div className={styles.grid}>
-          {filtered.map((story) => {
-            const record = progress.reading[story.id];
-            const percent = record?.completedAt
-              ? 100
-              : record
-                ? Math.min(
-                    99,
-                    Math.round(((record.page + 1) / story.pages.length) * 100),
-                  )
-                : 0;
-            return (
-              <Link
-                key={story.id}
-                to={`/story/${story.slug}`}
-                className={styles.card}
-              >
-                <span className={styles.coverWrap}>
-                  <img
-                    src={story.cover}
-                    alt=""
-                    className={styles.cover}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span className={styles.category}>{story.category}</span>
-                  {percent > 0 && (
-                    <span className={styles.percentBadge}>
-                      {record?.completedAt ? "Tugatilgan" : `${percent}%`}
-                    </span>
-                  )}
-                </span>
-                <span className={styles.cardBody}>
-                  <span className={styles.cardTitle}>
-                    <strong>{story.title}</strong>
-                  </span>
-                  <span className={styles.cardSubtitle}>{story.subtitle}</span>
-                  <span className={styles.cardMeta}>
-                    <Clock3 size={15} />
-                    {story.minutes} daqiqa
-                    <i />
-                    {story.age[0]}–{story.age[1]} yosh
-                  </span>
-                  {percent > 0 && (
-                    <ProgressBar
-                      value={percent}
-                      max={100}
-                      label={`${story.title} o‘qish jarayoni`}
-                    />
-                  )}
-                  <span className={styles.cardActionPill}>
-                    {record?.completedAt
-                      ? "Yana o‘qish"
-                      : percent > 0
-                        ? "Davom ettirish →"
-                        : "O‘qish →"}
-                  </span>
-                </span>
-              </Link>
-            );
-          })}
-        </div>
       </section>
     </div>
   );

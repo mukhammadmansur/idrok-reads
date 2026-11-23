@@ -174,6 +174,45 @@ export function ParentSettingsTab() {
             {authError && <p className={styles.error}>{authError}</p>}
 
             <form onSubmit={handleAuth} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("register")}
+                  style={{
+                    flex: 1,
+                    minHeight: 38,
+                    borderRadius: 10,
+                    border: "1.5px solid var(--line)",
+                    background: authMode === "register" ? "var(--accent)" : "transparent",
+                    color: authMode === "register" ? "#fff" : "var(--text)",
+                    fontSize: "0.875rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  Yangi hisob
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("login")}
+                  style={{
+                    flex: 1,
+                    minHeight: 38,
+                    borderRadius: 10,
+                    border: "1.5px solid var(--line)",
+                    background: authMode === "login" ? "var(--accent)" : "transparent",
+                    color: authMode === "login" ? "#fff" : "var(--text)",
+                    fontSize: "0.875rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  Mavjud hisob
+                </button>
+              </div>
+
               <div className={styles.field}>
                 <label htmlFor="settings-email" className={styles.label}>
                   E-mail

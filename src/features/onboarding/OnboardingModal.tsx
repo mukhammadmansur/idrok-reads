@@ -183,6 +183,44 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
               <GoogleButton onCredential={handleGoogleCredential} />
 
               <div className={styles.authTabWrap}>
+                <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode("register")}
+                    style={{
+                      flex: 1,
+                      minHeight: 38,
+                      borderRadius: 10,
+                      border: "1.5px solid var(--line)",
+                      background: authMode === "register" ? "var(--accent)" : "transparent",
+                      color: authMode === "register" ? "#fff" : "var(--text)",
+                      fontSize: "0.875rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    Yangi hisob
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode("login")}
+                    style={{
+                      flex: 1,
+                      minHeight: 38,
+                      borderRadius: 10,
+                      border: "1.5px solid var(--line)",
+                      background: authMode === "login" ? "var(--accent)" : "transparent",
+                      color: authMode === "login" ? "#fff" : "var(--text)",
+                      fontSize: "0.875rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    Mavjud hisob
+                  </button>
+                </div>
                 {authError && (
                   <p
                     role="alert"

@@ -43,14 +43,15 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
     setAuthError("");
     setAuthBusy(true);
     try {
+      // Save local profile first so auto-merge can immediately bind it to the new account
+      const trimmed = name.trim() || "Kitobxon";
+      createLocalChildProfile(trimmed, avatar, ageGroup);
+
       if (authMode === "login") {
         await login(email.trim(), password);
       } else {
         await register(email.trim(), password);
       }
-      // Save local profile first so auto-merge can immediately bind it to the new account
-      const trimmed = name.trim() || "Kitobxon";
-      createLocalChildProfile(trimmed, avatar, ageGroup);
       onComplete();
     } catch (cause) {
       setAuthError(
@@ -65,9 +66,11 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
     setAuthError("");
     setAuthBusy(true);
     try {
-      await googleLogin(credential);
+      // Save local profile first so auto-merge can immediately bind it to the new account
       const trimmed = name.trim() || "Kitobxon";
       createLocalChildProfile(trimmed, avatar, ageGroup);
+
+      await googleLogin(credential);
       onComplete();
     } catch (cause) {
       setAuthError(

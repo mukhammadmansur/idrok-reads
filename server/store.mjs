@@ -406,7 +406,7 @@ export function createStore(
     },
     createChild(token, body) {
       keys(body, ["name", "avatar"]);
-      const current = family.requireParent(token);
+      const current = authenticated(token);
       requireValue(
         typeof body.name === "string" &&
           body.name.trim().length >= 1 &&
@@ -415,6 +415,10 @@ export function createStore(
         "Ism 1–30 belgidan iborat bo‘lsin.",
       );
       requireValue(avatars.includes(body.avatar), "Belgi tanlang.");
+      const user = get("SELECT pin_hash FROM users WHERE id=?", current.user_id);
+      if (user?.pin_hash) {
+        family.requireParent(token);
+      }
       return atomic(() => {
         requireValue(
           get(

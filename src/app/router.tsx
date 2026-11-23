@@ -37,47 +37,31 @@ export const router = createBrowserRouter([
     errorElement: <RouteError />,
     children: [
       {
-        element: <ChildLayout />,
+        element: (
+          <RequireProfile>
+            <ChildLayout />
+          </RequireProfile>
+        ),
         children: [
           {
             index: true,
-            element: (
-              <RequireProfile>
-                <LibraryPage />
-              </RequireProfile>
-            ),
+            element: <LibraryPage />,
           },
           {
             path: "story/:slug",
-            element: (
-              <RequireProfile>
-                <StoryPage />
-              </RequireProfile>
-            ),
+            element: <StoryPage />,
           },
           {
             path: "quiz",
-            element: (
-              <RequireProfile>
-                <QuizLibraryPage />
-              </RequireProfile>
-            ),
+            element: <QuizLibraryPage />,
           },
           {
             path: "quiz/:id",
-            element: (
-              <RequireProfile>
-                <QuizPage />
-              </RequireProfile>
-            ),
+            element: <QuizPage />,
           },
           {
             path: "rewards",
-            element: (
-              <RequireProfile>
-                <RewardsPage />
-              </RequireProfile>
-            ),
+            element: <RewardsPage />,
           },
           { path: "account", element: <AccountPage /> },
           { path: "account/login", element: <AccountPage /> },

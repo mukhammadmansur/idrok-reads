@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { Check, Plus, X } from "lucide-react";
 import { Avatar, STORYBOOK_AVATARS, type AvatarId } from "../../design-system/Avatar";
 import { useProgress } from "../../lib/context";
+import { ApiError } from "../../lib/api";
+import { ParentalGateModal } from "../parent/ParentalGateModal";
 import styles from "./ProfileSwitcherModal.module.css";
 
 interface ProfileSwitcherModalProps {
@@ -18,12 +20,15 @@ export function ProfileSwitcherModal({
     selectedChildId,
     selectChild,
     createChild,
+    setToast,
   } = useProgress();
 
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState<AvatarId>("cat");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [showGate, setShowGate] = useState(false);
 
   if (!isOpen) return null;
 
@@ -42,11 +47,39 @@ export function ProfileSwitcherModal({
     event.preventDefault();
     if (!name.trim() || busy) return;
     setBusy(true);
+    setError("");
     try {
       await createChild(name.trim(), avatar);
+      const childName = name.trim();
       setName("");
       setCreating(false);
       onClose();
+      setToast(`${childName} profili muvaffaqiyatli qo‘shildi ✓`);
+    } catch (cause) {
+      if (cause instanceof ApiError && cause.code === "parent_locked") {
+        setShowGate(true);
+      } else {
+        setError(cause instanceof Error ? cause.message : "Profil qo‘shilmadi.");
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleGateSuccess = async () => {
+    setShowGate(false);
+    if (!name.trim()) return;
+    setBusy(true);
+    setError("");
+    try {
+      await createChild(name.trim(), avatar);
+      const childName = name.trim();
+      setName("");
+      setCreating(false);
+      onClose();
+      setToast(`${childName} profili muvaffaqiyatli qo‘shildi ✓`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Profil qo‘shilmadi.");
     } finally {
       setBusy(false);
     }
@@ -152,11 +185,16 @@ export function ProfileSwitcherModal({
               ))}
             </div>
 
+            {error && <div className={styles.errorAlert}>{error}</div>}
+
             <div className={styles.formActions}>
               <button
                 type="button"
                 className={styles.cancelBtn}
-                onClick={() => setCreating(false)}
+                onClick={() => {
+                  setError("");
+                  setCreating(false);
+                }}
                 disabled={busy}
               >
                 Bekor qilish
@@ -171,6 +209,12 @@ export function ProfileSwitcherModal({
             </div>
           </form>
         )}
+
+        <ParentalGateModal
+          isOpen={showGate}
+          onClose={() => setShowGate(false)}
+          onSuccess={() => void handleGateSuccess()}
+        />
       </div>
     </div>
   );

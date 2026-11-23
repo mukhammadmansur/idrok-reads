@@ -232,3 +232,13 @@
   font-weight: 500;
   cursor: pointer;
 }
+
+.errorAlert {
+  padding: 0.625rem 0.875rem;
+  background: #fdf2f2;
+  border: 1px solid #f87171;
+  color: #b91c1c;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}

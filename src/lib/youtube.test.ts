@@ -10,7 +10,7 @@ describe("YouTube links", () => {
     ])
       expect(youtubeId(url)).toBe("aqz-KE-bpKQ");
     expect(youtubeEmbed("https://youtu.be/aqz-KE-bpKQ")).toBe(
-      "https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ?rel=0&playsinline=1",
+      "https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ?rel=0&modestbranding=1&playsinline=1",
     );
   });
   it("rejects other hosts, protocols, malformed IDs and pasted HTML", () => {

@@ -24,6 +24,6 @@ export function youtubeId(value: string): string | null {
 export function youtubeEmbed(value: string): string | null {
   const id = youtubeId(value);
   return id
-    ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`
+    ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1`
     : null;
 }

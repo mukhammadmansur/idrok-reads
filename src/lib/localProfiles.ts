@@ -2,14 +2,21 @@ import type { ProfileProgress } from "../content/types";
 import { emptyProgress, STORAGE_KEY } from "./progress";
 
 export type StorybookAvatarId =
-  | "sun"
-  | "leaf"
-  | "cloud"
-  | "star"
-  | "moon"
-  | "rabbit"
+  | "lion"
+  | "owl"
+  | "bear"
+  | "wolf"
+  | "falcon"
+  | "fox"
+  | "whale"
   | "cat"
+  | "rabbit"
   | "rocket"
+  | "star"
+  | "sun"
+  | "moon"
+  | "cloud"
+  | "leaf"
   | "snow";
 
 export interface LocalChildProfile {

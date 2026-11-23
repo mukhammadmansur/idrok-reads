@@ -38,7 +38,7 @@ export function ParentSettingsTab() {
 
   // Child creation state
   const [childName, setChildName] = useState("");
-  const [childAvatar, setChildAvatar] = useState<AvatarId>("cat");
+  const [childAvatar, setChildAvatar] = useState<AvatarId>("lion");
   const [childBusy, setChildBusy] = useState(false);
   const [childMsg, setChildMsg] = useState("");
   const [childError, setChildError] = useState("");

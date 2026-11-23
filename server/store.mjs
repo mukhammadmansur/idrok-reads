@@ -16,15 +16,22 @@ import { canonicalYoutubeUrl } from "./youtube.mjs";
 const scrypt = promisify(scryptCallback);
 const themes = ["classic", "forest", "ice", "holo"];
 const avatars = [
+  "lion",
+  "owl",
+  "bear",
+  "wolf",
+  "falcon",
+  "fox",
+  "whale",
+  "cat",
+  "rabbit",
+  "rocket",
+  "star",
   "sun",
+  "moon",
+  "cloud",
   "leaf",
   "snow",
-  "rocket",
-  "cloud",
-  "star",
-  "moon",
-  "rabbit",
-  "cat",
 ];
 const digest = (value) => createHash("sha256").update(value).digest("hex");
 const now = () => new Date().toISOString();

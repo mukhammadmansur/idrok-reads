@@ -25,7 +25,7 @@ export function ProfileSwitcherModal({
 
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState<AvatarId>("cat");
+  const [avatar, setAvatar] = useState<AvatarId>("lion");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [showGate, setShowGate] = useState(false);

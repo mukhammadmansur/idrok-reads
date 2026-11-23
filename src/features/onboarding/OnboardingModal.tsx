@@ -14,7 +14,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
   const { googleLogin, login, register, createChild, user } = useProgress();
   const [step, setStep] = useState<1 | 2>(1);
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState<AvatarId>("cat");
+  const [avatar, setAvatar] = useState<AvatarId>("lion");
   const [ageGroup, setAgeGroup] = useState<"5-6" | "7-8" | "9-11" | undefined>(
     undefined,
   );

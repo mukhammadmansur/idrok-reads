@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   BookOpen,
+  Home,
   Medal,
   MessageCircleQuestion,
   Palette,
@@ -17,9 +18,10 @@ import { themeById } from "../../content";
 import { useProgress } from "../../lib/context";
 import styles from "./ChildLayout.module.css";
 
-// EXACT 3 PRIMARY NAV ITEMS for Child World
+// 4 PRIMARY NAV ITEMS for Child World
 const navItems = [
-  { to: "/", label: "Kutubxona", icon: BookOpen, end: true },
+  { to: "/", label: "Bosh sahifa", icon: Home, end: true },
+  { to: "/library", label: "Kutubxona", icon: BookOpen },
   { to: "/quiz", label: "Savol-javob", icon: MessageCircleQuestion },
   { to: "/rewards", label: "Yutuqlarim", icon: Medal },
 ];
@@ -42,7 +44,7 @@ export function ChildLayout() {
   const [switcherOpen, setSwitcherOpen] = useState(false);
 
   const currentSection = location.pathname.startsWith("/story/")
-    ? "/"
+    ? "/library"
     : location.pathname;
 
   const child = profiles.find((profile) => profile.id === selectedChildId);

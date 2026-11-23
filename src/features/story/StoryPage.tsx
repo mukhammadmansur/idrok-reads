@@ -32,7 +32,7 @@ export function StoryPage() {
 
   return (
     <div className={styles.page}>
-      <Link to="/" className={styles.back}>
+      <Link to="/library" className={styles.back}>
         <ArrowLeft size={20} />
         Kutubxonaga qaytish
       </Link>

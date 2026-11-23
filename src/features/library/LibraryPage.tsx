@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  BookOpen,
   Clock3,
   Search,
   Sparkles,
@@ -70,17 +71,13 @@ export function LibraryPage() {
     <div className={styles.page}>
       <PageIntro
         eyebrow="Kichik kitobxonlar olami"
-        title={
-          child
-            ? `Salom, ${child.name}! Bugun qaysi olamga sayohat qilamiz?`
-            : "Salom! Bugun qaysi olamga sayohat qilamiz?"
-        }
-        description="Bir hikoya tanla — qolganini tasavvuring bitiradi."
-        size="hero"
+        title="Kutubxona"
+        description="O‘zingga yoqqan ertakni tanla va sehrli sayohatni boshla."
+        size="page"
         actions={
           <span className={styles.stat}>
-            <Sparkles size={16} />
-            {completed} ta hikoya tugatilgan
+            <BookOpen size={16} />
+            {stories.length} ta ertak
           </span>
         }
       />

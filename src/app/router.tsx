@@ -3,6 +3,7 @@ import { ChildLayout } from "./layouts/ChildLayout";
 import { RootLayout } from "./RootLayout";
 import { RequireProfile } from "./RequireProfile";
 import { NotFoundPage } from "./NotFoundPage";
+import { HomePage } from "../features/home/HomePage";
 import { LibraryPage } from "../features/library/LibraryPage";
 import { StoryPage } from "../features/story/StoryPage";
 import { ReaderPage } from "../features/reader/ReaderPage";
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
+            element: <HomePage />,
+          },
+          {
+            path: "library",
             element: <LibraryPage />,
           },
           {

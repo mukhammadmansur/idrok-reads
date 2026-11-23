@@ -13,7 +13,7 @@ import {
   STORAGE_KEY,
   recordQuiz,
 } from "./progress";
-import type { ProfileProgress } from "../data/types";
+import type { ProfileProgress } from "../content/types";
 import {
   api,
   ApiError,
@@ -31,18 +31,41 @@ import {
   readOutbox,
   saveOutbox,
 } from "./outbox";
+import {
+  createLocalChildProfile,
+  deleteLocalProfile,
+  getActiveLocalProfile,
+  getActiveLocalProfileId,
+  getLocalProfiles,
+  saveLocalProfiles,
+  setActiveLocalProfileId,
+  updateActiveProfileProgress,
+  type LocalChildProfile,
+  type StorybookAvatarId,
+} from "./localProfiles";
+import { executeBackgroundAutoMerge } from "./autoMerge";
+
 export type SyncState =
-  "local" | "loading" | "saving" | "saved" | "offline" | "error";
+  | "local"
+  | "loading"
+  | "saving"
+  | "saved"
+  | "offline"
+  | "error";
+
 interface State extends AccountSession {
   progress: ProfileProgress;
   remote: ProfileProgress;
   revision: number;
   accountLoading: boolean;
   profileError: string;
+  sessionError: string;
   sync: SyncState;
   syncError: string;
   storageError: boolean;
+  toastMessage: string | null;
 }
+
 interface ProgressContext extends State {
   update: (change: (p: ProfileProgress) => ProfileProgress) => void;
   answerQuiz: (id: string, answers: number[]) => void;
@@ -51,49 +74,78 @@ interface ProgressContext extends State {
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   createChild: (name: string, avatar: ChildProfile["avatar"]) => Promise<void>;
+  updateChild: (
+    id: string,
+    updates: { name?: string; avatar?: StorybookAvatarId },
+  ) => Promise<void>;
+  deleteChild: (id: string) => Promise<void>;
   selectChild: (id: string) => Promise<void>;
   retrySync: () => void;
-  importGuest: () => void;
-  guestReadingCount: number;
+  clearToast: () => void;
+  setToast: (msg: string | null) => void;
 }
+
 const Context = createContext<ProgressContext | null>(null);
+
 const anonymous: AccountSession = {
   user: null,
   children: [],
   selectedChildId: null,
   parent: null,
 };
-function guestData() {
+
+function initialGuestProgress(): ProfileProgress {
+  const localActive = getActiveLocalProfile();
+  if (localActive) return localActive.progress;
   try {
     return readProgress(localStorage.getItem(STORAGE_KEY));
   } catch {
     return emptyProgress();
   }
 }
+
+function localToChildProfiles(locals: LocalChildProfile[]): ChildProfile[] {
+  return locals.map((p) => ({
+    id: p.id,
+    name: p.name,
+    avatar: p.avatarId,
+    createdAt: p.createdAt,
+  }));
+}
+
 export function ProgressProvider({ children }: { children: ReactNode }) {
-  const [guestSnapshot, setGuestSnapshot] = useState(guestData);
-  const guest = useRef<ProfileProgress>(guestSnapshot);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const initialLocalProfiles = getLocalProfiles();
+  const initialActive = getActiveLocalProfile();
+
   const initial: State = {
     ...anonymous,
-    progress: guestSnapshot,
+    children: localToChildProfiles(initialLocalProfiles),
+    selectedChildId: initialActive?.id ?? null,
+    progress: initialGuestProgress(),
     remote: emptyProgress(),
     revision: 0,
     accountLoading: true,
     profileError: "",
+    sessionError: "",
     sync: "local",
     syncError: "",
     storageError: false,
+    toastMessage: null,
   };
+
   const live = useRef(initial);
   const [state, setState] = useState(initial);
   const generation = useRef(0);
   const flushing = useRef(false);
   const flushRef = useRef<() => Promise<void>>(async () => {});
   const volatile = useRef(new Map<string, ProgressEvent[]>());
+
   const publish = useCallback((next: State) => {
     live.current = next;
     setState(next);
   }, []);
+
   const pending = useCallback(
     (key: string) => [
       ...new Map(
@@ -104,6 +156,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     ],
     [],
   );
+
   const persist = useCallback((key: string, events: ProgressEvent[]) => {
     volatile.current.set(key, events);
     try {
@@ -113,24 +166,33 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       return true;
     }
   }, []);
+
   const actorKey = (value: State) =>
     value.user && value.selectedChildId
       ? outboxKey(value.user.id, value.selectedChildId)
       : null;
+
   const expire = useCallback(() => {
     generation.current++;
+    const locals = getLocalProfiles();
+    const active = getActiveLocalProfile();
     publish({
       ...live.current,
       ...anonymous,
-      progress: guest.current,
+      children: localToChildProfiles(locals),
+      selectedChildId: active?.id ?? null,
+      progress: active?.progress ?? emptyProgress(),
       remote: emptyProgress(),
       revision: 0,
       accountLoading: false,
       profileError: "",
+      sessionError: "",
       sync: "local",
       syncError: "Sessiya tugadi. Akkauntga qayta kiring.",
+      toastMessage: null,
     });
   }, [publish]);
+
   const refresh = useCallback(async () => {
     const value = live.current,
       key = actorKey(value),
@@ -148,6 +210,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         revision: result.revision,
         progress: applyPending(result.progress, queue),
         profileError: "",
+        sessionError: "",
         sync: queue.length ? "saving" : "saved",
         syncError: "",
       });
@@ -162,6 +225,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         });
     }
   }, [pending, publish, expire]);
+
   const flush = useCallback(async () => {
     if (flushing.current) return;
     const value = live.current,
@@ -218,26 +282,47 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         queueMicrotask(() => void flushRef.current());
     }
   }, [pending, persist, publish, expire]);
+
   useEffect(() => {
     flushRef.current = flush;
   }, [flush]);
+
   const hydrate = useCallback(
     async (view: AccountSession) => {
       const stamp = ++generation.current;
       if (!view.user) {
+        const locals = getLocalProfiles();
+        const active = getActiveLocalProfile();
         publish({
           ...live.current,
           ...anonymous,
-          progress: guest.current,
+          children: localToChildProfiles(locals),
+          selectedChildId: active?.id ?? null,
+          progress: active?.progress ?? emptyProgress(),
           remote: emptyProgress(),
           revision: 0,
           accountLoading: false,
           profileError: "",
+          sessionError: "",
           sync: "local",
           syncError: "",
         });
         return;
       }
+
+      // Execute background auto-merge if there are unsynced local profiles
+      try {
+        const mergeResult = await executeBackgroundAutoMerge(view, api);
+        if (mergeResult.mergedProfilesCount > 0) {
+          view = await api.session();
+          if (mergeResult.toastMessage) {
+            setToastMessage(mergeResult.toastMessage);
+          }
+        }
+      } catch {
+        // Continue even if auto-merge hits a temporary error
+      }
+
       publish({
         ...live.current,
         ...view,
@@ -246,17 +331,22 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         revision: 0,
         accountLoading: !!view.selectedChildId,
         profileError: "",
+        sessionError: "",
         sync: "loading",
         syncError: "",
       });
-      if (!view.selectedChildId) {
+
+      if (!view.user || !view.selectedChildId) {
         publish({ ...live.current, accountLoading: false });
         return;
       }
+      const user = view.user;
+      const childId = view.selectedChildId;
+
       try {
-        const result: ServerProgress = await api.progress(view.selectedChildId);
+        const result: ServerProgress = await api.progress(childId);
         if (stamp !== generation.current) return;
-        const key = outboxKey(view.user.id, view.selectedChildId),
+        const key = outboxKey(user.id, childId),
           queue = pending(key);
         publish({
           ...live.current,
@@ -282,28 +372,43 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     },
     [pending, publish, expire],
   );
+
+  const sessionPending = useRef(false);
+  const loadSession = useCallback(async () => {
+    if (sessionPending.current) return;
+    sessionPending.current = true;
+    const stamp = generation.current;
+    publish({ ...live.current, accountLoading: true, sessionError: "" });
+    try {
+      const view = await api.session();
+      if (stamp === generation.current) await hydrate(view);
+    } catch {
+      if (stamp === generation.current)
+        publish({
+          ...live.current,
+          accountLoading: false,
+          sessionError:
+            "Akkaunt holatini tekshirib bo‘lmadi. Internet yoki server ulanishini tekshirib, qayta urinib ko‘ring.",
+        });
+    } finally {
+      sessionPending.current = false;
+    }
+  }, [hydrate, publish]);
+
   useEffect(() => {
-    let active = true;
-    void api
-      .session()
-      .then((view) => {
-        if (active) void hydrate(view);
-      })
-      .catch(() => {
-        if (active) void hydrate(anonymous);
-      });
-    return () => {
-      active = false;
-    };
-  }, [hydrate]);
+    void loadSession();
+  }, [loadSession]);
+
   useEffect(() => {
     document.documentElement.dataset.theme = state.progress.theme;
     document.documentElement.style.colorScheme =
       state.progress.theme === "holo" ? "dark" : "light";
   }, [state.progress.theme]);
+
   useEffect(() => {
     const reconnect = () => {
-      if (live.current.profileError) void hydrate(live.current);
+      if (live.current.sessionError) void loadSession();
+      else if (live.current.profileError) void hydrate(live.current);
       else {
         void flushRef.current();
         void refresh();
@@ -320,22 +425,17 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("focus", reconnect);
       document.removeEventListener("visibilitychange", visible);
     };
-  }, [hydrate, refresh]);
+  }, [hydrate, loadSession, refresh]);
+
   const commit = useCallback(
     (progress: ProfileProgress, events: ProgressEvent[]) => {
       const current = live.current;
       if (current.accountLoading || current.profileError) return;
       const key = actorKey(current);
+
       if (!current.user) {
-        guest.current = progress;
-        setGuestSnapshot(progress);
-        let storageError = false;
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-        } catch {
-          storageError = true;
-        }
-        publish({ ...current, progress, storageError });
+        updateActiveProfileProgress(() => progress);
+        publish({ ...current, progress, storageError: false });
       } else if (key) {
         const queue = [...pending(key), ...events],
           storageError = events.length
@@ -352,6 +452,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     },
     [pending, persist, publish],
   );
+
   const update = useCallback(
     (change: (p: ProfileProgress) => ProfileProgress) => {
       const previous = live.current.progress;
@@ -360,6 +461,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     },
     [commit],
   );
+
   const answerQuiz = useCallback(
     (id: string, answers: number[]) => {
       const { score, total } = quizScore(id, answers);
@@ -369,72 +471,146 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     },
     [commit],
   );
+
   const login = useCallback(
     async (email: string, password: string) =>
       hydrate(await api.login(email, password)),
     [hydrate],
   );
+
   const googleLogin = useCallback(
     async (credential: string) => hydrate(await api.google(credential)),
     [hydrate],
   );
+
   const register = useCallback(
     async (email: string, password: string) =>
       hydrate(await api.register(email, password)),
     [hydrate],
   );
+
   const logout = useCallback(async () => {
-    await api.logout();
-    await hydrate(anonymous);
-    navigate("/account");
-  }, [hydrate]);
+    try {
+      await api.logout();
+    } catch {
+      // ignore
+    }
+    const locals = getLocalProfiles();
+    const active = getActiveLocalProfile();
+    publish({
+      ...live.current,
+      ...anonymous,
+      children: localToChildProfiles(locals),
+      selectedChildId: active?.id ?? null,
+      progress: active?.progress ?? emptyProgress(),
+      accountLoading: false,
+      sync: "local",
+      syncError: "",
+      toastMessage: null,
+    });
+  }, [publish]);
+
   const createChild = useCallback(
-    async (name: string, avatar: ChildProfile["avatar"]) =>
-      hydrate(await api.createChild(name, avatar)),
-    [hydrate],
+    async (name: string, avatar: ChildProfile["avatar"]) => {
+      if (!live.current.user) {
+        const created = createLocalChildProfile(name, avatar);
+        const locals = getLocalProfiles();
+        publish({
+          ...live.current,
+          children: localToChildProfiles(locals),
+          selectedChildId: created.id,
+          progress: created.progress,
+        });
+      } else {
+        await hydrate(await api.createChild(name, avatar));
+      }
+    },
+    [hydrate, publish],
   );
+
+  const updateChild = useCallback(
+    async (
+      id: string,
+      updates: { name?: string; avatar?: StorybookAvatarId },
+    ) => {
+      if (!live.current.user) {
+        const list = getLocalProfiles();
+        const idx = list.findIndex((p) => p.id === id);
+        if (idx !== -1) {
+          list[idx] = {
+            ...list[idx],
+            ...(updates.name ? { name: updates.name.trim() } : {}),
+            ...(updates.avatar ? { avatarId: updates.avatar } : {}),
+          };
+          saveLocalProfiles(list);
+          const active = getActiveLocalProfile();
+          publish({
+            ...live.current,
+            children: localToChildProfiles(list),
+            progress: active?.progress ?? live.current.progress,
+          });
+        }
+      } else {
+        await hydrate(await api.updateChild(id, updates as any));
+      }
+    },
+    [hydrate, publish],
+  );
+
+  const deleteChild = useCallback(
+    async (id: string) => {
+      if (!live.current.user) {
+        deleteLocalProfile(id);
+        const locals = getLocalProfiles();
+        const active = getActiveLocalProfile();
+        publish({
+          ...live.current,
+          children: localToChildProfiles(locals),
+          selectedChildId: active?.id ?? null,
+          progress: active?.progress ?? emptyProgress(),
+        });
+      } else {
+        await hydrate(await api.deleteChild(id));
+      }
+    },
+    [hydrate, publish],
+  );
+
   const selectChild = useCallback(
-    async (id: string) => hydrate(await api.selectChild(id)),
-    [hydrate],
+    async (id: string) => {
+      if (!live.current.user) {
+        setActiveLocalProfileId(id);
+        const active = getActiveLocalProfile();
+        if (active) {
+          publish({
+            ...live.current,
+            selectedChildId: active.id,
+            progress: active.progress,
+          });
+        }
+      } else {
+        await hydrate(await api.selectChild(id));
+      }
+    },
+    [hydrate, publish],
   );
+
   const retrySync = useCallback(() => {
-    if (live.current.profileError) void hydrate(live.current);
+    if (live.current.sessionError) void loadSession();
+    else if (live.current.profileError) void hydrate(live.current);
     else {
       void flushRef.current();
       void refresh();
     }
-  }, [hydrate, refresh]);
-  const importGuest = useCallback(() => {
-    if (!live.current.user || !live.current.selectedChildId) return;
-    const events: ProgressEvent[] = [];
-    for (const [storyId, record] of Object.entries(guest.current.reading)) {
-      if (!["oy-dosti", "bulut-kemasi", "dengiz-siri"].includes(storyId))
-        continue;
-      const page = Math.min(7, record.page);
-      if (record.completedAt)
-        events.push({
-          id: eventId(),
-          type: "reading",
-          storyId,
-          page: 7,
-          complete: true,
-        });
-      if (!record.completedAt || page !== 7)
-        events.push({
-          id: eventId(),
-          type: "reading",
-          storyId,
-          page,
-          complete: false,
-        });
-    }
-    if (events.length)
-      commit(applyPending(live.current.progress, events), events);
-  }, [commit]);
+  }, [hydrate, loadSession, refresh]);
+
   return (
     <Context.Provider
       value={{
         ...state,
+        toastMessage,
+        clearToast: () => setToastMessage(null),
+        setToast: (msg: string | null) => setToastMessage(msg),
         update,
         answerQuiz,
         login,
@@ -442,33 +618,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         googleLogin,
         logout,
         createChild,
+        updateChild,
+        deleteChild,
         selectChild,
         retrySync,
-        importGuest,
-        guestReadingCount: Object.keys(guestSnapshot.reading).length,
       }}
     >
       {children}
     </Context.Provider>
   );
 }
+
 export function useProgress() {
   const context = useContext(Context);
   if (!context) throw new Error("Missing progress provider");
   return context;
-}
-export function navigate(path: string) {
-  window.location.hash = path;
-}
-export function useRoute() {
-  const [path, setPath] = useState(() => window.location.hash.slice(1) || "/");
-  useEffect(() => {
-    const change = () => {
-      setPath(window.location.hash.slice(1) || "/");
-      window.scrollTo(0, 0);
-    };
-    window.addEventListener("hashchange", change);
-    return () => window.removeEventListener("hashchange", change);
-  }, []);
-  return path;
 }

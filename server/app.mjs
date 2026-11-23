@@ -115,6 +115,12 @@ export function createApp({
           return json(200, store.familySummary(token));
         if (method === "GET" && url.pathname === "/api/session")
           return json(200, store.sessionView(token));
+        if (method === "GET" && url.pathname === "/api/videos")
+          return json(200, { videos: store.videoOverrides(token) });
+        if (method === "GET" && url.pathname === "/api/parent/videos") {
+          store.requireParent(token);
+          return json(200, { videos: store.videoOverrides(token) });
+        }
         if (!["GET", "HEAD"].includes(method)) writeCheck(req);
         if (method === "POST" && url.pathname === "/api/auth/google") {
           store.googleRate(req.socket.remoteAddress ?? "unknown");
@@ -155,6 +161,16 @@ export function createApp({
             200,
             await store.setParentPin(token, await jsonBody(req)),
           );
+        if (method === "POST" && url.pathname === "/api/parent/videos")
+          return json(
+            200,
+            store.saveStoryVideo(token, await jsonBody(req)),
+          );
+        if (method === "POST" && url.pathname === "/api/parent/videos/remove")
+          return json(
+            200,
+            store.removeStoryVideo(token, await jsonBody(req)),
+          );
         if (
           method === "POST" &&
           ["/api/auth/register", "/api/auth/login"].includes(url.pathname)
@@ -175,6 +191,16 @@ export function createApp({
         }
         if (method === "POST" && url.pathname === "/api/children")
           return json(201, store.createChild(token, await jsonBody(req)));
+        const childMatch = url.pathname.match(/^\/api\/children\/([a-f0-9-]{36})$/);
+        if (childMatch) {
+          const [, id] = childMatch;
+          if (method === "PATCH") {
+            return json(200, store.updateChild(token, id, await jsonBody(req)));
+          }
+          if (method === "DELETE") {
+            return json(200, store.deleteChild(token, id));
+          }
+        }
         const match = url.pathname.match(
           /^\/api\/children\/([a-f0-9-]{36})\/(progress|events|select|activity)$/,
         );

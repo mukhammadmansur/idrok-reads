@@ -1,4 +1,5 @@
-import type { ProfileProgress } from "../data/types";
+import type { ProfileProgress } from "../content/types";
+import type { StorybookAvatarId } from "./localProfiles";
 export interface ParentAccount {
   id: string;
   email: string;
@@ -6,7 +7,7 @@ export interface ParentAccount {
 export interface ChildProfile {
   id: string;
   name: string;
-  avatar: "sun" | "leaf" | "snow" | "rocket";
+  avatar: StorybookAvatarId;
   createdAt: string;
 }
 export interface ParentAccess {
@@ -57,6 +58,12 @@ export interface ServerProgress {
   revision: number;
   progress: ProfileProgress;
 }
+export interface StoryVideoOverride {
+  url: string;
+  title: string;
+  updatedAt: string;
+}
+export type StoryVideoMap = Record<string, StoryVideoOverride>;
 export type ProgressEvent =
   | { id: string; type: "theme"; theme: ProfileProgress["theme"] }
   | {
@@ -80,11 +87,12 @@ async function request<T>(
   path: string,
   body?: unknown,
   keepalive = false,
+  method?: string,
 ): Promise<T> {
   let response: Response;
   try {
     response = await fetch("/api" + path, {
-      method: body === undefined ? "GET" : "POST",
+      method: method ?? (body === undefined ? "GET" : "POST"),
       credentials: "same-origin",
       signal: AbortSignal.timeout(15000),
       keepalive,
@@ -132,6 +140,15 @@ export const api = {
   parentLock: () => request<ParentAccess>("/parent/lock", {}),
   setParentPin: (pin: string) => request<ParentAccess>("/parent/pin", { pin }),
   family: () => request<FamilyOverview>("/parent/overview"),
+  videos: () => request<{ videos: StoryVideoMap }>("/videos"),
+  parentVideos: () => request<{ videos: StoryVideoMap }>("/parent/videos"),
+  saveStoryVideo: (storyId: string, url: string, title: string) =>
+    request<{ video: StoryVideoOverride & { storyId: string } }>(
+      "/parent/videos",
+      { storyId, url, title },
+    ),
+  removeStoryVideo: (storyId: string) =>
+    request<{ ok: boolean }>("/parent/videos/remove", { storyId }),
   activity: (
     id: string,
     body: {
@@ -154,6 +171,12 @@ export const api = {
   logout: () => request<{ ok: boolean }>("/auth/logout", {}),
   createChild: (name: string, avatar: ChildProfile["avatar"]) =>
     request<AccountSession>("/children", { name, avatar }),
+  updateChild: (
+    id: string,
+    updates: { name?: string; avatar?: ChildProfile["avatar"] },
+  ) => request<AccountSession>(`/children/${id}`, updates, false, "PATCH"),
+  deleteChild: (id: string) =>
+    request<AccountSession>(`/children/${id}`, {}, false, "DELETE"),
   selectChild: (id: string) =>
     request<AccountSession>(`/children/${id}/select`, {}),
   progress: (id: string) => request<ServerProgress>(`/children/${id}/progress`),

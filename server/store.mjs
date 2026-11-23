@@ -10,11 +10,22 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 import { promisify } from "node:util";
-import catalog from "./catalog.json" with { type: "json" };
+import { catalog } from "./catalog.mjs";
+import { canonicalYoutubeUrl } from "./youtube.mjs";
 
 const scrypt = promisify(scryptCallback);
 const themes = ["classic", "forest", "ice", "holo"];
-const avatars = ["sun", "leaf", "snow", "rocket"];
+const avatars = [
+  "sun",
+  "leaf",
+  "snow",
+  "rocket",
+  "cloud",
+  "star",
+  "moon",
+  "rabbit",
+  "cat",
+];
 const digest = (value) => createHash("sha256").update(value).digest("hex");
 const now = () => new Date().toISOString();
 const storyById = (id) =>
@@ -90,6 +101,7 @@ export function createStore(
     CREATE TABLE IF NOT EXISTS quizzes(child_id TEXT NOT NULL REFERENCES children(id) ON DELETE CASCADE,quiz_id TEXT NOT NULL,score INTEGER NOT NULL,total INTEGER NOT NULL,attempts INTEGER NOT NULL,attempted_at TEXT NOT NULL,PRIMARY KEY(child_id,quiz_id));
     CREATE TABLE IF NOT EXISTS events(child_id TEXT NOT NULL REFERENCES children(id) ON DELETE CASCADE,event_id TEXT NOT NULL,payload_hash TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(child_id,event_id));
     CREATE TABLE IF NOT EXISTS rate_limits(bucket TEXT PRIMARY KEY,count INTEGER NOT NULL,reset_at INTEGER NOT NULL);
+    CREATE TABLE IF NOT EXISTS story_videos(user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,story_id TEXT NOT NULL,url TEXT NOT NULL,title TEXT NOT NULL,updated_at TEXT NOT NULL,PRIMARY KEY(user_id,story_id));
     `);
   const run = (sql, ...args) => db.prepare(sql).run(...args);
   const get = (sql, ...args) => db.prepare(sql).get(...args);
@@ -186,6 +198,23 @@ export function createStore(
     );
     family.unlockSession(token);
     return { token, ...sessionView(token) };
+  }
+  function videoOverrides(token) {
+    const current = session(token);
+    if (!current) return {};
+    return Object.fromEntries(
+      all(
+        "SELECT story_id,url,title,updated_at FROM story_videos WHERE user_id=?",
+        current.user_id,
+      ).map((row) => [
+        row.story_id,
+        {
+          url: row.url,
+          title: row.title,
+          updatedAt: row.updated_at,
+        },
+      ]),
+    );
   }
   function progress(token, id) {
     const { child } = owned(token, id);
@@ -331,6 +360,50 @@ export function createStore(
     logout(token) {
       if (token) run("DELETE FROM sessions WHERE token_hash=?", digest(token));
     },
+    videoOverrides,
+    saveStoryVideo(token, body) {
+      keys(body, ["storyId", "url", "title"]);
+      const current = family.requireParent(token);
+      if (!storyById(body.storyId))
+        throw new ApiError(404, "Hikoya topilmadi.", "not_found");
+      requireValue(
+        typeof body.url === "string" &&
+          body.url.length <= 500 &&
+          !!canonicalYoutubeUrl(body.url),
+        "YouTube video havolasini tekshiring.",
+      );
+      requireValue(
+        typeof body.title === "string" &&
+          body.title.trim().length >= 1 &&
+          body.title.trim().length <= 120 &&
+          !/\p{Cc}/u.test(body.title),
+        "Video nomi 1–120 belgidan iborat bo‘lsin.",
+      );
+      const url = canonicalYoutubeUrl(body.url),
+        title = body.title.trim(),
+        time = now();
+      run(
+        "INSERT INTO story_videos(user_id,story_id,url,title,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id,story_id) DO UPDATE SET url=excluded.url,title=excluded.title,updated_at=excluded.updated_at",
+        current.user_id,
+        body.storyId,
+        url,
+        title,
+        time,
+      );
+      return {
+        video: { storyId: body.storyId, url, title, updatedAt: time },
+      };
+    },
+    removeStoryVideo(token, body) {
+      keys(body, ["storyId"]);
+      const current = family.requireParent(token);
+      run(
+        "DELETE FROM story_videos WHERE user_id=? AND story_id=?",
+        current.user_id,
+        body.storyId,
+      );
+      return { ok: true };
+    },
     createChild(token, body) {
       keys(body, ["name", "avatar"]);
       const current = family.requireParent(token);
@@ -376,6 +449,71 @@ export function createStore(
         current.token_hash,
       );
       return sessionView(token);
+    },
+    updateChild(token, id, body) {
+      const { current } = owned(token, id);
+      family.requireParent(token);
+      keys(body, ["name", "avatar"]);
+      if (body.name !== undefined) {
+        requireValue(
+          typeof body.name === "string" &&
+            body.name.trim().length >= 1 &&
+            body.name.trim().length <= 30 &&
+            !/\p{Cc}/u.test(body.name),
+          "Ism 1–30 belgidan iborat bo‘lsin.",
+        );
+      }
+      if (body.avatar !== undefined) {
+        requireValue(avatars.includes(body.avatar), "Belgi tanlang.");
+      }
+      return atomic(() => {
+        if (body.name !== undefined && body.avatar !== undefined) {
+          run(
+            "UPDATE children SET name=?, avatar=? WHERE id=? AND user_id=?",
+            body.name.trim(),
+            body.avatar,
+            id,
+            current.user_id,
+          );
+        } else if (body.name !== undefined) {
+          run(
+            "UPDATE children SET name=? WHERE id=? AND user_id=?",
+            body.name.trim(),
+            id,
+            current.user_id,
+          );
+        } else if (body.avatar !== undefined) {
+          run(
+            "UPDATE children SET avatar=? WHERE id=? AND user_id=?",
+            body.avatar,
+            id,
+            current.user_id,
+          );
+        }
+        return sessionView(token);
+      });
+    },
+    deleteChild(token, id) {
+      const { current } = owned(token, id);
+      family.requireParent(token);
+      return atomic(() => {
+        run(
+          "DELETE FROM children WHERE id=? AND user_id=?",
+          id,
+          current.user_id,
+        );
+        const remaining = all(
+          "SELECT id FROM children WHERE user_id=? ORDER BY created_at,id",
+          current.user_id,
+        );
+        const nextSelected = remaining[0]?.id ?? null;
+        run(
+          "UPDATE sessions SET selected_child_id=? WHERE token_hash=?",
+          nextSelected,
+          current.token_hash,
+        );
+        return sessionView(token);
+      });
     },
     progress,
     applyEvents(token, id, body) {

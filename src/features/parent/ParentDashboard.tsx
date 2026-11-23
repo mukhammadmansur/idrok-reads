@@ -19,11 +19,60 @@ import {
   type FamilyChild,
   type FamilyOverview,
 } from "../../lib/api";
+import { getLocalProfiles } from "../../lib/localProfiles";
 import { useProgress } from "../../lib/context";
 import { useParentAccess } from "./ParentGate";
 import styles from "./ParentDashboard.module.css";
 
 const weekdays = ["Yak", "Dsh", "Sesh", "Chor", "Pay", "Jum", "Shan"];
+
+function localToFamilyOverview(locals: ReturnType<typeof getLocalProfiles>): FamilyOverview {
+  const today = new Date().toISOString().slice(0, 10);
+  const weekDates = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().slice(0, 10);
+  });
+
+  return {
+    generatedAt: new Date().toISOString(),
+    children: locals.map((local) => {
+      const completed = Object.values(local.progress.reading).filter(
+        (r) => !!r.completedAt,
+      ).length;
+      const started = Object.keys(local.progress.reading).length;
+      const quizAttempts = Object.keys(local.progress.quizzes).length;
+      const totalSeconds = local.activeReadingSeconds ?? 0;
+
+      return {
+        profile: {
+          id: local.id,
+          name: local.name,
+          avatar: local.avatarId,
+          createdAt: local.createdAt,
+        },
+        progress: local.progress,
+        metrics: {
+          started,
+          completed,
+          quizAttempts,
+          accuracy: null,
+          todaySeconds: totalSeconds,
+          weekSeconds: totalSeconds,
+          totalSeconds,
+          lastActiveAt: local.createdAt,
+        },
+        week: weekDates.map((date) => ({
+          date,
+          seconds: date === today ? totalSeconds : 0,
+          readingEvents: date === today ? started : 0,
+          quizAttempts: date === today ? quizAttempts : 0,
+        })),
+        recent: [],
+      };
+    }),
+  };
+}
 
 function duration(seconds: number) {
   const total = Math.max(0, Math.round(seconds));
@@ -67,7 +116,7 @@ const dayName = (value: string) =>
   weekdays[new Date(`${value}T12:00:00Z`).getUTCDay()];
 
 export function ParentDashboard() {
-  const { selectedChildId } = useProgress();
+  const { selectedChildId, user } = useProgress();
   const access = useParentAccess();
   const refreshAccess = access?.refresh;
   const [data, setData] = useState<FamilyOverview | null>(null);
@@ -77,6 +126,13 @@ export function ParentDashboard() {
 
   const load = useCallback(async () => {
     setBusy(true);
+    if (!user) {
+      const locals = getLocalProfiles();
+      setData(localToFamilyOverview(locals));
+      setError("");
+      setBusy(false);
+      return;
+    }
     try {
       const next = await api.family();
       setData(next);
@@ -92,7 +148,7 @@ export function ParentDashboard() {
     } finally {
       setBusy(false);
     }
-  }, [refreshAccess]);
+  }, [refreshAccess, user]);
 
   useEffect(() => {
     void load();

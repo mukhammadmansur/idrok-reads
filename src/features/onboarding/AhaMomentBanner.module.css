@@ -37,19 +37,21 @@
 }
 
 .connectButton {
-  min-height: 40px;
-  padding: 0 1rem;
+  min-height: 48px;
+  padding: 0 1.25rem;
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
   transition: background 0.2s;
 }
 
@@ -58,15 +60,15 @@
 }
 
 .dismissButton {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   background: transparent;
   border: none;
   color: var(--muted);
   cursor: pointer;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .dismissButton:hover {

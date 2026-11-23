@@ -32,9 +32,9 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
     setStep(2);
   };
 
-  const finishWithoutParent = () => {
+  const finishWithoutParent = async () => {
     const trimmed = name.trim() || "Kitobxon";
-    createLocalChildProfile(trimmed, avatar, ageGroup);
+    await createChild(trimmed, avatar);
     onComplete();
   };
 

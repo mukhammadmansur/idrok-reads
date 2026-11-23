@@ -50,16 +50,18 @@ export function ParentLayout() {
           </Link>
           <nav className={styles.nav} aria-label="Ota-onalar menyusi">
             <NavLink to="/parent" end>
-              Natijalar
+              Farzandlarim
             </NavLink>
             <NavLink to="/parent/videos">Videolar</NavLink>
-            <NavLink to="/account">Akkaunt</NavLink>
+            <NavLink to="/parent/account">Hisob va PIN</NavLink>
             <Link
               to="/"
               className={styles.libraryLink}
               onClick={() => {
                 setParentSessionUnlocked(false);
-                void api.parentLock().catch(() => {});
+                if (user) {
+                  void api.parentLock().catch(() => {});
+                }
               }}
             >
               <ArrowLeft size={16} />

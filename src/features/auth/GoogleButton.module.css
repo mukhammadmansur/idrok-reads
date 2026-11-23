@@ -1,0 +1,70 @@
+.wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.host {
+  display: grid;
+  justify-items: center;
+  min-height: 48px;
+}
+
+.host[hidden] {
+  display: none;
+}
+
+.fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.fallback span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.retry {
+  justify-self: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.retry:hover {
+  background: var(--accent-soft);
+}

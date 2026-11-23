@@ -6,7 +6,14 @@ import {
   completeStory,
   recordQuiz,
 } from "./progress";
-import { stories, generalQuiz } from "../data/stories";
+import { stories, generalQuiz } from "../content/stories";
+
+const publicArt = new Set(
+  Object.keys(import.meta.glob("../../public/art/*")).map((path) =>
+    path.replace("../../public", ""),
+  ),
+);
+const hasArt = (path: string) => publicArt.has(path);
 describe("persistent reading state", () => {
   it("resumes after serialization", () => {
     const p = recordPage(emptyProgress(), "oy-dosti", 4);
@@ -47,51 +54,27 @@ describe("published content", () => {
     for (const s of stories) {
       expect(s.pages.length).toBeGreaterThanOrEqual(8);
       expect(s.pages.length).toBeLessThanOrEqual(15);
-      expect(s.themes).toHaveLength(4);
       expect(s.quiz.length).toBeGreaterThanOrEqual(3);
+      expect(new Set(s.pages.map((p) => p.id)).size).toBe(s.pages.length);
     }
     for (const q of [...stories.flatMap((s) => s.quiz), ...generalQuiz])
       expect(q.answer).toBeLessThan(q.options.length);
+    const ids = [...stories.flatMap((s) => s.quiz), ...generalQuiz].map(
+      (q) => q.id,
+    );
+    expect(new Set(ids).size).toBe(ids.length);
   });
-});
-
-describe("structured story leaves", () => {
-  it("retains every word once across the reading leaves", () => {
-    const normalize = (v: string) => v.replace(/\s+/g, " ").trim();
-    for (const story of stories)
-      for (const page of story.pages) {
-        const text = page.leaves
-          .flat()
-          .filter((b) => b.type === "text")
-          .map((b) => ("text" in b ? b.text : ""))
-          .join(" ");
-        expect(normalize(text)).toBe(normalize(page.text));
-        const passages = page.leaves.flat().filter((b) => b.type === "text");
-        expect(
-          passages,
-          "One complete passage gives a single clear reading order",
-        ).toHaveLength(1);
-        expect("text" in passages[0] && passages[0].text).toBe(page.text);
-      }
-  });
-  it("illustrates every main dialogue with story-specific scenes", () => {
+  it("illustrates every page with story-specific, existing artwork", () => {
     for (const story of stories) {
-      const illustrated = story.pages.filter((p) =>
-        p.leaves.flat().some((b) => b.type === "illustration"),
-      );
-      expect(illustrated.length).toBeGreaterThanOrEqual(6);
-      for (const page of story.pages.filter((p) => p.text.includes("«")))
-        expect(
-          page.leaves.flat().some((b) => b.type === "illustration"),
-          page.text,
-        ).toBe(true);
-      const assets = illustrated.flatMap((p) =>
-        p.leaves
-          .flat()
-          .filter((b) => b.type === "illustration")
-          .map((b) => ("src" in b ? b.src : "")),
-      );
-      expect(new Set(assets).size).toBeGreaterThanOrEqual(6);
+      for (const page of story.pages) {
+        expect(page.text.trim().length, page.id).toBeGreaterThan(80);
+        expect(page.alt.trim().length, page.id).toBeGreaterThan(10);
+        expect(hasArt(page.image), page.image).toBe(true);
+      }
+      expect(hasArt(story.cover)).toBe(true);
+      expect(
+        new Set(story.pages.map((p) => p.image)).size,
+      ).toBeGreaterThanOrEqual(6);
     }
   });
 });

@@ -516,6 +516,85 @@ test("parent PIN and password gate are enforced on the server, expire, and prese
   );
 });
 
+test("parents can set a validated YouTube video for each story and only their family sees it", async () => {
+  const a = await open(),
+    parent = await a.register();
+  assert.deepEqual(
+    (await a.request("/api/videos", { cookie: parent.cookie })).data.videos,
+    {},
+  );
+  assert.deepEqual((await a.request("/api/videos")).data.videos, {});
+  const save = (body) =>
+    a.request("/api/parent/videos", {
+      method: "POST",
+      cookie: parent.cookie,
+      body,
+    });
+  for (const url of [
+    "javascript:alert(1)",
+    "http://www.youtube.com/watch?v=aqz-KE-bpKQ",
+    "https://evil.invalid/watch?v=aqz-KE-bpKQ",
+    "https://www.youtube.com/watch?v=short",
+  ])
+    assert.equal(
+      (await save({ storyId: "oy-dosti", url, title: "Video" })).status,
+      400,
+    );
+  assert.equal(
+    (await save({ storyId: "not-a-story", url: "https://youtu.be/aqz-KE-bpKQ", title: "Video" })).status,
+    404,
+  );
+  const saved = await save({
+    storyId: "oy-dosti",
+    url: "https://youtu.be/aqz-KE-bpKQ?t=4",
+    title: "  Oyga maktub videosi  ",
+  });
+  assert.equal(saved.status, 200);
+  assert.equal(
+    saved.data.video.url,
+    "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  );
+  assert.equal(saved.data.video.title, "Oyga maktub videosi");
+  assert.equal(
+    (
+      await a.request("/api/videos", { cookie: parent.cookie })
+    ).data.videos["oy-dosti"].title,
+    "Oyga maktub videosi",
+  );
+  const other = await a.register("other-videos@example.invalid");
+  assert.deepEqual((await a.request("/api/videos", { cookie: other.cookie })).data.videos, {});
+  await a.request("/api/parent/lock", {
+    method: "POST",
+    cookie: parent.cookie,
+    body: {},
+  });
+  assert.equal(
+    (await a.request("/api/parent/videos", { cookie: parent.cookie })).status,
+    403,
+  );
+  assert.equal(
+    (
+      await save({ storyId: "oy-dosti", url: "https://youtu.be/aqz-KE-bpKQ", title: "X" })
+    ).status,
+    403,
+  );
+  await a.request("/api/parent/unlock", {
+    method: "POST",
+    cookie: parent.cookie,
+    body: { method: "password", secret: password },
+  });
+  const removed = await a.request("/api/parent/videos/remove", {
+    method: "POST",
+    cookie: parent.cookie,
+    body: { storyId: "oy-dosti" },
+  });
+  assert.equal(removed.status, 200);
+  assert.deepEqual(
+    (await a.request("/api/videos", { cookie: parent.cookie })).data.videos,
+    {},
+  );
+});
+
 test("PIN guessing is rate limited per parent across newly issued sessions", async () => {
   const a = await open(),
     parent = await a.register();

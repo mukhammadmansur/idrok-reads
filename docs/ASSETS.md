@@ -14,7 +14,7 @@ These assets were generated with Image Gen for this project on 2026-11-12 and en
 
 The four environment files total approximately 1 MiB. The active nonclassic environment loads eagerly; selection thumbnails load lazily. HoloBook's transparency, blur, border reflections and text backing are live CSS over the environment, not a baked picture of a book. Reduced motion disables the slow environment animation. An image failure leaves the theme's solid fallback and all reading controls working.
 
-The original authored SVG covers remain in use for discovery and opening illustrations. Editorial placement is specified in `src/data/stories.ts`; block types live in `src/data/types.ts`. Do not replace missing illustration blocks with repeated covers. Text-only pages are intentional.
+The original authored SVG covers remain in use for discovery and opening illustrations. Each page's scene image and alt text are specified in `src/content/library.json`; contracts live in `src/content/types.ts`. A unit test checks that every referenced image exists in `public/art/`. Do not replace missing scenes with repeated covers.
 
 The earlier decorative frame assets and review captures are retained under `docs/visual-review/archive/` for design history. They are no longer shipped from `public/` or used in the interface.
 

@@ -1,0 +1,294 @@
+{
+  "stories": [
+    {
+      "id": "oy-dosti",
+      "slug": "oy-dosti",
+      "title": "Oyga maktub",
+      "subtitle": "Kichik tulkining katta orzusi",
+      "description": "Tulkixon Oyga xat yozdi. Quyonvoy unga yordam beradi. Xat Oyga yetib borarmikan?",
+      "cover": "/art/oy-dosti.svg",
+      "age": [6, 10],
+      "minutes": 6,
+      "category": "Do‘stlik",
+      "reward": "Oy do‘sti",
+      "video": {
+        "url": "https://www.youtube.com/watch?v=yXe0yxzYkjo",
+        "title": "Oy nega shaklini o‘zgartiradi? (inglizcha)",
+        "credit": "SciShow Kids · inglizcha",
+        "poster": "/art/picture-moon-gathering.webp",
+        "source": "library"
+      },
+      "quiz": [
+        {
+          "id": "moon-1",
+          "prompt": "Tulkixon kimga maktub yozdi?",
+          "options": ["Quyoshga", "Oyga", "Dengizga"],
+          "answer": 1,
+          "explanation": "Tulkixon Oy yolg‘iz bo‘lmasin deb unga do‘stlik maktubini yozdi."
+        },
+        {
+          "id": "moon-2",
+          "prompt": "Tulkixon va Quyonvoy avval nimani yasashdi?",
+          "options": ["Qog‘oz samolyot", "Katta kema", "Qor odam"],
+          "answer": 0,
+          "explanation": "Ular maktubni uchirish uchun qog‘oz samolyot yasashdi."
+        },
+        {
+          "id": "moon-3",
+          "prompt": "Hikoya oxirida Tulkixonni nima quvontirdi?",
+          "options": [
+            "Eng baland daraxt",
+            "Yangi o‘yinchoq",
+            "Do‘stlarining yonida bo‘lishi"
+          ],
+          "answer": 2,
+          "explanation": "Do‘stlari yig‘ilgach, Tulkixon hech kim yolg‘iz emasligini tushundi."
+        }
+      ],
+      "status": "published",
+      "pages": [
+        {
+          "text": "O‘rmonda Tulkixon degan kichkina tulki yashar, har kecha maysali tepalikdan Oyga qarardi. Oy nuri uning quloqlarini va atrofdagi maysalarni kumush rangga bo‘yagandek edi. Tulkixon boshini ko‘tarib, osmonda yolg‘iz turgan Oyni uzoq kuzatdi. «Sening ham do‘sting bormikan?» deb o‘yladi u. U Oy bilan do‘st bo‘lishni juda xohlardi.",
+          "image": "/art/picture-moon-opening.webp",
+          "alt": "Tulkixon maysali tepalikda Oyga qarab turibdi."
+        },
+        {
+          "text": "Tulkixon deraza yoniga o‘tirib, oldiga toza qog‘oz va qalam qo‘ydi. U Oyga xat yozar ekan, har bir harfni chiroyli qilishga urindi. «Salom, Oy, men sen bilan do‘st bo‘lmoqchiman», deb yozdi u. «Sen ham meni ko‘ryapsanmi?» Tulkixon tayyor maktubini yana bir marta o‘qib, xursand jilmaydi.",
+          "image": "/art/moon-letter.webp",
+          "alt": "Tulkixon deraza yonida Oyga do‘stlik maktubini yozyapti."
+        },
+        {
+          "text": "Tulkixon xatini mahkam ushlab, daraxtning pastroq shoxiga chiqdi. U yuqoriga qaradi, lekin Oy hali ham juda uzoqda turardi. Quyonvoy pastda kutib, do‘stining maktubiga va osmonga navbat bilan qaradi. «Bu yerdan ham yetmas ekan», dedi Tulkixon biroz xafa bo‘lib. U shoshilmay pastga tushdi, endi xatni qanday yetkazishni birga o‘ylash kerak edi.",
+          "image": "/art/moon-tree.webp",
+          "alt": "Tulkixon daraxt shoxida maktubini ushlab turibdi, Quyonvoy esa pastda kutyapti."
+        },
+        {
+          "text": "«Kel, maktubingni birga uchirib ko‘ramiz», dedi Quyonvoy maysaga o‘tirib. Ular xat yozilgan qog‘ozni buklab, avval kichik samolyot yasashdi. Tulkixon uning qanotlarini tekisladi, Quyonvoy esa yonida umid bilan kutdi. Samolyot bir oz uchdi-da, yumshoq maysaga sekin qo‘ndi. Oyga yetmagan bo‘lsa ham, Tulkixon do‘stining yonida qolganidan xursand edi.",
+          "image": "/art/moon-paper-plane.webp",
+          "alt": "Tulkixon va Quyonvoy maysalar ustida qog‘oz samolyot yasashyapti."
+        },
+        {
+          "text": "Shu payt Boyo‘g‘li bobo uchib kelib, ikki do‘stning yoniga qo‘ndi. Tulkixon unga maktubini ko‘rsatib, samolyot Oyga yetmaganini aytdi. Bobo bolalarni tingladi, keyin ularga mehr bilan qarab jilmaydi. «Do‘stlaring yoningda-ku, ularni ham xursand qil», dedi u. Tulkixon Quyonvoyga qaradi: do‘sti shu vaqtgacha yonida kutib, unga yordam berayotgan edi.",
+          "image": "/art/picture-moon-owl.webp",
+          "alt": "Boyo‘g‘li bobo Tulkixon va Quyonvoyga mehr ulashish haqida gapiryapti."
+        },
+        {
+          "text": "Tulkixon va Quyonvoy birga chiroq yasab, uni maysali tepalikka olib chiqishdi. Boyo‘g‘li bobo yonlarida turdi, ular chiroqni tekis yerga qo‘yishdi. Uning iliq yorug‘ligi ikki do‘stning yuziga va atrofdagi maysalarga tushdi. «Bu yerda birga o‘tirsak bo‘ladi», dedi Quyonvoy quvonib. O‘rmon do‘stlari yorug‘likni ko‘rib, ularning yoniga birin-ketin kelishdi.",
+          "image": "/art/picture-moon-lantern.webp",
+          "alt": "Tulkixon va Quyonvoy chiroqni tepalikdagi yerga qo‘yishyapti."
+        },
+        {
+          "text": "Do‘stlar yerdagi chiroq atrofida joylashgach, Tulkixon maktubini ochdi. «Bu xatni Oyga yozgan edim», dedi u biroz tortinib. U har bir so‘zni sekin o‘qidi, do‘stlari esa jim tinglashdi. Xat tugayotgan paytda Oy bulut ortidan chiqib, tepalikni yoritdi. Tulkixon boshini ko‘tardi, keyin yonida o‘tirgan do‘stlariga qarab, keng jilmaydi.",
+          "image": "/art/picture-moon-gathering.webp",
+          "alt": "Tulkixon maktubini o‘qiyapti, o‘rmon do‘stlari yerdagi chiroq atrofida tinglashyapti."
+        },
+        {
+          "text": "Oy nurida Tulkixon Quyonvoyga yaqinroq o‘tirib, yig‘ilgan do‘stlariga qaradi. Maktubi Oyga yetmagan edi, lekin uni tinglaydigan do‘stlari shu yerda edi. «Sizlar yonimda bo‘lsangiz, men yolg‘iz emasman», dedi u xursand bo‘lib. Quyonvoy ham jilmaydi, Boyo‘g‘li bobo esa boshini ohista qimirlatdi. Ular har kecha shu tepalikda birga uchrashadigan bo‘lishdi.",
+          "image": "/art/picture-moon-gathering.webp",
+          "alt": "Tulkixon, Quyonvoy va do‘stlari Oy nurida birga: endi hech kim yolg‘iz emas."
+        }
+      ]
+    },
+    {
+      "id": "bulut-kemasi",
+      "slug": "bulut-kemasi",
+      "title": "Bulutlar kemasi",
+      "subtitle": "Shamol olib kelgan sarguzasht",
+      "description": "Zara bobosi bilan qog‘oz kema yasaydi. Kichik kema bir chumoliga yordam beradi.",
+      "cover": "/art/bulut-kemasi.svg",
+      "age": [6, 10],
+      "minutes": 5,
+      "category": "Sarguzasht",
+      "reward": "Orzular sayyohi",
+      "video": {
+        "url": "https://www.youtube.com/watch?v=Xo0jbo0Z_Pk",
+        "title": "Qog‘ozdan kema yasaymiz (inglizcha)",
+        "credit": "Red Ted Art · inglizcha",
+        "poster": "/art/cloud-folding.webp",
+        "source": "library"
+      },
+      "quiz": [
+        {
+          "id": "cloud-1",
+          "prompt": "Zara kemasiga qanday nom berdi?",
+          "options": ["Yulduz", "Orzu", "Quyosh"],
+          "answer": 1,
+          "explanation": "Zara kichik kemasiga «Orzu» deb nom berdi."
+        },
+        {
+          "id": "cloud-2",
+          "prompt": "Yelkan nimadan yasaldi?",
+          "options": ["Bargdan", "Toshdan", "Muzdan"],
+          "answer": 0,
+          "explanation": "Zara yashil bargni cho‘pga mahkamladi."
+        },
+        {
+          "id": "cloud-3",
+          "prompt": "Zara kimga yordam berdi?",
+          "options": ["Kapalakka", "Baliqqa", "Chumoliga"],
+          "answer": 2,
+          "explanation": "Kema ho‘l toshda qolgan chumolini qirg‘oqqa olib bordi."
+        }
+      ],
+      "status": "published",
+      "pages": [
+        {
+          "text": "Zara deraza yonida turib, osmonda suzib borayotgan oppoq bulutni kuzatdi. Bulutning bir tomoni baland, ikkinchi tomoni uzun kemaga o‘xshardi. U ko‘zini bulutdan uzmay, yonida turgan bobosining qo‘lini ohista ushladi. «Men ham shunday kema yasayman», dedi Zara zavqlanib. Bobosi jilmaydi, Zara esa o‘zining kichik kemasini ko‘z oldiga keltirdi.",
+          "image": "/art/picture-cloud-opening.webp",
+          "alt": "Zara deraza yonida kemaga o‘xshagan bulutni tomosha qilyapti."
+        },
+        {
+          "text": "Zara bobosi bilan stol yoniga o‘tirib, oq qog‘ozni ehtiyotlab bukladi. Bobosi bir chetini ko‘rsatdi, Zara esa uni barmog‘i bilan tekisladi. Qog‘oz asta-sekin kichik kemaga aylandi, Zara uni ikki kaftida ushlab ko‘rdi. «Kemamizning nomi Orzu bo‘lsin», dedi u xursand bo‘lib. Bobosi bu nomni yoqtirdi, ikkovlari tayyor kemani tomosha qilishdi.",
+          "image": "/art/cloud-folding.webp",
+          "alt": "Zara va bobosi stol yonida qog‘ozdan kema buklashyapti."
+        },
+        {
+          "text": "Hovlida Zara bobosi yonida cho‘kkalab, kemani kichik, sayoz ko‘lmakka ehtiyotlab qo‘ydi. Oq kema suv yuzida turdi, ammo hali oldinga siljimadi. Zara uning uchiga qarab, suzib ketishini bir oz kutdi. «Nega kemamiz joyida turibdi?» deb so‘radi u bobosidan. Bobosi ham kemaga qaradi, Zara esa suvga kirmay, ko‘lmak chetida qoldi.",
+          "image": "/art/picture-cloud-puddle.webp",
+          "alt": "Zara oq qog‘oz kemani hovlidagi ko‘lmakka qo‘yyapti."
+        },
+        {
+          "text": "«Kemamizga shamol yordam berishi uchun yelkan yasaymiz», dedi bobosi Zaraga. U barg va kichik cho‘pni ko‘rsatib, yelkan qanday turishini tushuntirdi. Zara yashil bargni cho‘pga ehtiyotlab taqdi, bobosi esa yonida kuzatib turdi. Ular tayyor yelkanni qog‘oz kemaga mahkamlab, yana suvga qo‘yishdi. Endi Zara bargning shamolda qimirlay boshlashini qiziqib kutardi.",
+          "image": "/art/cloud-sail.webp",
+          "alt": "Bobosi Zaraga yelkan haqida tushuntiryapti, Zara barg va cho‘pni ushlab turibdi."
+        },
+        {
+          "text": "Yengil shamol esib, bargdan yasalgan yashil yelkanni sekin oldinga surdi. Kema ko‘lmak bo‘ylab suza boshladi, uning ortida mayda iz qoldi. «Qarang, bobojon, Orzu suzyapti», dedi Zara yuzlari yorishib. U bobosi yonida, quruq chetdan kemaga ergashib, mayda qadamlar bilan yurdi. Har safar yelkan qimirlaganda, Zara kemaning qaysi tomonga burilishini qiziqib kuzatdi.",
+          "image": "/art/picture-cloud-wind.webp",
+          "alt": "Shamol barg yelkanli kemani suryapti, Zara uni kuzatib yuribdi."
+        },
+        {
+          "text": "Ko‘lmakdagi ho‘l tosh ustida kichkina chumoli qolib ketgan edi. U oyoqlarini qimirlatib, atrofidagi suvga qarar, quruq joyga o‘ta olmasdi. «Bobojon, kemamiz unga yordam bera oladi», dedi Zara chumolini ko‘rsatib. Bobosi yonida turganida, u quruq chetdan kemani toshga yaqin surdi. Chumoli yashil yelkanli kemaga chiqdi, Zara esa uni xursand kuzatdi.",
+          "image": "/art/cloud-ant-rescue.webp",
+          "alt": "Yashil barg yelkanli qog‘oz kema ho‘l toshda qolgan chumolini qutqaryapti."
+        },
+        {
+          "text": "Orzu kemasi chumolini olib, ko‘lmakning maysali qirg‘og‘iga sekin yetib keldi. Zara bobosi yonida turib, kichkina yo‘lovchining har bir harakatini kuzatdi. Chumoli kemadan quruq maysaga tushdi va oyoqlarini tez-tez qimirlatib yurib ketdi. «Birinchi yo‘lovchimizni qutqardik», dedi Zara quvonch bilan bobosiga qarab. U endi kemasiga qarasa, toshda qolgan kichkina chumolini ham eslardi.",
+          "image": "/art/cloud-passenger.webp",
+          "alt": "Zara birinchi yo‘lovchisini kuzatyapti: chumoli kemadan xavfsiz maysaga tushyapti."
+        },
+        {
+          "text": "Kechga yaqin Zara bobosi bilan osmonda suzayotgan bulut kemani yana ko‘rdi. U qo‘l silkib, o‘zining qog‘oz kemasi bugun qilgan ishni esladi. «Bizning Orzu chumolini qirg‘oqqa olib bordi», dedi u bobosiga. Bobosi Zaraga mehr bilan qarab, uning yordamidan xursand ekanini aytdi. Zara bobosi yonida jilmayib turdi, bulut esa osmonda sekin uzoqlashdi.",
+          "image": "/art/picture-cloud-goodbye.webp",
+          "alt": "Zara va bobosi kechki osmonda kemaga o‘xshagan bulutga qo‘l silkishyapti."
+        }
+      ]
+    },
+    {
+      "id": "dengiz-siri",
+      "slug": "dengiz-siri",
+      "title": "Dengizning kichik siri",
+      "subtitle": "Do‘sting bilan qo‘rqinch ham kichrayadi",
+      "description": "Kitvoy chuqur suvdan qo‘rqadi. Toshbaqacha yonida bo‘lsa, u dadilroq suzadi.",
+      "cover": "/art/dengiz-siri.svg",
+      "age": [6, 10],
+      "minutes": 7,
+      "category": "Tabiat",
+      "reward": "Dengiz kashfiyotchisi",
+      "video": {
+        "url": "https://www.youtube.com/watch?v=dciLg3Zm1hI",
+        "title": "Ko‘k kit bilan tanishamiz (inglizcha)",
+        "credit": "Nat Geo Kids · inglizcha",
+        "poster": "/art/picture-sea-home.webp",
+        "source": "library"
+      },
+      "quiz": [
+        {
+          "id": "sea-1",
+          "prompt": "Kitvoy nimadan qo‘rqardi?",
+          "options": ["Chuqur suvdan", "Quyoshdan", "Marjondan"],
+          "answer": 0,
+          "explanation": "Chuqur suv Kitvoyga qorong‘i ko‘rinardi."
+        },
+        {
+          "id": "sea-2",
+          "prompt": "Oqim kuchayganda do‘stlar nima qilishdi?",
+          "options": [
+            "Shoshilib suzishdi",
+            "Tosh ortida kutishdi",
+            "Ajralib ketishdi"
+          ],
+          "answer": 1,
+          "explanation": "Ular xavfsiz joyda oqim pasayishini kutishdi."
+        },
+        {
+          "id": "sea-3",
+          "prompt": "Kitvoy nimani o‘rgandi?",
+          "options": [
+            "Hech kimdan yordam so‘ramaslikni",
+            "Doim shoshilishni",
+            "Kichik qadam ham jasorat ekanini"
+          ],
+          "answer": 2,
+          "explanation": "Kitvoy yordam so‘rash va kichik qadam tashlash ham jasoratligini bildi."
+        }
+      ],
+      "status": "published",
+      "pages": [
+        {
+          "text": "Kitvoy kichkina kit edi, u quyosh tushgan yorug‘ suvda o‘ynashni yaxshi ko‘rardi. Tanish marjonlar ustidan suzganda, suv uning atrofida mayin yaltirardi. Ammo uzoqdagi chuqur suv unga qorong‘i ko‘rinar, o‘sha tomonga qarasa yuragi tez urardi. «Bu yerda o‘zimni tinch his qilaman», deb o‘ylardi u. Kitvoy chuqur suvdan qo‘rqib, tanish joylarga yaqin yurardi.",
+          "image": "/art/picture-sea-opening.webp",
+          "alt": "Kitvoy quyosh tushgan suvda marjonlar ustidan suzyapti."
+        },
+        {
+          "text": "Bir kuni Kitvoy marjonlar yonida mayin bir qo‘shiq eshitdi. U ovoz kelayotgan tomonga sekin suzib, kuylayotgan Toshbaqachani ko‘rdi. Toshbaqacha uni payqab, qo‘shig‘ini tugatdi va ochiq chehra bilan qaradi. «Salom, mening ismim Toshbaqacha, seniki-chi?» deb so‘radi u. Kitvoy o‘zini tanishtirdi, ikkovi gaplashib, bir-birining yonida bemalol suzadigan do‘stlar bo‘lib qolishdi.",
+          "image": "/art/picture-sea-meeting.webp",
+          "alt": "Kitvoy marjonlar yonida qo‘shiq aytayotgan Toshbaqacha bilan tanishyapti."
+        },
+        {
+          "text": "«Uyimga birga suzamizmi?» deb so‘radi Toshbaqacha Kitvoyga mehr bilan qarab. «Yo‘lda chuqur suv bor, lekin men yoningda bo‘laman». Kitvoy uzoqdagi qorong‘iroq suvga qaradi va bir oz jim qoldi. U do‘sti bilan borishni xohlardi, ammo yuragi yana tez ura boshladi. «Men chuqur suvdan qo‘rqaman», dedi u ovozini pasaytirib.",
+          "image": "/art/sea-courage.webp",
+          "alt": "Toshbaqacha Kitvoyni birga suzishga taklif qilyapti, Kitvoy esa ikkilanib turibdi."
+        },
+        {
+          "text": "Toshbaqacha Kitvoyning qo‘rqayotganini eshitib, uning yoniga yaqinroq suzib keldi. «Qo‘rqsang, menga ayt, men yoningdaman», dedi u shoshilmasdan. Kitvoy do‘stiga qarab, boshini qimirlatdi va sekin suzishga rozi bo‘ldi. Ular yonma-yon yo‘lga tushib, avval kichik bir masofani bosib o‘tishdi. Kitvoy hali biroz qo‘rqardi, lekin endi qo‘rquvini yolg‘iz ichida saqlashi shart emas edi.",
+          "image": "/art/sea-courage.webp",
+          "alt": "Toshbaqacha qo‘rqayotgan Kitvoyni mehr bilan qo‘llab-quvvatlayapti."
+        },
+        {
+          "text": "Yo‘lda mayda baliqlar suv ichida birin-ketin yaltirab, yonlaridan suzib o‘tdi. Kitvoy ularni ko‘rib, sekin suzgancha boshini u yoqdan bu yoqqa burdi. «Qara, suvda ham yulduzlar bordek», dedi u hayrat bilan. Toshbaqacha yonida turib, yaltiragan baliqlarni u bilan birga tomosha qildi. Kitvoyning yuragi tinchroq ura boshladi, endi u chuqur suvdan kamroq qo‘rqardi.",
+          "image": "/art/picture-sea-lights.webp",
+          "alt": "Kitvoy va Toshbaqacha yulduzlarga o‘xshab yaltiragan mayda baliqlarni tomosha qilishyapti."
+        },
+        {
+          "text": "Bir ozdan keyin suv tez oqa boshladi, Kitvoy buni darrov sezdi. Toshbaqacha bilan u yaqin turgan katta toshning ortiga o‘tishdi. «Avval shu yerda kutaylik», dedi Toshbaqacha do‘stining yonida qolib. Kitvoy shoshilmadi, ular xavfsiz joyda suv tinchiguncha birga kutishdi. Oqim pasaygachgina, do‘stlar tosh ortidan chiqib, yana sekin yo‘lga tushishdi.",
+          "image": "/art/sea-friends.webp",
+          "alt": "Kichkina kit Kitvoy va toshbaqa Toshbaqacha xavfsiz tosh yonida oqim tinishini kutishyapti."
+        },
+        {
+          "text": "Toshbaqacha uyiga yetib kelgach, Kitvoy ham uning yonida to‘xtadi. Ular shoshilmay suzib, kuchli oqim tinishini birga kutganlarini eslashdi. «Men bilan kelganing uchun rahmat, do‘stim», dedi Toshbaqacha jilmayib. Kitvoyning ko‘ngli yorishdi, u endi o‘zini avvalgidan dadilroq his qilardi. U quvonchidan mayin qo‘shiq aytdi, Toshbaqacha esa yonida turib uni mamnun tingladi.",
+          "image": "/art/sea-song.webp",
+          "alt": "Toshbaqacha uyiga yetib kelib rahmat aytyapti, Kitvoy quvonchdan kuylayapti."
+        },
+        {
+          "text": "Kitvoy tanish marjonlar yonidagi uyiga qaytib, bugungi yo‘lini esladi. U do‘sti bilan yangi joyga bordi, qo‘rqqanini aytdi va shoshilmay suzdi. «Kichik qadam ham jasorat ekan», deb o‘yladi u xursand bo‘lib. Chuqur suv hali ham biroz qo‘rqinchli edi, ammo endi Kitvoy yordam so‘rash mumkinligini bilardi. U Toshbaqacha bilan birga kutganlarini eslab jilmaydi.",
+          "image": "/art/picture-sea-home.webp",
+          "alt": "Kitvoy tanish marjonlar yonidagi uyiga xursand qaytyapti."
+        }
+      ]
+    }
+  ],
+  "generalQuiz": [
+    {
+      "id": "general-1",
+      "prompt": "O‘simlik o‘sishi uchun nimalar kerak?",
+      "options": ["Faqat qorong‘ilik", "Suv va quyosh nuri", "Faqat toshlar"],
+      "answer": 1,
+      "explanation": "Suv va quyosh nuri o‘simliklarning o‘sishiga yordam beradi."
+    },
+    {
+      "id": "general-2",
+      "prompt": "Do‘sting xafa bo‘lsa, nima qilish mumkin?",
+      "options": ["Uni tinglash", "Ustidan kulish", "Gapini bo‘lish"],
+      "answer": 0,
+      "explanation": "Tinglash va mehr ko‘rsatish do‘stimizga yordam beradi."
+    },
+    {
+      "id": "general-3",
+      "prompt": "Qaysi hayvon dengizda yashaydi?",
+      "options": ["Tulki", "Quyon", "Kit"],
+      "answer": 2,
+      "explanation": "Kit — dengizda yashaydigan sutemizuvchi hayvon."
+    }
+  ]
+}

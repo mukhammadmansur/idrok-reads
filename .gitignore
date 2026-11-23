@@ -57,6 +57,7 @@ yarn-error.log*
 *.bak
 *.swp
 .DS_Store
+vibe_images/
 
 # Private account database and backups
 data/

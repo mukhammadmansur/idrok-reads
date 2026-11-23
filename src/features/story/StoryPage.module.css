@@ -1,0 +1,205 @@
+.page {
+  display: grid;
+  gap: 20px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 48px;
+  padding: 0 10px 0 4px;
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.back:hover {
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.layout {
+  display: grid;
+  gap: 26px;
+}
+
+.coverWrap {
+  --cover-inset: 0px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  padding: var(--cover-inset);
+  background: var(--surface-soft);
+  box-shadow: var(--shadow-2);
+}
+
+.coverInset {
+  overflow: hidden;
+  border-radius: calc(var(--radius-xl) - var(--cover-inset) - 1px);
+  background: var(--surface-soft);
+}
+
+.cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.ribbon {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+}
+
+.completed {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.detail {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.detail h1 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6vw, 60px);
+  font-weight: 600;
+  letter-spacing: -1.6px;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.subtitle {
+  color: var(--warm);
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-style: italic;
+}
+
+.description {
+  max-width: 58ch;
+  color: var(--ink-soft);
+  font-size: 17px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.resumeNote {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.about {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.about h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.about p {
+  max-width: 58ch;
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
+.reward {
+  color: var(--ink) !important;
+  font-weight: 700;
+}
+
+:global(:root[data-theme="forest"]) .coverWrap {
+  --cover-inset: 10px;
+  border-color: #79542c;
+  background: url("/art/enchanted-bark-v1.webp") center / cover;
+}
+
+:global(:root[data-theme="ice"]) .coverWrap {
+  --cover-inset: 10px;
+  border-color: #b5d9ec;
+  background: conic-gradient(
+    from 35deg,
+    #b9e9f5,
+    #fff,
+    #c7bcf0,
+    #93cde1,
+    #b9e9f5
+  );
+}
+
+@media (min-width: 820px) {
+  .layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: start;
+    gap: 48px;
+  }
+
+  .coverWrap {
+    position: sticky;
+    top: 100px;
+  }
+
+  .cover {
+    aspect-ratio: 4 / 5;
+  }
+
+  .actions {
+    max-width: 420px;
+  }
+}

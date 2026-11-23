@@ -4,7 +4,7 @@ This phase adds real parent registration/login and child progress persistence wi
 
 ## Local setup
 
-Use Node.js 24+ (validated on 24.22.1), then `npm ci` and `npm run dev`. This starts Vite on 5173 and the API on 3001. On Windows use `npm.cmd` if PowerShell blocks `npm.ps1`. Open the frontend, choose **Ota-onalar uchun**, register a parent email/password, and create a child first name/avatar. Passwords must be 12–128 characters; a child needs no credentials. Each account supports six child profiles. Sign-in and sign-up have separate routes (`#/account/login`, `#/account/register`), explanatory cards, and matching-password confirmation during registration.
+Use Node.js 24+ (validated on 24.22.1), then `npm ci` and `npm run dev`. This starts Vite on 5173 and the API on 3001. On Windows use `npm.cmd` if PowerShell blocks `npm.ps1`. Open the frontend, choose **Ota-onalar uchun**, register a parent email/password, and create a child first name/avatar. Passwords must be 12–128 characters; a child needs no credentials. Each account supports six child profiles. Sign-in and sign-up have separate routes (`/account/login`, `/account/register`), explanatory cards, and matching-password confirmation during registration.
 
 No external provider, API key, or initial admin credential is needed. `.env.example` contains only optional non-secret defaults:
 
@@ -51,7 +51,7 @@ SQLite stores parent email/password hash, optional PIN hash, Google subject link
 
 Registration/login have persistent IP-based limits (10 registrations/hour and 20 login attempts/15 minutes). The server uses the socket address, not an untrusted forwarded IP. Behind one reverse proxy, users therefore share that proxy's rate bucket; configure trusted proxy-aware limiting before a larger public rollout.
 
-`server/catalog.json` is authoritative for story page counts and quiz answer/option counts. A test ensures it matches `src/data/stories.ts`. Update both together when publishing content. Browser answer keys are visible for supportive immediate feedback; quiz secrecy/anti-cheating is not claimed.
+`server/catalog.mjs` derives story page counts and quiz answer/option counts from `src/content/library.json`, the same file the browser reads. Editing that one file updates both; a unit test confirms the derivation. Browser answer keys are visible for supportive immediate feedback; quiz secrecy/anti-cheating is not claimed.
 
 ## Event synchronization
 
@@ -74,13 +74,13 @@ Guest progress stays under `iqro.progress.v1` and never silently joins an accoun
 
 ## Verification
 
-`npm test` runs 15 frontend unit tests and 17 HTTP/SQLite integration tests, including password/session hashes, revocation, cross-parent denial, sibling separation, server grading, idempotency, atomic rollback, persistent restart, write-origin checks, limits and private-file serving. Browser tests add independent-device resume, sibling switching, offline/reload retry, explicit guest transfer, mobile form accessibility, quiz retry, session expiry and two-tab queues. The broader reader/theme/accessibility suite remains in `tests/`.
+`npm test` runs 19 frontend unit tests and 18 HTTP/SQLite integration tests, including password/session hashes, revocation, cross-parent denial, sibling separation, server grading, idempotency, atomic rollback, persistent restart, write-origin checks, limits and private-file serving. `npm run test:e2e` runs 119 Playwright checks. The 13 account checks use the real isolated server and cover independent-device resume, sibling switching, child-mode parent locking and PIN unlock, offline/reload retry, explicit guest transfer, mobile form accessibility, quiz completion during a write outage, session expiry, two-tab queues, four-child monitoring and active-reading time phases. The broader reader/theme/accessibility suite remains in `tests/`.
 
 Playwright uses a separate in-memory API on port 3101; keep frontend port 5173 free to avoid accidentally reusing another development server. Integration persistence tests use temporary databases. The isolated browser server raises only its registration fixture limit; deployed/default limits are not weakened. Committed fixtures use `.invalid` email addresses and test-only passphrases. Screenshots show synthetic preview data, never real family accounts.
 
 ## Parent protection and monitoring
 
-Successful password or Google authentication opens parent controls for 30 minutes. Visiting child-mode pages locks them; returning requires the saved six-digit PIN, the account password, or Google reauthentication for Google-only accounts. The gate protects both `#/parent` and signed-in account settings, and the server rejects overview, profile-management and PIN-setting operations while locked. Reloads and direct URLs do not remove the gate. Five failed PIN/password unlocks per parent in 15 minutes produce a rate limit, shared across that parent's sessions. A successful unlock clears its failed-attempt bucket. PINs use salted scrypt and never enter localStorage. Changing a PIN also locks parent access in other sessions. Forgotten PINs can be replaced after password confirmation; Google-only accounts can reauthenticate with their linked Google identity.
+Successful password or Google authentication opens parent controls for 30 minutes. Visiting child-mode pages locks them; returning requires the saved six-digit PIN, the account password, or Google reauthentication for Google-only accounts. The gate protects both `/parent` and signed-in account settings, and the server rejects overview, profile-management and PIN-setting operations while locked. Reloads and direct URLs do not remove the gate. Five failed PIN/password unlocks per parent in 15 minutes produce a rate limit, shared across that parent's sessions. A successful unlock clears its failed-attempt bucket. PINs use salted scrypt and never enter localStorage. Changing a PIN also locks parent access in other sessions. Forgotten PINs can be replaced after password confirmation; Google-only accounts can reauthenticate with their linked Google identity.
 
 The dashboard shows all children at once and lets a parent inspect one without changing the child's currently selected reading profile. It includes completed/in-progress books, best quiz accuracy (clearly labeled), attempt counts, actual latest attempt scores, last synchronized activity, a seven-day active-time chart, and per-book progress. No invented online indicator or estimated reading time is used as measured time. New accepted reading/quiz events create history once; replayed event receipts do not duplicate history.
 

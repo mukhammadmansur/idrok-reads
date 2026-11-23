@@ -37,7 +37,7 @@ Open http://127.0.0.1:3001. This Node process serves both `dist/` and `/api`. A 
 - ClassicBook turns a curved, two-sided paper leaf with moving shadows in 1.25 seconds. The leaf follows a held mouse or finger; a short drag returns it to its place. A small hand demonstrates dragging once per browser. Page corners, buttons, arrow keys, and horizontal swipes share the same renderer; progress updates after the leaf settles.
 - A stable book size across every page, including large-text mode; hidden measurement copies reserve enough room without exposing duplicated content.
 - Reading progress, resume, idempotent completion, badges, and milestones, with visible next-book and replay actions before the video.
-- Click-to-load YouTube videos configured with ordinary links in `src/data/videos.ts`, with a direct YouTube fallback. Three temporary films are clearly marked as demo viewing rather than original story recaps. The earlier animation/local-video model remains supported.
+- Click-to-load YouTube videos chosen per story by a parent in the parent area (`/parent/videos`), with a direct YouTube fallback. No sample film is shown when a parent has not chosen one.
 - A **separate Savol-javob section**: questions about completed books or general questions available immediately. No forced quiz after reading.
 - Supportive answer feedback, best score persistence, and explicit retries.
 - Parent registration/login, up to six child name/avatar profiles, profile switching, and server-stored reading and quiz results. Use **Ota-onalar uchun → Ro‘yxatdan o‘tish** to begin; children need no email or password.
@@ -58,7 +58,7 @@ npm run test:e2e
 
 Playwright uses `/usr/bin/chromium` by default. On another machine set `CHROMIUM_PATH` to an installed Chromium executable. Run browser tests with port 5173 free, or set `CI=1` to refuse an existing server: Playwright starts the combined development runner with API port 3101 and an isolated in-memory database. Automated accessibility checks use axe-core. `npm test` includes frontend unit tests and real HTTP/SQLite integration tests. Browser tests cover the reader plus account isolation, multiple browsers, profile switching, outage recovery, expired sessions, and multiple tabs.
 
-Use `npm run format` for source formatting. The hash router requires no frontend route rewrites. See [account architecture and operations](docs/ACCOUNTS.md) for configuration, API contracts, test coverage, and hosting requirements.
+Use `npm run format` for source formatting. Routes are ordinary browser paths; `server/app.mjs` serves `index.html` for extensionless page requests so deep links and reloads work. See [account architecture and operations](docs/ACCOUNTS.md) for configuration, API contracts, test coverage, and hosting requirements.
 
 ## Data boundary
 

@@ -1,13 +1,11 @@
 import { StrictMode, Component, type ReactNode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./app/router";
 import { ProgressProvider } from "./lib/context";
-import "./styles.css";
-import "./themes.css";
-import "./worlds.css";
-import "./comfort.css";
-import "./picturebook.css";
-import "./account.css";
+import "./styles/tokens.css";
+import "./styles/global.css";
+
 class ErrorBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }
@@ -17,7 +15,7 @@ class ErrorBoundary extends Component<
     return { failed: true };
   }
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("Iqro UI error", error, info.componentStack);
+    console.error("IdrokReads UI error", error, info.componentStack);
   }
   render() {
     return this.state.failed ? (
@@ -27,11 +25,8 @@ class ErrorBoundary extends Component<
           Kichik nosozlik yuz berdi. Saqlangan o‘qish jarayoning shu brauzerda
           qoladi.
         </p>
-        <button
-          className="button"
-          onClick={() => window.location.assign(window.location.pathname)}
-        >
-          Kutubxonani ochish
+        <button className="button" onClick={() => window.location.reload()}>
+          Sahifani yangilash
         </button>
       </main>
     ) : (
@@ -39,11 +34,12 @@ class ErrorBoundary extends Component<
     );
   }
 }
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
       <ProgressProvider>
-        <App />
+        <RouterProvider router={router} />
       </ProgressProvider>
     </ErrorBoundary>
   </StrictMode>,

@@ -1,6 +1,6 @@
-import type { ProfileProgress } from "../data/types";
+import type { ProfileProgress } from "../content/types";
 import type { ProgressEvent } from "./api";
-import { generalQuiz, stories } from "../data/stories";
+import { generalQuiz, stories } from "../content/stories";
 import { completeStory, recordPage, recordQuiz } from "./progress";
 export function eventId() {
   const bytes = crypto.getRandomValues(new Uint8Array(16));

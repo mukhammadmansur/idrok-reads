@@ -1,4 +1,4 @@
-import type { ProfileProgress, ThemeId } from "../data/types";
+import type { ProfileProgress, ThemeId } from "../content/types";
 export const STORAGE_KEY = "iqro.progress.v1";
 export const emptyProgress = (): ProfileProgress => ({
   version: 1,

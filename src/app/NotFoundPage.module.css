@@ -1,0 +1,36 @@
+.page {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  min-height: 60vh;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: var(--shadow-1);
+}
+
+.page h1 {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+
+.page p {
+  max-width: 44ch;
+  color: var(--ink-soft);
+}
+
+.page a {
+  margin-top: 8px;
+}

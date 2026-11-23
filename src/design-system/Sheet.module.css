@@ -1,0 +1,73 @@
+.sheet {
+  width: min(560px, 100%);
+  max-height: min(86dvh, 720px);
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+}
+
+.sheet::backdrop {
+  background: #10201966;
+  backdrop-filter: blur(4px);
+}
+
+.sheet[open] {
+  animation: sheet-in var(--motion-base) var(--ease);
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.inner {
+  display: flex;
+  max-height: inherit;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) var(--space-3);
+}
+
+.header h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.header p {
+  margin-top: 6px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.body {
+  min-height: 0;
+  flex: 1;
+  padding: 0 var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+@media (min-width: 720px) {
+  .sheet {
+    margin: auto;
+    border-radius: var(--radius-xl);
+  }
+}

@@ -10,67 +10,58 @@ KEEP: the repository identity and original README title, now expanded into run d
 
 The founder's correction before the master prompt takes precedence over its sequential quiz examples: Savol-javob is an independent destination with completed-book questions and general questions. Finishing a story never forces or automatically opens a quiz. The child can read, finish, view the recap, and return to the library. A completion badge depends on reading completion, not a quiz score.
 
-The provisional product name is Iqro. No billing, social features, leaderboard, chatbot, or content-generation pipeline is included.
+The product name is IdrokReads (internal package/storage names keep the earlier `iqro` prefix for compatibility). No billing, social features, leaderboard, chatbot, or content-generation pipeline is included.
 
 ## Current stack and boundaries
 
 React 19, TypeScript, Vite, npm lockfile, Lucide icons, CSS tokens, authored local SVG artwork, Node.js 24+ HTTP/SQLite backend, Vitest, Node integration tests, Playwright/Chromium, ESLint, and axe-core. The backend adds no third-party runtime dependency.
 
-The route layer is a small hash router: library, story details, reader, completion, independent quiz library/session, rewards, parent view, and account. Unknown stories and destinations have a recovery action. A same-origin `/api` provides parent sessions, owned child profiles, and progress events. Node serves the built frontend; Vite proxies the API during development.
+The route layer uses React Router browser routes with deep links: library, story details, reader, completion, independent quiz library/session, rewards, parent view, and account. Unknown stories and destinations have a recovery action. A same-origin `/api` provides parent sessions, owned child profiles, and progress events. Node serves the built frontend; Vite proxies the API during development.
 
-Story content is typed structured data, never HTML. Each logical page contains two physical leaves with a complete passage in one reading block and a large illustration. Sentences and dialogue are never automatically split at the spine. Image and narration sides vary between scenes; all current published pages have scene artwork. The same pages feed one reader; themes control CSS custom properties and environmental details. Themes never own progress or story logic. Selecting a world on the home page stays on that page; selecting it on story details also updates the whole application immediately. Both persist the choice in the existing versioned profile. Nonclassic worlds use full environment artwork behind readable surfaces; HoloBook uses translucent leaves and backdrop blur with local text backing.
+Story content is typed structured data in `src/content/library.json`, never HTML. Each page holds one complete passage plus one scene illustration with alt text; sentences and dialogue are never split across the spine. The server derives its grading catalog from the same file, so content and answer keys cannot drift. The same pages feed one reader; themes control CSS custom properties and environmental details. Themes never own progress or story logic. Selecting a world on the home page stays on that page; selecting it on story details also updates the whole application immediately. Both persist the choice in the existing versioned profile. Nonclassic worlds use full environment artwork behind readable surfaces; HoloBook uses translucent leaves and backdrop blur with local text backing.
 
 Progress functions are immutable and separated from rendering. Guest storage remains separate from authenticated data. Account events have durable per-parent/per-child queues and idempotency receipts. SQLite transactions preserve first completion dates and best quiz scores; the server grades answer indices and checks child ownership. Versioned storage parsing tolerates malformed data. Browser refresh does not create another quiz attempt. The reading resume point follows the last successfully synchronized reading event; it is not a distributed ordering of offline client clocks. See [ACCOUNTS.md](ACCOUNTS.md) for guarantees and limits.
 
 ## File / module map
 
-| Path | Responsibility |
-| --- | --- |
-| `src/App.tsx` | Route selection and unknown-route handling |
-| `src/main.tsx` | Entry point and render-error boundary |
-| `src/components/Shell.tsx` | Desktop sidebar, mobile navigation, skip link, storage warning |
-| `src/components/Home.tsx` | Featured story, discovery, search, filters, resume, theme previews |
-| `src/components/StoryDetails.tsx` | Story description, theme selection, start/resume/replay |
-| `src/components/Reader.tsx` | Shared reader engine, pointer navigation, completion |
-| `src/components/PaperTurn.tsx` | Curved physical leaves for ClassicBook, ForestBook and IceBook |
-| `src/components/HologramReveal.tsx` | Drag-controlled light reveal on the stationary HoloBook glass |
-| `src/components/BookSizing.tsx` | Measure all spreads at the active width/type size to keep book height fixed |
-| `src/components/StoryPageContent.tsx` | Shared leaf/block renderer for readable text and optional inline scenes |
-| `src/components/ThemeVisual.tsx` | Theme icons, world thumbnails, and shared environment backdrop |
-| `src/components/Recap.tsx` | YouTube link player, direct fallback, and legacy local animation/video support |
-| `src/data/videos.ts` | Replaceable YouTube demo links, titles and credits |
-| `src/lib/youtube.ts` | Strict video-link parsing and controlled iframe URLs |
-| `src/components/Quiz.tsx` | Independent quiz library, answers, feedback, results, retries |
-| `src/components/Progress.tsx` | Milestones, story badges, selected child's parent activity |
-| `src/components/Account.tsx` | Parent login/registration, child picker, guest transfer, sync status |
-| `src/components/ui.tsx` | Reusable story card, artwork fallback, empty state, section title |
-| `src/data/types.ts` | Story, pages, themes, media, questions, progress contracts |
-| `src/data/stories.ts` | Original content, publication status, theme metadata, general questions |
-| `src/lib/progress.ts` | Storage validation and pure page/completion/quiz transitions |
-| `src/lib/context.tsx` | Session lifecycle, guest persistence, child hydration and event synchronization |
-| `src/lib/api.ts` | Typed same-origin account/progress client |
-| `src/lib/outbox.ts` | Validated account/child-scoped pending events and optimistic progress |
-| `server/store.mjs` | SQLite schema, password/session hashes, ownership, event transactions and grading |
-| `server/family.mjs` | Additive v2 migration, parent PIN gate, family monitoring, active-time intervals and Google identities |
-| `server/google.mjs` | Google RS256 token verification, audience/issuer/expiry/nonce validation and cached signing keys |
-| `src/components/ParentGate.tsx` | Parent verification, six-digit code settings and child-mode locking |
-| `src/components/ParentDashboard.tsx` | Whole-family cards, per-child detail, weekly time chart and recent activity |
-| `src/components/GoogleButton.tsx` | Official Google button when configured, clear unavailable/retry states otherwise |
-| `src/lib/useReadingActivity.ts` | Foreground reader heartbeat with idle/visibility pauses |
-| `server/app.mjs` | HTTP API, cookies, write-origin checks, safe built-file serving |
-| `server/index.mjs` | Server settings, private database permissions and graceful shutdown |
-| `server/catalog.json` | Server-owned story bounds and quiz answer keys, checked against frontend content |
-| `scripts/dev.mjs` | Starts and stops the API and Vite together on Linux/Windows |
-| `src/account.css` | Responsive account forms, profile picker and sync feedback |
-| `src/styles.css` | Base components, responsive rules, and paper motion |
-| `src/themes.css` | Persisted application palettes and story leaf layout |
-| `src/picturebook.css` | Large illustrated-book composition, intact narration and living scenery motion |
-| `src/comfort.css` | Soft scenery crossfades, subtle motion, stable reader geometry and clear start/finish screens |
-| `src/worlds.css` | Full environment scenery, material surfaces, world selection and responsive glass |
-| `public/worlds/` | Generated WebP environments and matching selection thumbnails |
-| `public/art/` | Original SVG covers and generated story scenes |
-| `src/lib/progress.test.ts` | State and content validation tests |
-| `tests/` | Functional, responsive, failure-state and accessibility browser checks |
+| Path                                              | Responsibility                                                                                            |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `src/main.tsx`                                    | Entry point, render-error boundary, progress provider and router                                          |
+| `src/app/router.tsx`                              | Browser routes: library, story, reader, quiz library/session, rewards, account, parent area and not-found |
+| `src/app/RootLayout.tsx`                          | Theme attribute, route focus management, session/profile failure recovery                                 |
+| `src/app/layouts/ChildLayout.tsx`                 | Desktop sidebar, mobile navigation, skip link, profile switcher                                           |
+| `src/app/RequireProfile.tsx`                      | Sends signed-in parents without a selected child to the account page                                      |
+| `src/design-system/`                              | Button, IconButton, Avatar, PageIntro, ProgressBar and Sheet primitives                                   |
+| `src/styles/tokens.css`, `src/styles/global.css`  | Design tokens for all four themes and global base styles                                                  |
+| `src/features/library/`                           | Library with search and reading-status filters stored in the URL                                          |
+| `src/features/story/`                             | Story details, start/resume/replay and reward preview                                                     |
+| `src/features/reader/`                            | Book reader (`StoryBook`), page turning, completion and the parent-chosen YouTube video                   |
+| `src/features/quiz/`                              | Independent quiz library and quiz sessions                                                                |
+| `src/features/rewards/`                           | Badges and milestones                                                                                     |
+| `src/features/account/`, `src/features/auth/`     | Sign-in/sign-up, Google button, child profiles, guest import, PIN security                                |
+| `src/features/parent/`                            | Parent PIN gate, family dashboard and per-story video management                                          |
+| `src/features/theme/`                             | Theme picker sheet and glyphs                                                                             |
+| `src/content/library.json`                        | **Single source** for published stories, page text, artwork, alt text and questions                       |
+| `src/content/stories.ts`, `themes.ts`, `types.ts` | Typed access to the library, theme metadata, story and progress contracts                                 |
+| `src/content/videos.ts`                           | Chooses the parent-saved video; demo films are never shown                                                |
+| `src/lib/progress.ts`                             | Storage validation and pure page/completion/quiz transitions                                              |
+| `src/lib/context.tsx`                             | Session lifecycle, guest persistence, child hydration and event synchronization                           |
+| `src/lib/api.ts`                                  | Typed same-origin account/progress client                                                                 |
+| `src/lib/outbox.ts`                               | Validated account/child-scoped pending events and optimistic progress                                     |
+| `src/lib/paper-turn.ts`, `usePaperDrag.ts`        | Page-turn timing and pointer drag                                                                         |
+| `src/lib/useReadingActivity.ts`                   | Foreground reader heartbeat with idle/visibility pauses                                                   |
+| `src/lib/youtube.ts`                              | Strict video-link parsing and controlled iframe URLs                                                      |
+| `server/catalog.mjs`                              | Server grading catalog (page counts, answer keys) derived from `src/content/library.json`                 |
+| `server/store.mjs`                                | SQLite schema, password/session hashes, ownership, event transactions and grading                         |
+| `server/family.mjs`                               | Additive migration, parent PIN gate, family monitoring, active-time intervals and Google identities       |
+| `server/google.mjs`                               | Google RS256 token verification, audience/issuer/expiry/nonce validation and cached signing keys          |
+| `server/youtube.mjs`                              | Canonical YouTube URL validation for parent-saved videos                                                  |
+| `server/app.mjs`                                  | HTTP API, cookies, write-origin checks, safe built-file serving                                           |
+| `server/index.mjs`                                | Server settings, private database permissions and graceful shutdown                                       |
+| `scripts/dev.mjs`                                 | Starts and stops the API and Vite together on Linux/Windows                                               |
+| `public/worlds/`, `public/art/`                   | Environment artwork, original SVG covers and story scenes                                                 |
+| `src/**/*.test.ts`, `server/test/`                | Unit and real-HTTP API tests                                                                              |
+| `tests/`                                          | Playwright browser checks: navigation, themes, accounts and reader (isolated in-memory server)            |
 
 ## Incremental execution
 

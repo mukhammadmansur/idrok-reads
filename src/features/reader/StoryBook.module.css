@@ -575,58 +575,57 @@
   bottom: 11px;
 }
 
-:global(:root[data-theme="forest"]) .wrap {
-  --paper: #f6f3dc;
-  --paper-deep: #e5e9c8;
-  --book-ink: #293d2c;
-  --book-muted: #5e7057;
-  --book-line: #c8d5b6;
-  --book-accent: #3d663a;
-  --book-detail: #637b55;
-  --page-growth: url("/art/iqro-vines-v1.svg");
+:global(:root[data-theme="magic"]) .wrap {
+  --paper: #fff6ea;
+  --paper-deep: #f3e2c4;
+  --book-ink: #2c1848;
+  --book-muted: #6a5088;
+  --book-line: #e4c8f4;
+  --book-accent: #7a3ec8;
+  --book-detail: #8a62b0;
+  --page-growth: url("/art/iqro-stars-v1.svg");
 }
 
-:global(:root[data-theme="forest"]) .shell {
+:global(:root[data-theme="magic"]) .shell {
   --cover-radius: 30px;
   --cover-inset: clamp(10px, 1.6vw, 20px);
-  --cover-border: 1px;
-  border: var(--cover-border) solid #684521;
+  --cover-border: 2px;
+  border: var(--cover-border) solid #ffd56a;
   background:
-    linear-gradient(145deg, #c7a65e18, #38271338),
-    url("/art/enchanted-bark-v1.webp") center / cover;
+    radial-gradient(circle at 18% 20%, #ffd56a55, transparent 18%),
+    radial-gradient(circle at 80% 78%, #ff8bd244, transparent 22%),
+    radial-gradient(circle at 50% 0%, #c084fc, #4c1d95 62%);
   box-shadow:
-    0 34px 64px -24px #19301980,
-    0 9px 0 -3px #503921,
-    inset 0 2px 3px #e8c98c80,
-    inset 0 -4px 6px #281f1970;
+    0 34px 64px -24px #12081f,
+    0 0 28px #c084fc66,
+    inset 0 2px 0 #ffe7a8;
 }
 
-:global(:root[data-theme="forest"]) .shell::before {
+:global(:root[data-theme="magic"]) .shell::before {
   inset: 5px;
   border: 1px solid #d2b76c70;
   border-radius: calc(var(--cover-radius) - 5px);
 }
 
-:global(:root[data-theme="forest"]) .faceContent {
+:global(:root[data-theme="magic"]) .faceContent {
   background:
-    radial-gradient(ellipse at 0% 0%, #bfd29b55, transparent 37%),
-    radial-gradient(ellipse at 100% 100%, #d2bf8040, transparent 50%),
-    repeating-linear-gradient(0deg, #7b5d2908 0 1px, transparent 1px 4px),
+    radial-gradient(ellipse at 0% 0%, #e9d5ff66, transparent 40%),
+    radial-gradient(ellipse at 100% 100%, #ffd56a33, transparent 46%),
     var(--paper);
 }
 
-:global(:root[data-theme="forest"]) .scene {
-  --scene-glow: #abc45e;
-  --scene-spark: #fff3a7;
+:global(:root[data-theme="magic"]) .scene {
+  --scene-glow: #c084fc;
+  --scene-spark: #ffd56a;
 }
 
-:global(:root[data-theme="forest"]) .sceneHalo {
+:global(:root[data-theme="magic"]) .sceneHalo {
   background:
     radial-gradient(ellipse at 30% 35%, #f6d27960, transparent 55%),
     radial-gradient(ellipse at 70% 70%, #a0bf5b70, transparent 65%);
 }
 
-:global(:root[data-theme="ice"]) .wrap {
+:global(:root[data-theme="pirate"]) .wrap {
   --paper: #f0f9ff;
   --paper-deep: #dceef9;
   --book-ink: #243e50;
@@ -637,7 +636,7 @@
   --page-growth: url("/art/iqro-frost-v1.svg");
 }
 
-:global(:root[data-theme="ice"]) .shell {
+:global(:root[data-theme="pirate"]) .shell {
   --cover-radius: 30px;
   --cover-inset: clamp(10px, 1.6vw, 20px);
   --cover-border: 1px;
@@ -669,26 +668,26 @@
     inset 0 -4px 6px #5c89b080;
 }
 
-:global(:root[data-theme="ice"]) .shell::before {
+:global(:root[data-theme="pirate"]) .shell::before {
   inset: 4px;
   border: 1px solid #ffffffb0;
   border-radius: calc(var(--cover-radius) - 4px);
   box-shadow: inset 0 0 12px #fff8;
 }
 
-:global(:root[data-theme="ice"]) .faceContent {
+:global(:root[data-theme="pirate"]) .faceContent {
   background:
     radial-gradient(ellipse at 0% 0%, #b4dced60, transparent 40%),
     radial-gradient(ellipse at 100% 100%, #cbc1ee38, transparent 48%),
     linear-gradient(120deg, #fff9, transparent 60%), var(--paper);
 }
 
-:global(:root[data-theme="ice"]) .scene {
+:global(:root[data-theme="pirate"]) .scene {
   --scene-glow: #86d7e3;
   --scene-spark: #fff;
 }
 
-:global(:root[data-theme="ice"]) .sceneHalo {
+:global(:root[data-theme="pirate"]) .sceneHalo {
   background: conic-gradient(
     from 30deg,
     #b2b8ee70,
@@ -699,7 +698,7 @@
   mask: radial-gradient(ellipse, #000 30%, transparent 68%);
 }
 
-:global(:root[data-theme="ice"]) .sceneLight {
+:global(:root[data-theme="pirate"]) .sceneLight {
   background: conic-gradient(
     from 230deg at 45% 55%,
     transparent 0 35deg,
@@ -710,7 +709,7 @@
   );
 }
 
-:global(:root[data-theme="ice"]) .motes i {
+:global(:root[data-theme="pirate"]) .motes i {
   width: 5px;
   height: 5px;
   border-radius: 1px;
@@ -718,10 +717,10 @@
   box-shadow: 0 0 8px 2px #96cde8;
 }
 
-:global(:root[data-theme="forest"]) .pageTrim::before,
-:global(:root[data-theme="ice"]) .pageTrim::before,
-:global(:root[data-theme="forest"]) .pageTrim::after,
-:global(:root[data-theme="ice"]) .pageTrim::after {
+:global(:root[data-theme="magic"]) .pageTrim::before,
+:global(:root[data-theme="pirate"]) .pageTrim::before,
+:global(:root[data-theme="magic"]) .pageTrim::after,
+:global(:root[data-theme="pirate"]) .pageTrim::after {
   position: absolute;
   width: clamp(50px, 8vw, 105px);
   height: 42%;
@@ -740,27 +739,27 @@
   transform: rotate(180deg);
 }
 
-:global(:root[data-theme="forest"]) .faceContent:has(.prose) .pageTrim::before,
-:global(:root[data-theme="ice"]) .faceContent:has(.prose) .pageTrim::before,
-:global(:root[data-theme="forest"]) .faceContent:has(.prose) .pageTrim::after,
-:global(:root[data-theme="ice"]) .faceContent:has(.prose) .pageTrim::after {
+:global(:root[data-theme="magic"]) .faceContent:has(.prose) .pageTrim::before,
+:global(:root[data-theme="pirate"]) .faceContent:has(.prose) .pageTrim::before,
+:global(:root[data-theme="magic"]) .faceContent:has(.prose) .pageTrim::after,
+:global(:root[data-theme="pirate"]) .faceContent:has(.prose) .pageTrim::after {
   width: 34px;
 }
 
-:global(:root[data-theme="ice"]) .spine {
+:global(:root[data-theme="pirate"]) .spine {
   background: linear-gradient(90deg, transparent, #4184a820 48%, transparent);
 }
 
-:global(:root[data-theme="ice"]) .shell::after {
+:global(:root[data-theme="pirate"]) .shell::after {
   background: repeating-linear-gradient(180deg, #b9d8eb 0 1px, #eef8ff 1px 3px);
 }
 
-:global(:root[data-theme="ice"]) .turnPrev::before,
-:global(:root[data-theme="ice"]) .turnNext::before {
+:global(:root[data-theme="pirate"]) .turnPrev::before,
+:global(:root[data-theme="pirate"]) .turnNext::before {
   background: linear-gradient(135deg, transparent 47%, #c3deee 49%);
 }
 
-:global(:root[data-theme="holo"]) .wrap {
+:global(:root[data-theme="cyber"]) .wrap {
   --paper: #0a25347a;
   --paper-deep: #0a1c2a;
   --book-ink: #e4faff;
@@ -770,7 +769,7 @@
   --book-detail: #9fcad9;
 }
 
-:global(:root[data-theme="holo"]) .shell {
+:global(:root[data-theme="cyber"]) .shell {
   --cover-radius: 23px;
   --cover-inset: 7px;
   --cover-border: 1px;
@@ -788,7 +787,7 @@
     inset 0 0 20px #66e4ff10;
 }
 
-:global(:root[data-theme="holo"]) .shell::before {
+:global(:root[data-theme="cyber"]) .shell::before {
   inset: 3px;
   border-color: #80edff30;
   border-radius: calc(var(--cover-radius) - 3px);
@@ -797,7 +796,7 @@
     inset 0 -1px 0 #a4f3ff50;
 }
 
-:global(:root[data-theme="holo"]) .shell::after {
+:global(:root[data-theme="cyber"]) .shell::after {
   z-index: 1;
   right: 24px;
   bottom: -4px;
@@ -810,14 +809,14 @@
   pointer-events: none;
 }
 
-:global(:root[data-theme="holo"]) .book {
+:global(:root[data-theme="cyber"]) .book {
   background: transparent;
   box-shadow:
     0 0 0 1px #7ceaff50,
     inset 0 0 24px #54dfff0c;
 }
 
-:global(:root[data-theme="holo"]) .faceContent {
+:global(:root[data-theme="cyber"]) .faceContent {
   background:
     linear-gradient(
       135deg,
@@ -829,7 +828,7 @@
     radial-gradient(ellipse at 50% 0%, #19708c30, transparent 65%), var(--paper);
 }
 
-:global(:root[data-theme="holo"]) .faceContent::before {
+:global(:root[data-theme="cyber"]) .faceContent::before {
   position: absolute;
   z-index: 1;
   inset: 10px;
@@ -844,12 +843,12 @@
   pointer-events: none;
 }
 
-:global(:root[data-theme="holo"]) .left,
-:global(:root[data-theme="holo"]) .right {
+:global(:root[data-theme="cyber"]) .left,
+:global(:root[data-theme="cyber"]) .right {
   box-shadow: inset 0 0 24px #51dfff08;
 }
 
-:global(:root[data-theme="holo"]) .spine {
+:global(:root[data-theme="cyber"]) .spine {
   width: 20px;
   background: linear-gradient(
     90deg,
@@ -863,12 +862,12 @@
   box-shadow: 0 0 20px #36dfff12;
 }
 
-:global(:root[data-theme="holo"]) .scene {
+:global(:root[data-theme="cyber"]) .scene {
   --scene-glow: #54dcff;
   --scene-spark: #b0f4ff;
 }
 
-:global(:root[data-theme="holo"]) .sceneLight {
+:global(:root[data-theme="cyber"]) .sceneLight {
   background: conic-gradient(
     from 210deg,
     transparent 0 30deg,
@@ -877,20 +876,20 @@
   );
 }
 
-:global(:root[data-theme="holo"]) .imprint {
+:global(:root[data-theme="cyber"]) .imprint {
   filter: drop-shadow(0 0 5px #62e4ff80);
 }
 
-:global(:root[data-theme="holo"]) .prose {
+:global(:root[data-theme="cyber"]) .prose {
   background: radial-gradient(ellipse at 50% 50%, #04162440, transparent 80%);
 }
 
-:global(:root[data-theme="holo"]) .opening {
+:global(:root[data-theme="cyber"]) .opening {
   font-weight: 700;
   line-height: 1.15;
 }
 
-:global(:root[data-theme="holo"]) .dropCap::first-letter {
+:global(:root[data-theme="cyber"]) .dropCap::first-letter {
   float: none;
   padding: 0;
   font-size: inherit;
@@ -898,14 +897,14 @@
   line-height: inherit;
 }
 
-:global(:root[data-theme="holo"]) .sheetFace {
+:global(:root[data-theme="cyber"]) .sheetFace {
   background: #081e2c;
   box-shadow:
     0 0 0 1px #87edff80,
     0 0 24px #46dfff18;
 }
 
-:global(:root[data-theme="holo"]) .sheetFace::after {
+:global(:root[data-theme="cyber"]) .sheetFace::after {
   background: linear-gradient(
     90deg,
     #64dfff10,
@@ -916,8 +915,8 @@
   box-shadow: inset 0 0 0 1px #87edff40;
 }
 
-:global(:root[data-theme="holo"]) .turnPrev::before,
-:global(:root[data-theme="holo"]) .turnNext::before {
+:global(:root[data-theme="cyber"]) .turnPrev::before,
+:global(:root[data-theme="cyber"]) .turnNext::before {
   border-right: 2px solid #85ecff;
   border-bottom: 2px solid #85ecff;
   background: linear-gradient(135deg, transparent 47%, #62e4ff20 49%);
@@ -934,9 +933,9 @@
   }
 
   .shell,
-  :global(:root[data-theme="forest"]) .shell,
-  :global(:root[data-theme="ice"]) .shell,
-  :global(:root[data-theme="holo"]) .shell {
+  :global(:root[data-theme="magic"]) .shell,
+  :global(:root[data-theme="pirate"]) .shell,
+  :global(:root[data-theme="cyber"]) .shell {
     --cover-radius: 24px;
   }
 
@@ -1041,10 +1040,10 @@
 }
 
 @media (max-width: 719px) {
-  :global(:root[data-theme="forest"]) .faceContent.mobilePage .pageTrim::before,
-  :global(:root[data-theme="ice"]) .faceContent.mobilePage .pageTrim::before,
-  :global(:root[data-theme="forest"]) .faceContent.mobilePage .pageTrim::after,
-  :global(:root[data-theme="ice"]) .faceContent.mobilePage .pageTrim::after {
+  :global(:root[data-theme="magic"]) .faceContent.mobilePage .pageTrim::before,
+  :global(:root[data-theme="pirate"]) .faceContent.mobilePage .pageTrim::before,
+  :global(:root[data-theme="magic"]) .faceContent.mobilePage .pageTrim::after,
+  :global(:root[data-theme="pirate"]) .faceContent.mobilePage .pageTrim::after {
     width: 24px;
     height: 33%;
   }

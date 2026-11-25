@@ -1,5 +1,6 @@
 .reader {
   position: relative;
+  z-index: 1;
   display: flex;
   height: 100dvh;
   min-height: 0;
@@ -376,41 +377,13 @@
   color: var(--accent);
 }
 
-:global(:root[data-theme="forest"]) .reader,
-:global(:root[data-theme="forest"]) .done {
-  background:
-    linear-gradient(
-      180deg,
-      #edf2dce8 0%,
-      #edf2dc30 28%,
-      #dce7c540 78%,
-      #edf2dce8 100%
-    ),
-    url("/worlds/forest.webp") center / cover;
-}
-
-:global(:root[data-theme="ice"]) .reader,
-:global(:root[data-theme="ice"]) .done {
-  background:
-    linear-gradient(
-      180deg,
-      #eef8ffe8 0%,
-      #e2efff38 28%,
-      #e8ecff40 78%,
-      #eef8ffe8 100%
-    ),
-    url("/worlds/ice-garden.webp") center / cover;
-}
-
-:global(:root[data-theme="holo"]) .reader,
-:global(:root[data-theme="holo"]) .done {
-  background:
-    radial-gradient(ellipse at 50% 42%, #0c46634d, transparent 65%),
-    radial-gradient(ellipse at 95% 5%, #29bdff20, transparent 50%),
-    radial-gradient(ellipse at 0% 100%, #7754ff15, transparent 55%),
-    repeating-linear-gradient(0deg, #54dfff06 0 1px, transparent 1px 72px),
-    repeating-linear-gradient(90deg, #54dfff06 0 1px, transparent 1px 72px),
-    #040c15;
+:global(:root[data-theme="magic"]) .reader,
+:global(:root[data-theme="magic"]) .done,
+:global(:root[data-theme="pirate"]) .reader,
+:global(:root[data-theme="pirate"]) .done,
+:global(:root[data-theme="cyber"]) .reader,
+:global(:root[data-theme="cyber"]) .done {
+  background: transparent;
 }
 
 @media print {
@@ -431,12 +404,12 @@
   }
 }
 
-:global(:root[data-theme="holo"]) .titleBlock strong {
+:global(:root[data-theme="cyber"]) .titleBlock strong {
   font-size: 19px;
   letter-spacing: -0.5px;
 }
 
-:global(:root[data-theme="holo"]) .back {
+:global(:root[data-theme="cyber"]) .back {
   border-color: #62e4ff50;
   background: #12364b80;
   backdrop-filter: blur(12px);

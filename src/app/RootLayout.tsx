@@ -4,6 +4,7 @@ import { RefreshCw } from "lucide-react";
 import { Button } from "../design-system/Button";
 import { api } from "../lib/api";
 import { useProgress } from "../lib/context";
+import { WorldStage } from "../features/theme/WorldStage";
 import { LoadingScreen } from "./LoadingScreen";
 import styles from "./RootLayout.module.css";
 
@@ -33,7 +34,10 @@ export function RootLayout() {
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = progress.theme;
-    root.style.colorScheme = progress.theme === "holo" ? "dark" : "light";
+    root.style.colorScheme =
+      progress.theme === "magic" || progress.theme === "cyber"
+        ? "dark"
+        : "light";
   }, [progress.theme]);
 
   useEffect(() => {
@@ -74,5 +78,10 @@ export function RootLayout() {
       </main>
     );
 
-  return <Outlet />;
+  return (
+    <>
+      <WorldStage />
+      <Outlet />
+    </>
+  );
 }

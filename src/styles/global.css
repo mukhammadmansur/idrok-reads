@@ -28,25 +28,16 @@ body {
   overflow-x: hidden;
 }
 
-:root[data-theme="forest"] body {
-  background:
-    linear-gradient(180deg, #edf2dcf0, #edf2dcda),
-    url("/worlds/forest.webp") center / cover fixed;
+:root[data-theme="magic"] body {
+  background: #120a28;
 }
 
-:root[data-theme="ice"] body {
-  background:
-    linear-gradient(180deg, #eef8fff0, #eef8ffcf),
-    url("/worlds/ice-garden.webp") center / cover fixed;
+:root[data-theme="pirate"] body {
+  background: #7ec8ea;
 }
 
-:root[data-theme="holo"] body {
-  background:
-    radial-gradient(1100px 680px at 84% -12%, #16759f3d, transparent 62%),
-    radial-gradient(760px 520px at 0% 12%, #2ee6ff17, transparent 60%),
-    radial-gradient(980px 640px at 58% 118%, #7a4bff1c, transparent 64%),
-    #040c15;
-  background-attachment: fixed;
+:root[data-theme="cyber"] body {
+  background: #070514;
 }
 
 h1,

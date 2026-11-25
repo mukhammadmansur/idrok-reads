@@ -1,29 +1,46 @@
-import type { Theme } from "./types";
+import type { Theme, ThemeId } from "./types";
+
+export const themeIds = ["classic", "magic", "cyber", "pirate"] as const;
+
+const legacyThemes: Record<string, ThemeId> = {
+  forest: "magic",
+  ice: "pirate",
+  holo: "cyber",
+};
+
+export function normalizeTheme(value: unknown): ThemeId | null {
+  if (typeof value !== "string") return null;
+  if ((themeIds as readonly string[]).includes(value)) return value as ThemeId;
+  return legacyThemes[value] ?? null;
+}
+
+export const isDarkTheme = (theme: ThemeId) =>
+  theme === "magic" || theme === "cyber";
 
 export const themes: Theme[] = [
   {
     id: "classic",
-    name: "Klassik kitob",
-    short: "Klassik",
-    description: "Iliq qog‘oz va sokin o‘qish.",
+    name: "Oddiy kitob",
+    short: "Oddiy",
+    description: "Iliq qog‘oz va sokin o‘qish. Hech qanday sehr yo‘q.",
   },
   {
-    id: "forest",
-    name: "Yashil o‘rmon",
-    short: "O‘rmon",
-    description: "Po‘stloq muqova, maysali sahifalar va sehrli shu‘la.",
+    id: "magic",
+    name: "Sehrgar olami",
+    short: "Sehr",
+    description: "Ukki uchadi, yulduzlar pirpiraydi. Sen sehrli kitob ichidasan.",
   },
   {
-    id: "ice",
-    name: "Muz saroyi",
-    short: "Muz",
-    description: "Kristall muqova, qirov naqshlari va qutb shu‘lasi.",
+    id: "cyber",
+    name: "Neon shahar",
+    short: "Neon",
+    description: "Shaffof kitob, yonib turgan ko‘chalar. Kelajak shahriga tushding.",
   },
   {
-    id: "holo",
-    name: "Gologramma kitob",
-    short: "Kelajak",
-    description: "Shaffof sahifalar va nurli qirralar.",
+    id: "pirate",
+    name: "Qaroqchilar dengizi",
+    short: "Dengiz",
+    description: "Kema tebranadi, to‘lqin uriladi. Xarita ochiq, xazina yaqin.",
   },
 ];
 

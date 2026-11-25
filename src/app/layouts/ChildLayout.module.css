@@ -1,4 +1,6 @@
 .shell {
+  position: relative;
+  z-index: 1;
   min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
@@ -408,42 +410,49 @@
   }
 }
 
-:global(:root[data-theme="forest"]) .shell,
-:global(:root[data-theme="ice"]) .shell,
-:global(:root[data-theme="holo"]) .shell {
+:global(:root[data-theme="magic"]) .shell,
+:global(:root[data-theme="pirate"]) .shell,
+:global(:root[data-theme="cyber"]) .shell {
   background: transparent;
 }
 
-:global(:root[data-theme="forest"]) .sidebar {
+:global(:root[data-theme="magic"]) .sidebar {
   background:
-    url("/art/iqro-vines-v1.svg") left top / 65px auto no-repeat,
-    #f5f5e6e8;
+    url("/art/iqro-stars-v1.svg") left top / 72px auto no-repeat,
+    #2a1458e0;
+  border-right-color: #ffd56a55;
+  backdrop-filter: blur(16px);
 }
 
-:global(:root[data-theme="ice"]) .sidebar {
+:global(:root[data-theme="pirate"]) .sidebar {
   background:
-    url("/art/iqro-frost-v1.svg") left top / 65px auto no-repeat,
-    #f0f9ffe8;
+    url("/art/iqro-ropes-v1.svg") left top / 72px auto no-repeat,
+    #fff3d8ee;
+  border-right-color: #c9843a;
 }
 
-:global(:root[data-theme="holo"]) .sidebar {
-  background: linear-gradient(160deg, #103148a8, #061321e8);
-  border-right-color: #61deff40;
+:global(:root[data-theme="cyber"]) .sidebar {
+  background: linear-gradient(160deg, #1a1048cc, #070514ee);
+  border-right-color: #5ef2ff55;
   backdrop-filter: blur(20px);
-  box-shadow: 1px 0 24px #31cfff0a;
+  box-shadow: 1px 0 24px #ff4fd822;
 }
 
-:global(:root[data-theme="holo"]) .brandMark {
-  border-color: #62e4ff70;
-  background: linear-gradient(145deg, #1a526b80, #0b223780);
-  box-shadow:
-    inset 0 0 12px #62e4ff14,
-    0 0 16px #62e4ff12;
+:global(:root[data-theme="cyber"]) .brandMark,
+:global(:root[data-theme="magic"]) .brandMark {
+  border-color: #5ef2ff70;
+  background: linear-gradient(145deg, #241858, #120c28);
+  box-shadow: 0 0 16px #5ef2ff22;
 }
 
-:global(:root[data-theme="holo"]) .navLink.active {
-  background: linear-gradient(110deg, #1b607480, #12324960);
-  box-shadow: inset 0 0 0 1px #62e4ff30;
+:global(:root[data-theme="magic"]) .brandMark {
+  border-color: #ffd56a88;
+  box-shadow: 0 0 16px #ffd56a33;
+}
+
+:global(:root[data-theme="cyber"]) .navLink.active,
+:global(:root[data-theme="magic"]) .navLink.active {
+  box-shadow: inset 0 0 0 1px #5ef2ff40;
 }
 
 @media (max-width: 350px) {

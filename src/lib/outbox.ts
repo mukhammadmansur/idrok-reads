@@ -1,6 +1,7 @@
 import type { ProfileProgress } from "../content/types";
 import type { ProgressEvent } from "./api";
 import { generalQuiz, stories } from "../content/stories";
+import { normalizeTheme } from "../content/themes";
 import { completeStory, recordPage, recordQuiz } from "./progress";
 export function eventId() {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -19,8 +20,7 @@ export function readOutbox(key: string): ProgressEvent[] {
             !/^[a-zA-Z0-9_-]{16,80}$/.test(event.id)
           )
             return false;
-          if (event.type === "theme")
-            return ["classic", "forest", "ice", "holo"].includes(event.theme);
+          if (event.type === "theme") return normalizeTheme(event.theme) !== null;
           if (event.type === "reading") {
             const story = stories.find((s) => s.id === event.storyId);
             return (

@@ -14,7 +14,10 @@ import { catalog } from "./catalog.mjs";
 import { canonicalYoutubeUrl } from "./youtube.mjs";
 
 const scrypt = promisify(scryptCallback);
-const themes = ["classic", "forest", "ice", "holo"];
+const themes = ["classic", "magic", "cyber", "pirate"];
+const legacyThemes = { forest: "magic", ice: "pirate", holo: "cyber" };
+const normalizeTheme = (value) =>
+  themes.includes(value) ? value : (legacyThemes[value] ?? null);
 const avatars = [
   "lion",
   "owl",
@@ -242,7 +245,12 @@ export function createStore(
       };
     return {
       revision: child.revision,
-      progress: { version: 1, theme: child.theme, reading, quizzes },
+      progress: {
+        version: 1,
+        theme: normalizeTheme(child.theme) ?? "classic",
+        reading,
+        quizzes,
+      },
     };
   }
   function validateEvent(event) {
@@ -253,7 +261,9 @@ export function createStore(
     );
     if (event.type === "theme") {
       keys(event, ["id", "type", "theme"]);
-      requireValue(themes.includes(event.theme), "Olam noto‘g‘ri.");
+      const theme = normalizeTheme(event.theme);
+      requireValue(theme, "Olam noto‘g‘ri.");
+      event.theme = theme;
     } else if (event.type === "reading") {
       keys(event, ["id", "type", "storyId", "page", "complete"]);
       const story = storyById(event.storyId);

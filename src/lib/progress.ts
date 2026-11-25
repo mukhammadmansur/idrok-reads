@@ -1,4 +1,5 @@
-import type { ProfileProgress, ThemeId } from "../content/types";
+import { normalizeTheme } from "../content/themes";
+import type { ProfileProgress } from "../content/types";
 export const STORAGE_KEY = "iqro.progress.v1";
 export const emptyProgress = (): ProfileProgress => ({
   version: 1,
@@ -13,8 +14,8 @@ export function readProgress(raw: string | null): ProfileProgress {
     const data: unknown = JSON.parse(raw || "null");
     if (!object(data) || data.version !== 1) return emptyProgress();
     const result = emptyProgress();
-    if (["classic", "forest", "ice", "holo"].includes(String(data.theme)))
-      result.theme = data.theme as ThemeId;
+    const theme = normalizeTheme(data.theme);
+    if (theme) result.theme = theme;
     if (object(data.reading))
       for (const [id, r] of Object.entries(data.reading)) {
         if (

@@ -402,7 +402,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.theme = state.progress.theme;
     document.documentElement.style.colorScheme =
-      state.progress.theme === "holo" ? "dark" : "light";
+      state.progress.theme === "magic" || state.progress.theme === "cyber"
+        ? "dark"
+        : "light";
   }, [state.progress.theme]);
 
   useEffect(() => {

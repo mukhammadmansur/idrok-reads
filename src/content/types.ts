@@ -1,4 +1,4 @@
-export type ThemeId = "classic" | "forest" | "ice" | "holo";
+export type ThemeId = "classic" | "magic" | "cyber" | "pirate";
 
 export interface Question {
   id: string;

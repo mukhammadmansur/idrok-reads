@@ -1,11 +1,11 @@
-import { Orbit, Snowflake, Sparkles, Sun, Trees } from "lucide-react";
+import { Anchor, Orbit, Sparkles, Sun } from "lucide-react";
 import type { ThemeId } from "../../content";
 
 const glyphs = {
   classic: Sun,
-  forest: Trees,
-  ice: Snowflake,
-  holo: Orbit,
+  magic: Sparkles,
+  cyber: Orbit,
+  pirate: Anchor,
 } as const;
 
 export function ThemeGlyph({

@@ -8,10 +8,10 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",
-    "test": "vitest run && node --test server/test/api.test.mjs",
+    "test": "vitest run",
     "test:e2e": "playwright test",
     "format": "prettier --write src tests",
-    "start": "node --env-file-if-exists=.env server/index.mjs"
+    "start": "node --env-file-if-exists=.env scripts/start.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

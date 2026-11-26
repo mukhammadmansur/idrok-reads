@@ -62,3 +62,14 @@ vibe_images/
 # Private account database and backups
 data/
 *.db.backup*
+.venv/
+
+# Python bytecode caches (Django backend)
+__pycache__/
+*.py[cod]
+*$py.class
+django/staticfiles/
+django/media/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

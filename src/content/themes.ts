@@ -1,6 +1,13 @@
 import type { Theme, ThemeId } from "./types";
 
-export const themeIds = ["classic", "magic", "cyber", "pirate"] as const;
+export const themeIds = [
+  "classic",
+  "magic",
+  "cyber",
+  "pirate",
+  "kitty",
+  "ghost",
+] as const;
 
 const legacyThemes: Record<string, ThemeId> = {
   forest: "magic",
@@ -15,7 +22,7 @@ export function normalizeTheme(value: unknown): ThemeId | null {
 }
 
 export const isDarkTheme = (theme: ThemeId) =>
-  theme === "magic" || theme === "cyber";
+  theme === "magic" || theme === "cyber" || theme === "ghost";
 
 export const themes: Theme[] = [
   {
@@ -28,19 +35,31 @@ export const themes: Theme[] = [
     id: "magic",
     name: "Sehrgar olami",
     short: "Sehr",
-    description: "Ukki uchadi, yulduzlar pirpiraydi. Sen sehrli kitob ichidasan.",
+    description: "Sehrli ukki va uchayotgan kitoblar. Sen sehrli qasr kutubxonasidasan.",
   },
   {
     id: "cyber",
-    name: "Neon shahar",
-    short: "Neon",
-    description: "Shaffof kitob, yonib turgan ko‘chalar. Kelajak shahriga tushding.",
+    name: "Kosmos olami",
+    short: "Kosmos",
+    description: "Yulduzlar, sayyoralar va kichik raketa. Sen kosmik kitobni o‘qiyapsan.",
   },
   {
     id: "pirate",
     name: "Qaroqchilar dengizi",
     short: "Dengiz",
-    description: "Kema tebranadi, to‘lqin uriladi. Xarita ochiq, xazina yaqin.",
+    description: "Kema suzib ketmoqda, to‘lqinlar shitirlaydi. Xazina yaqin.",
+  },
+  {
+    id: "kitty",
+    name: "Pushti mushukcha",
+    short: "Mushukcha",
+    description: "Pushti gulzor va shirin mushukcha. Hammadan shirin o‘qish!",
+  },
+  {
+    id: "ghost",
+    name: "Arvoh qaroqchilar",
+    short: "Arvoh",
+    description: "Tumanli dengizda arvoh kema suzadi. Jasurlar uchun!",
   },
 ];
 

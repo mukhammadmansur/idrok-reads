@@ -38,6 +38,21 @@ export const STORYBOOK_AVATARS: { id: StorybookAvatarId; label: string }[] = [
   { id: "sun", label: "Quyosh" },
 ];
 
+export const AVATAR_IMAGES: Partial<Record<StorybookAvatarId, string>> = {
+  lion: "/art/avatars/avatar-lion.jpg",
+  owl: "/art/avatars/avatar-owl.jpg",
+  bear: "/art/avatars/avatar-bear.jpg",
+  wolf: "/art/avatars/avatar-wolf.jpg",
+  falcon: "/art/avatars/avatar-falcon.jpg",
+  fox: "/art/avatars/avatar-fox.jpg",
+  whale: "/art/avatars/avatar-whale.jpg",
+  cat: "/art/avatars/avatar-cat.jpg",
+  rabbit: "/art/avatars/avatar-rabbit.jpg",
+  rocket: "/art/avatars/avatar-rocket.jpg",
+  star: "/art/avatars/avatar-star.jpg",
+  sun: "/art/avatars/avatar-sun.jpg",
+};
+
 export const AVATAR_COLORS: Record<
   StorybookAvatarId,
   { bg: string; color: string; border: string }
@@ -654,21 +669,36 @@ export function Avatar({
 }) {
   const Sticker = stickers[avatar] || stickers.sun;
   const colors = AVATAR_COLORS[avatar] || AVATAR_COLORS.sun;
+  const image = AVATAR_IMAGES[avatar];
 
   return (
     <span
-      className={styles.avatar}
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: colors.bg,
-        borderColor: colors.border,
-      }}
+      className={image ? `${styles.avatar} ${styles.photo}` : styles.avatar}
+      style={
+        image
+          ? { width: size, height: size }
+          : {
+              width: size,
+              height: size,
+              backgroundColor: colors.bg,
+              borderColor: colors.border,
+            }
+      }
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
     >
-      <Sticker size={Math.round(size * 0.94)} />
+      {image ? (
+        <img
+          className={styles.stickerImg}
+          src={image}
+          alt=""
+          draggable={false}
+          loading="lazy"
+        />
+      ) : (
+        <Sticker size={Math.round(size * 0.94)} />
+      )}
     </span>
   );
 }

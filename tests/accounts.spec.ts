@@ -58,7 +58,7 @@ async function signIn(page: Page, email: string) {
 /** Registers a parent and the first child. The app then enters child mode, which locks parent controls. */
 async function register(page: Page, email: string, name = "Kitobxon") {
   await signUp(page, email);
-  await page.getByLabel("Bolaning ismi").fill(name);
+  await page.getByLabel("Farzandingizning ismi").fill(name);
   const locked = page.waitForResponse(
     (r) => r.url().endsWith("/api/parent/lock") && r.ok(),
   );
@@ -69,15 +69,23 @@ async function register(page: Page, email: string, name = "Kitobxon") {
   await locked;
 }
 
-/** Opens the parent section with the account password, as a parent would. */
+/** Opens the parent section by solving the grown-up math challenge shown while no PIN is set. */
 async function unlock(page: Page) {
+  // A previous unlock only lives in the tab session; drop it so the gate
+  // really re-opens and re-unlocks the server, as a fresh visit would.
+  await page.evaluate(() =>
+    sessionStorage.removeItem("iqro.parent_session_unlocked.v1"),
+  );
   await page.goto("/parent");
-  await page.getByLabel("Akkaunt paroli").fill(password);
-  await page
-    .getByRole("button", { name: "Bo‘limni ochish", exact: true })
-    .click();
+  const gate = page.getByRole("dialog", { name: "Ota-onalar paneli" });
+  await expect(gate).toBeVisible();
+  const question = gate.locator('[class*="mathQuestion"]');
+  await expect(question).toBeVisible();
+  const [a, b] = (await question.textContent())!.match(/\d+/g)!.map(Number);
+  for (const digit of String(a * b))
+    await gate.getByRole("button", { name: digit, exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Har bir farzand — o‘z yo‘lida." }),
+    page.getByRole("heading", { name: "Farzandlarim", exact: true }),
   ).toBeVisible();
 }
 
@@ -85,9 +93,9 @@ async function unlock(page: Page) {
 async function addChild(page: Page, name: string) {
   await page.goto("/account");
   await page
-    .getByRole("button", { name: "Bola qo‘shish", exact: true })
+    .getByRole("button", { name: "Farzandingizni qo‘shing", exact: true })
     .click();
-  await page.getByLabel("Bolaning ismi", { exact: true }).fill(name);
+  await page.getByLabel("Farzandingizning ismi", { exact: true }).fill(name);
   await page
     .getByRole("button", { name: "Profilni yaratish", exact: true })
     .click();
@@ -230,16 +238,19 @@ test("a child cannot switch profiles from child mode without the parent", async 
   await page
     .getByRole("button", { name: "Bobur Profilni almashtirish" })
     .click();
-  const sheet = page.getByRole("dialog", { name: "Profil" });
+  const sheet = page.getByRole("dialog", { name: "Kim o‘qiydi?" });
   await sheet.getByRole("button", { name: "Asal" }).click();
-  await expect(sheet.getByRole("alert")).toContainText("Ota-onalar bo‘limini");
+  // The server rejects the switch while parent controls are locked: the
+  // sheet stays open and Bobur remains the active profile.
+  await expect(sheet).toBeVisible();
   await expect(sheet.getByRole("button", { name: "Bobur" })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await expect(
-    sheet.getByRole("link", { name: "Ota-onalar paneli" }),
-  ).toBeVisible();
+  await expect(sheet.getByRole("button", { name: "Asal" })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
   expect((await session(page)).selectedChildId).toBe(bobur);
 });
 
@@ -263,7 +274,7 @@ test("offline events survive reload and sync exactly once after reconnect", asyn
   await expect.poll(() => pendingKeys(page)).toBe(0);
 });
 
-test("guest reading stays separate until the parent explicitly imports it", async ({
+test("legacy guest reading never leaks into the parent account", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -292,22 +303,8 @@ test("guest reading stays separate until the parent explicitly imports it", asyn
   ).json();
   expect(before.progress.reading).toEqual({});
 
-  await page.goto("/account");
-  await expect(
-    page.getByRole("heading", { name: "Mahalliy natijalarni ko‘chirish" }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Profilga qo‘shish", exact: true })
-    .click();
-  await expect
-    .poll(async () => {
-      const result = await (
-        await page.request.get(`/api/children/${child}/progress`)
-      ).json();
-      return !!result.progress.reading["oy-dosti"]?.completedAt;
-    })
-    .toBe(true);
-  expect(await savedPage(page, child)).toBe(0);
+  // The manual import step was removed; the old guest store must simply stay
+  // on the device and never be silently copied into the account.
   expect(
     await page.evaluate(
       () =>
@@ -438,18 +435,22 @@ test("the parent PIN is required after returning to child mode and protects the 
 }) => {
   await register(page, address(), "Azizbek");
   await unlock(page);
-  await page.goto("/account");
-  await page.getByText("Ota-onalar himoyasi", { exact: true }).click();
-  await page.getByLabel("6 xonali kod yarating").fill("482619");
-  await page.getByLabel("Kodni qayta kiriting").fill("482619");
+  await page.goto("/parent/settings");
+  await page.getByLabel("Yangi 4 xonali PIN-kod").fill("4826");
+  await page.getByLabel("PIN-kodni tasdiqlang").fill("4826");
   await page
-    .getByRole("button", { name: "Kodni saqlash", exact: true })
+    .getByRole("button", { name: "PIN-kodni saqlash", exact: true })
     .click();
   await expect(
-    page.getByText("Ota-ona kodi saqlandi.", { exact: true }),
+    page.getByText("4 xonali PIN-kod muvaffaqiyatli saqlandi.", {
+      exact: true,
+    }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Kitob o‘qish", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Kutubxonaga qaytish", exact: true })
+    .click();
+  await expect(page).toHaveURL(/127\.0\.0\.1:5173\/$/);
   await expect
     .poll(
       async () =>
@@ -459,20 +460,22 @@ test("the parent PIN is required after returning to child mode and protects the 
   expect((await page.request.get("/api/parent/overview")).status()).toBe(403);
 
   await page.goto("/parent");
+  const gate = page.getByRole("dialog", { name: "Ota-onalar paneli" });
+  await expect(gate).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Bu bo‘lim faqat ota-onalar uchun" }),
+    page.getByText("Davom etish uchun 4 xonali PIN-kodni kiriting"),
   ).toBeVisible();
+  for (let attempt = 0; attempt < 4; attempt++)
+    await gate.getByRole("button", { name: "1", exact: true }).click();
+  await expect(gate.getByRole("alert")).toContainText("noto‘g‘ri");
+  for (const digit of "4826")
+    await gate.getByRole("button", { name: digit, exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Har bir farzand — o‘z yo‘lida." }),
-  ).toHaveCount(0);
-  await page.getByLabel("6 xonali ota-ona kodi").fill("111111");
-  await page.getByRole("button", { name: "Bo‘limni ochish" }).click();
-  await expect(page.getByRole("alert")).toContainText("noto‘g‘ri");
-  await page.getByLabel("6 xonali ota-ona kodi").fill("482619");
-  await page.getByRole("button", { name: "Bo‘limni ochish" }).click();
-  await expect(page.getByRole("button", { name: /^Azizbek/ })).toBeVisible();
+    page.getByRole("heading", { name: "Farzandlarim", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("tab", { name: /^Azizbek/ })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole("button", { name: /^Azizbek/ })).toBeVisible();
+  await expect(page.getByRole("tab", { name: /^Azizbek/ })).toBeVisible();
 });
 
 test("four named children have clear separate monitoring and accessible mobile details", async ({
@@ -500,18 +503,17 @@ test("four named children have clear separate monitoring and accessible mobile d
   for (const name of ["Madina", "Yusuf", "Soliha"]) await addChild(page, name);
 
   await page.goto("/parent");
-  await expect(page.getByRole("button", { name: /tugatilgan/ })).toHaveCount(4);
-  const aziz = page.getByRole("button", { name: /^Azizbek/ });
-  await expect(aziz).toContainText("1");
-  await aziz.click();
+  await expect(page.getByRole("tab")).toHaveCount(4);
+  const aziz = page.getByRole("tab", { name: /^Azizbek/ });
+  await expect(aziz).toHaveAttribute("aria-selected", "true");
   await expect(
     page.getByRole("region", { name: "Azizbek natijalari" }),
-  ).toContainText("O‘qib tugatilgan");
+  ).toContainText("Tugatilgan");
 
-  await page.getByRole("button", { name: /^Madina/ }).click();
+  await page.getByRole("tab", { name: /^Madina/ }).click();
   const madina = page.getByRole("region", { name: "Madina natijalari" });
   await expect(madina).toContainText("Hali boshlanmagan");
-  await expect(madina).not.toContainText("O‘qib tugatilgan");
+  await expect(madina.getByText("Tugatilgan", { exact: true })).toHaveCount(0);
   await expect(
     madina.getByRole("heading", { name: "Madina", exact: true }),
   ).toBeInViewport();
@@ -526,7 +528,14 @@ test("four named children have clear separate monitoring and accessible mobile d
     )
     .toBe(false);
   await page.goto("/parent");
-  await expect(page.getByLabel("Akkaunt paroli")).toBeVisible();
+  // The tab session still remembers the parent unlock, so the dashboard
+  // renders, but the server refuses to hand over the family data.
+  await expect(
+    page.getByRole("heading", { name: "Farzandlarim", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Qayta urinish", exact: true }),
+  ).toBeVisible();
   await axe(page);
   await noOverflow(page);
 });
@@ -555,15 +564,10 @@ test("sign-in and sign-up have distinct routes and confirmed new passwords", asy
     .getByRole("button", { name: "Akkaunt yaratish", exact: true })
     .click();
   await expect(page.getByRole("alert")).toContainText("bir xil");
-  // Without a configured client ID the Google control is replaced by guidance.
+  // Without a configured client ID the Google control renders nothing.
   await expect(
-    page.getByText(
-      "Google orqali kirish hozircha mavjud emas. E-mail orqali davom eting.",
-    ),
-  ).toBeVisible();
-  await expect(page.getByRole("button", { name: /Google orqali/ })).toHaveCount(
-    0,
-  );
+    page.getByRole("button", { name: /Google orqali/ }),
+  ).toHaveCount(0);
 });
 
 test("reading activity stops in hidden and idle tabs and restarts on interaction", async ({

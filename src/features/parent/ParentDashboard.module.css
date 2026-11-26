@@ -32,6 +32,12 @@
   padding: 4px 0 10px;
 }
 
+.childTabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .childPill {
   display: inline-flex;
   align-items: center;
@@ -54,7 +60,8 @@
   background: var(--accent-soft);
 }
 
-.childPillActive {
+.childPillActive,
+.childPillActive:hover {
   border-color: var(--accent);
   background: var(--accent);
   color: #fff;

@@ -50,10 +50,12 @@ export function ParentLayout() {
           </Link>
           <nav className={styles.nav} aria-label="Ota-onalar menyusi">
             <NavLink to="/parent" end>
-              Farzandlarim
+              Umumiy
             </NavLink>
-            <NavLink to="/parent/videos">Videolar</NavLink>
-            <NavLink to="/parent/account">Hisob va PIN</NavLink>
+            <NavLink to="/parent/children">Farzandlar</NavLink>
+            <NavLink to="/parent/shop">Obuna va do‘kon</NavLink>
+            <NavLink to="/parent/news">Yangiliklar</NavLink>
+            <NavLink to="/parent/settings">Sozlamalar</NavLink>
             <Link
               to="/"
               className={styles.libraryLink}

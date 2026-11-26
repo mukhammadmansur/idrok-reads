@@ -1,33 +1,35 @@
-import type { ComponentType } from "react";
 import {
+  Atom,
   BookOpen,
   Clock3,
+  Gem,
+  Landmark,
   Play,
   RotateCcw,
   Search,
   Sparkles,
+  Trophy,
+  Wand2,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { stories } from "../../content";
 import { useProgress } from "../../lib/context";
 import { ProgressBar } from "../../design-system/ProgressBar";
-import {
-  BookSticker,
-  LionSticker,
-  FoxSticker,
-  WhaleSticker,
-} from "../../design-system/Avatar";
 import { AhaMomentBanner } from "../onboarding/AhaMomentBanner";
+import { WorldCritter } from "../theme/WorldCritter";
 import styles from "./LibraryPage.module.css";
+
+type CategoryTheme = "all" | "fairy" | "science" | "history" | "premium";
 
 interface WorldTopic {
   id: string;
   category: string;
   label: string;
   sublabel: string;
-  theme: "all" | "adventure" | "friendship" | "nature";
-  icon: ComponentType<{ size?: number }>;
+  theme: CategoryTheme;
+  icon: LucideIcon;
 }
 
 const WORLD_TOPICS: WorldTopic[] = [
@@ -35,45 +37,61 @@ const WORLD_TOPICS: WorldTopic[] = [
     id: "all",
     category: "all",
     label: "Barchasi",
-    sublabel: "Barcha ertaklar",
+    sublabel: "Barcha kitoblar",
     theme: "all",
-    icon: BookSticker,
+    icon: BookOpen,
   },
   {
-    id: "Sarguzasht",
-    category: "Sarguzasht",
-    label: "Jasur sarguzasht",
-    sublabel: "Jasorat va sayohat",
-    theme: "adventure",
-    icon: LionSticker,
+    id: "Ertak",
+    category: "Ertak",
+    label: "Ertaklar",
+    sublabel: "Sehrli ertaklar",
+    theme: "fairy",
+    icon: Wand2,
   },
   {
-    id: "Do‘stlik",
-    category: "Do‘stlik",
-    label: "Do‘stlik va mehr",
-    sublabel: "Mehr-oqibat ertaklari",
-    theme: "friendship",
-    icon: FoxSticker,
+    id: "Ilmiy",
+    category: "Ilmiy",
+    label: "Ilmiy",
+    sublabel: "Fan va tabiat sirlari",
+    theme: "science",
+    icon: Atom,
   },
   {
-    id: "Tabiat",
-    category: "Tabiat",
-    label: "Sehrli tabiat",
-    sublabel: "Dengiz va tabiat sirlari",
-    theme: "nature",
-    icon: WhaleSticker,
+    id: "Tarixiy",
+    category: "Tarixiy",
+    label: "Tarixiy",
+    sublabel: "Ajdodlar izidan",
+    theme: "history",
+    icon: Landmark,
+  },
+  {
+    id: "Premium",
+    category: "Premium",
+    label: "Premium",
+    sublabel: "Maxsus kitoblar",
+    theme: "premium",
+    icon: Gem,
   },
 ];
 
-const STATUS_OPTIONS = [
-  { id: "all", label: "Barcha kitoblar", emoji: "✨" },
-  { id: "reading", label: "O‘qilayotganlar", emoji: "📖" },
-  { id: "completed", label: "Tugatilganlar", emoji: "🏆" },
+const CATEGORY_META: Record<string, { theme: CategoryTheme; icon: LucideIcon }> = {
+  ertak: { theme: "fairy", icon: Wand2 },
+  ilmiy: { theme: "science", icon: Atom },
+  tarixiy: { theme: "history", icon: Landmark },
+  premium: { theme: "premium", icon: Gem },
+};
+
+const STATUS_OPTIONS: { id: string; label: string; icon: LucideIcon }[] = [
+  { id: "all", label: "Barcha kitoblar", icon: Sparkles },
+  { id: "reading", label: "O‘qilayotganlar", icon: BookOpen },
+  { id: "completed", label: "Tugatilganlar", icon: Trophy },
 ];
 
 export function LibraryPage() {
   const { progress, children: profiles, selectedChildId, user } = useProgress();
   const child = profiles.find((profile) => profile.id === selectedChildId);
+  const world = progress.theme === "classic" ? null : progress.theme;
   const [params, setParams] = useSearchParams();
 
   const query = params.get("q") ?? "";
@@ -123,15 +141,24 @@ export function LibraryPage() {
       {/* 1. TOP BAR: Compact, joyful, child-centric */}
       <header className={styles.libraryHeader}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.pageTitle}>
-            <span className={styles.titleIcon}>
-              <BookSticker size={32} />
-            </span>
-            <span>Sehrli kitoblar javoni</span>
-          </h1>
-          <p className={styles.pageSubtitle}>
-            O‘zingga yoqqan ertakni tanla va sehrli sayohatga chiq!
-          </p>
+          <div className={styles.headerCopy}>
+            <h1 className={styles.pageTitle}>
+              <span className={styles.titleIcon}>
+                <BookOpen size={28} />
+              </span>
+              <span>Sehrli kitoblar javoni</span>
+            </h1>
+            <p className={styles.pageSubtitle}>
+              O‘zingga yoqqan ertakni tanla va sehrli sayohatga chiq!
+            </p>
+          </div>
+          {world && (
+            <WorldCritter
+              world={world}
+              variant="inline"
+              className={styles.headerBuddy}
+            />
+          )}
         </div>
 
         <div className={styles.headerRight}>
@@ -205,20 +232,23 @@ export function LibraryPage() {
 
         {/* Status Pills */}
         <div className={styles.statusGroup} role="group" aria-label="O‘qish holati">
-          {STATUS_OPTIONS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => changeFilter("status", item.id)}
-              className={`${styles.statusPill} ${
-                status === item.id ? styles.statusPillActive : ""
-              }`}
-              aria-pressed={status === item.id}
-            >
-              <span>{item.emoji}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
+          {STATUS_OPTIONS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => changeFilter("status", item.id)}
+                className={`${styles.statusPill} ${
+                  status === item.id ? styles.statusPillActive : ""
+                }`}
+                aria-pressed={status === item.id}
+              >
+                <Icon size={16} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -226,7 +256,9 @@ export function LibraryPage() {
       <section className={styles.bookshelfSection} aria-label="Kitoblar javoni">
         {filtered.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>🔍</div>
+            <div className={styles.emptyIcon}>
+              <Search size={42} />
+            </div>
             <h3>Ertak topilmadi</h3>
             <p>
               {query
@@ -244,7 +276,7 @@ export function LibraryPage() {
                 setParams(next, { replace: true });
               }}
             >
-              <BookSticker size={20} />
+              <BookOpen size={20} />
               <span>Barcha ertaklarni ko‘rish</span>
             </button>
           </div>
@@ -264,11 +296,12 @@ export function LibraryPage() {
               const currentStep = record ? record.page + 1 : 0;
 
               const normCat = normalize(story.category);
-              const cardTheme = normCat.includes("sarguzasht")
-                ? "adventure"
-                : normCat.includes("dost")
-                  ? "friendship"
-                  : "nature";
+              const catMeta = CATEGORY_META[normCat] ?? {
+                theme: "all" as CategoryTheme,
+                icon: BookOpen,
+              };
+              const cardTheme = catMeta.theme;
+              const CategoryIcon = catMeta.icon;
 
               return (
                 <Link
@@ -288,9 +321,7 @@ export function LibraryPage() {
                     {/* Floating Top Badges */}
                     <div className={styles.coverTopBadges}>
                       <span className={styles.categoryBadge}>
-                        {cardTheme === "adventure" && <LionSticker size={16} />}
-                        {cardTheme === "friendship" && <FoxSticker size={16} />}
-                        {cardTheme === "nature" && <WhaleSticker size={16} />}
+                        <CategoryIcon size={14} />
                         <span>{story.category}</span>
                       </span>
 

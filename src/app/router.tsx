@@ -11,10 +11,13 @@ import { QuizLibraryPage } from "../features/quiz/QuizLibraryPage";
 import { QuizPage } from "../features/quiz/QuizPage";
 import { RewardsPage } from "../features/rewards/RewardsPage";
 import { AccountPage } from "../features/account/AccountPage";
+import { MyProfilePage } from "../features/profile/MyProfilePage";
 import { ParentLayout } from "../features/parent/ParentLayout";
 import { ParentGate } from "../features/parent/ParentGate";
 import { ParentDashboard } from "../features/parent/ParentDashboard";
-import { ParentVideos } from "../features/parent/ParentVideos";
+import { ParentChildrenTab } from "../features/parent/ParentChildrenTab";
+import { ParentShopTab } from "../features/parent/ParentShopTab";
+import { ParentNewsTab } from "../features/parent/ParentNewsTab";
 import { ParentSettingsTab } from "../features/parent/ParentSettingsTab";
 import { ParentLogin } from "../features/parent/ParentLogin";
 import { buttonClass } from "../design-system/Button";
@@ -71,6 +74,7 @@ export const router = createBrowserRouter([
           { path: "account", element: <AccountPage /> },
           { path: "account/login", element: <AccountPage /> },
           { path: "account/register", element: <AccountPage /> },
+          { path: "profile", element: <MyProfilePage /> },
         ],
       },
       {
@@ -91,8 +95,12 @@ export const router = createBrowserRouter([
             element: <ParentGate />,
             children: [
               { index: true, element: <ParentDashboard /> },
-              { path: "videos", element: <ParentVideos /> },
-              { path: "account", element: <ParentSettingsTab /> },
+              { path: "children", element: <ParentChildrenTab /> },
+              { path: "shop", element: <ParentShopTab /> },
+              { path: "news", element: <ParentNewsTab /> },
+              { path: "settings", element: <ParentSettingsTab /> },
+              { path: "account", element: <Navigate to="/parent/settings" replace /> },
+              { path: "videos", element: <Navigate to="/parent" replace /> },
             ],
           },
           { path: "*", element: <Navigate to="/parent" replace /> },

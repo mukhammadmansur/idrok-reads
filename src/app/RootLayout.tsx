@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { RefreshCw } from "lucide-react";
 import { Button } from "../design-system/Button";
 import { api } from "../lib/api";
 import { useProgress } from "../lib/context";
+import { isDarkTheme } from "../content/themes";
 import { WorldStage } from "../features/theme/WorldStage";
 import { LoadingScreen } from "./LoadingScreen";
 import styles from "./RootLayout.module.css";
@@ -31,13 +32,10 @@ export function RootLayout() {
     void api.parentLock().catch(() => undefined);
   }, [userId, childMode]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = progress.theme;
-    root.style.colorScheme =
-      progress.theme === "magic" || progress.theme === "cyber"
-        ? "dark"
-        : "light";
+    root.style.colorScheme = isDarkTheme(progress.theme) ? "dark" : "light";
   }, [progress.theme]);
 
   useEffect(() => {

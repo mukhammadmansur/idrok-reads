@@ -1,4 +1,10 @@
-export type ThemeId = "classic" | "magic" | "cyber" | "pirate";
+export type ThemeId =
+  | "classic"
+  | "magic"
+  | "cyber"
+  | "pirate"
+  | "kitty"
+  | "ghost";
 
 export interface Question {
   id: string;

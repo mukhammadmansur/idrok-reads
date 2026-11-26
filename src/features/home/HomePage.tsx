@@ -1,22 +1,46 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  Atom,
   BookOpen,
   Clock,
   Compass,
   Flame,
+  Gem,
   HelpCircle,
+  Landmark,
   Play,
   RotateCcw,
   Sparkles,
+  Target,
   Trophy,
+  Wand2,
+  type LucideIcon,
 } from "lucide-react";
 import { stories } from "../../content/stories";
 import { useProgress } from "../../lib/context";
 import { Avatar } from "../../design-system/Avatar";
 import { ProgressBar } from "../../design-system/ProgressBar";
 import { AhaMomentBanner } from "../onboarding/AhaMomentBanner";
+import { WorldCritter } from "../theme/WorldCritter";
 import styles from "./HomePage.module.css";
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  ertak: Wand2,
+  ilmiy: Atom,
+  tarixiy: Landmark,
+  premium: Gem,
+};
+
+function CategoryIcon({ icon }: { icon: string }) {
+  const norm = icon
+    .toLocaleLowerCase("uz")
+    .normalize("NFKC")
+    .replace(/[‘’ʻʼ`']/g, "")
+    .trim();
+  const Cmp = CATEGORY_ICONS[norm] ?? BookOpen;
+  return <Cmp size={13} />;
+}
 
 export function HomePage() {
   const { user, children: profileList, selectedChildId, progress } = useProgress();
@@ -24,6 +48,7 @@ export function HomePage() {
   const child = profileList.find((p) => p.id === selectedChildId);
   const childName = child?.name || "Kitobxon";
   const childAvatar = child?.avatar || "lion";
+  const world = progress.theme === "classic" ? null : progress.theme;
 
   // In-progress story
   const inProgressStory = stories
@@ -54,9 +79,16 @@ export function HomePage() {
         <div className={styles.greetingLeft}>
           <Avatar avatar={childAvatar} size={58} />
           <div className={styles.greetingText}>
-            <h1>Salom, {childName}! 🌟</h1>
+            <h1>Salom, {childName}!</h1>
             <p>Bugun qaysi sehrli olamga sayohat qilamiz?</p>
           </div>
+          {world && (
+            <WorldCritter
+              world={world}
+              variant="inline"
+              className={styles.greetingBuddy}
+            />
+          )}
         </div>
 
         <div className={styles.statsRow}>
@@ -81,7 +113,7 @@ export function HomePage() {
         <section className={styles.continueSection} aria-label="O‘qishni davom ettirish">
           <div className={styles.shelfHeader}>
             <h2 className={styles.shelfTitle}>
-              <Flame size={20} style={{ color: "#ea580c" }} />
+              <Flame size={20} style={{ color: "var(--warm)" }} />
               O‘qishni davom ettiramiz!
             </h2>
           </div>
@@ -118,7 +150,6 @@ export function HomePage() {
         <Link
           to={`/story/${featuredStory.slug}`}
           className={styles.heroSpotlight}
-          aria-label={`Kunning ertagi: ${featuredStory.title}`}
         >
           <div className={styles.heroArtWrap}>
             <span className={styles.heroBadge}>
@@ -134,9 +165,13 @@ export function HomePage() {
 
           <div className={styles.heroContent}>
             <div className={styles.heroMeta}>
-              <span>⏱ {featuredStory.minutes} daqiqa</span>
+              <span>
+                <Clock size={14} /> {featuredStory.minutes} daqiqa
+              </span>
               <span>•</span>
-              <span>🎯 {featuredStory.age[0]}–{featuredStory.age[1]} yosh</span>
+              <span>
+                <Target size={14} /> {featuredStory.age[0]}–{featuredStory.age[1]} yosh
+              </span>
               <span>•</span>
               <span>{featuredStory.category}</span>
             </div>
@@ -181,11 +216,8 @@ export function HomePage() {
                     className={styles.cardCover}
                   />
                   <span className={styles.cardCategoryBadge}>
-                    {story.category === "Do‘stlik"
-                      ? "🤝 Do‘stlik"
-                      : story.category === "Sarguzasht"
-                        ? "🦁 Sarguzasht"
-                        : "🌿 Tabiat"}
+                    <CategoryIcon icon={story.category} />
+                    <span>{story.category}</span>
                   </span>
                   {isCompleted && (
                     <span className={styles.cardStatusBadge}>

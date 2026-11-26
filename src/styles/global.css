@@ -37,7 +37,15 @@ body {
 }
 
 :root[data-theme="cyber"] body {
-  background: #070514;
+  background: #0b0a2a;
+}
+
+:root[data-theme="kitty"] body {
+  background: #ffe6f0;
+}
+
+:root[data-theme="ghost"] body {
+  background: #05070d;
 }
 
 h1,

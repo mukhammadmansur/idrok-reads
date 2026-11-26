@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { Check, Plus, X } from "lucide-react";
+import { Check, Pencil, Plus, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Avatar, STORYBOOK_AVATARS, type AvatarId } from "../../design-system/Avatar";
 import { useProgress } from "../../lib/context";
 import { ApiError } from "../../lib/api";
@@ -112,6 +113,7 @@ export function ProfileSwitcherModal({
         </div>
 
         {!creating ? (
+          <>
           <div className={styles.grid}>
             {profiles.map((profile) => {
               const active = profile.id === selectedChildId;
@@ -145,18 +147,28 @@ export function ProfileSwitcherModal({
                 <span className={styles.addIcon}>
                   <Plus size={24} />
                 </span>
-                <span className={styles.addText}>Yangi kitobxon</span>
+                <span className={styles.addText}>Farzandingizni qo‘shing</span>
               </button>
             )}
           </div>
+
+          <Link
+            to="/profile"
+            className={styles.editLink}
+            onClick={onClose}
+          >
+            <Pencil size={15} />
+            O‘z profilimni tahrirlash
+          </Link>
+          </>
         ) : (
           <form onSubmit={handleCreate} className={styles.createForm}>
             <div className={styles.formHead}>
-              <span className={styles.formTitle}>Yangi kitobxon qo‘shish</span>
+              <span className={styles.formTitle}>Farzandingizni qo‘shing</span>
             </div>
 
             <label htmlFor="switcher-child-name" className="sr-only">
-              Ism
+              Farzandingizning ismi
             </label>
             <input
               id="switcher-child-name"
@@ -165,7 +177,7 @@ export function ProfileSwitcherModal({
               required
               minLength={2}
               maxLength={20}
-              placeholder="Bolaning ismi"
+              placeholder="Masalan, Madina"
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus

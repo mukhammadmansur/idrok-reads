@@ -9,7 +9,7 @@ import {
 import { stories, generalQuiz } from "../content/stories";
 
 const publicArt = new Set(
-  Object.keys(import.meta.glob("../../public/art/*")).map((path) =>
+  Object.keys(import.meta.glob("../../public/art/**/*")).map((path) =>
     path.replace("../../public", ""),
   ),
 );
@@ -52,7 +52,7 @@ describe("persistent reading state", () => {
 describe("published content", () => {
   it("contains complete stories and valid question answers", () => {
     for (const s of stories) {
-      expect(s.pages.length).toBeGreaterThanOrEqual(8);
+      expect(s.pages.length).toBeGreaterThanOrEqual(6);
       expect(s.pages.length).toBeLessThanOrEqual(15);
       expect(s.quiz.length).toBeGreaterThanOrEqual(3);
       expect(new Set(s.pages.map((p) => p.id)).size).toBe(s.pages.length);

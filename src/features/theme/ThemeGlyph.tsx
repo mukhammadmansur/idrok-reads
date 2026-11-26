@@ -1,4 +1,4 @@
-import { Anchor, Orbit, Sparkles, Sun } from "lucide-react";
+import { Anchor, Cat, Ghost, Orbit, Sparkles, Sun } from "lucide-react";
 import type { ThemeId } from "../../content";
 
 const glyphs = {
@@ -6,6 +6,8 @@ const glyphs = {
   magic: Sparkles,
   cyber: Orbit,
   pirate: Anchor,
+  kitty: Cat,
+  ghost: Ghost,
 } as const;
 
 export function ThemeGlyph({

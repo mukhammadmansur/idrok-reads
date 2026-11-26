@@ -21,8 +21,10 @@ const base: Story = {
 };
 
 describe("storyVideo", () => {
-  it("gives each published book a distinct valid library video with a local poster", () => {
-    const published = stories.filter((story) => story.status === "published");
+  it("gives every published story that ships a video a distinct valid library video with a local poster", () => {
+    const published = stories.filter(
+      (story) => story.status === "published" && story.video,
+    );
     const ids = published.map((story) => {
       const video = storyVideo(story);
       expect(video?.source).toBe("library");

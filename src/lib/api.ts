@@ -64,6 +64,27 @@ export interface StoryVideoOverride {
   updatedAt: string;
 }
 export type StoryVideoMap = Record<string, StoryVideoOverride>;
+export interface PricingPlan {
+  slug: string;
+  name: string;
+  price: number;
+  period: string;
+  maxChildren: number | null;
+  note: string;
+  featured: boolean;
+}
+export interface NewsEntry {
+  id: number;
+  title: string;
+  body: string;
+  createdAt: string;
+}
+export interface GuideEntry {
+  id: number;
+  title: string;
+  body: string;
+}
+export type GuidesBySection = Record<string, GuideEntry[]>;
 export type ProgressEvent =
   | { id: string; type: "theme"; theme: ProfileProgress["theme"] }
   | {
@@ -141,14 +162,6 @@ export const api = {
   setParentPin: (pin: string) => request<ParentAccess>("/parent/pin", { pin }),
   family: () => request<FamilyOverview>("/parent/overview"),
   videos: () => request<{ videos: StoryVideoMap }>("/videos"),
-  parentVideos: () => request<{ videos: StoryVideoMap }>("/parent/videos"),
-  saveStoryVideo: (storyId: string, url: string, title: string) =>
-    request<{ video: StoryVideoOverride & { storyId: string } }>(
-      "/parent/videos",
-      { storyId, url, title },
-    ),
-  removeStoryVideo: (storyId: string) =>
-    request<{ ok: boolean }>("/parent/videos/remove", { storyId }),
   activity: (
     id: string,
     body: {
@@ -164,6 +177,9 @@ export const api = {
       keepalive,
     ),
   session: () => request<AccountSession>("/session"),
+  pricing: () => request<{ plans: PricingPlan[] }>("/pricing"),
+  news: () => request<{ news: NewsEntry[] }>("/news"),
+  guides: () => request<{ guides: GuidesBySection }>("/guides"),
   register: (email: string, password: string) =>
     request<AccountSession>("/auth/register", { email, password }),
   login: (email: string, password: string) =>

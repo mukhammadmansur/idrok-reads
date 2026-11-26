@@ -5,6 +5,7 @@
   background: rgba(44, 38, 30, 0.7);
   backdrop-filter: blur(8px);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   padding: 1.25rem;
   overflow-y: auto;
@@ -265,4 +266,35 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+@media (max-width: 380px) {
+  .backdrop {
+    padding: 0.75rem;
+  }
+
+  .card {
+    padding: 1.5rem 1rem;
+    gap: 1.1rem;
+  }
+
+  .header h1 {
+    font-size: 1.35rem;
+  }
+
+  .avatarGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .avatarOption {
+    padding: 0.5rem 0.2rem 0.45rem;
+    min-height: 70px;
+    border-radius: 14px;
+  }
+
+  .avatarOption span {
+    width: 40px !important;
+    height: 40px !important;
+  }
 }

@@ -27,6 +27,7 @@ import { useProgress } from "../../lib/context";
 import { completeStory, recordPage } from "../../lib/progress";
 import { useReadingActivity } from "../../lib/useReadingActivity";
 import { ThemeGlyph } from "../theme/ThemeGlyph";
+import { WorldCritter } from "../theme/WorldCritter";
 import { NotFoundPage } from "../../app/NotFoundPage";
 import { StoryBook, type StoryBookHandle } from "./StoryBook";
 import { StoryVideoSection } from "./StoryVideoSection";
@@ -75,6 +76,7 @@ function Reader({
   const speech = useRef<SpeechSynthesisUtterance | null>(null);
   const uzbekVoice = useRef<SpeechSynthesisVoice | undefined>(undefined);
   const child = profiles.find((profile) => profile.id === selectedChildId);
+  const world = progress.theme === "classic" ? null : progress.theme;
   const current = story.pages[page];
   const last = page === story.pages.length - 1;
   const nextStory = stories[(stories.indexOf(story) + 1) % stories.length];
@@ -401,6 +403,14 @@ function Reader({
         <p className="sr-only" aria-live="polite">
           {page + 1}-sahifa. {current.text}
         </p>
+        {world && (
+          <WorldCritter
+            world={world}
+            variant="reader"
+            pulse={page}
+            className={styles.critter}
+          />
+        )}
         <StoryBook
           ref={book}
           story={story}

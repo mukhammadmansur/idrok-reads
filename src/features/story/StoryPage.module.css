@@ -9,8 +9,10 @@
   gap: 8px;
   width: fit-content;
   min-height: 48px;
-  padding: 0 10px 0 4px;
-  border-radius: var(--radius-sm);
+  padding: 0 14px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
   color: var(--ink-soft);
   font-size: 14px;
   font-weight: 700;
@@ -46,7 +48,7 @@
 .cover {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
 }
 
@@ -79,6 +81,12 @@
   display: grid;
   align-content: start;
   gap: 14px;
+  padding: clamp(18px, 2.4vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .detail h1 {
@@ -164,23 +172,33 @@
   font-weight: 700;
 }
 
-:global(:root[data-theme="forest"]) .coverWrap {
-  --cover-inset: 10px;
-  border-color: #79542c;
-  background: url("/art/enchanted-bark-v1.webp") center / cover;
+:global(:root[data-theme="magic"]) .coverWrap {
+  --cover-inset: 8px;
+  border: 3px solid #ffd56a;
+  background: linear-gradient(145deg, #4c1d95, #2a1458);
+  box-shadow:
+    0 28px 50px -20px #12081f,
+    0 0 30px #c084fc33;
 }
 
-:global(:root[data-theme="ice"]) .coverWrap {
-  --cover-inset: 10px;
-  border-color: #b5d9ec;
-  background: conic-gradient(
-    from 35deg,
-    #b9e9f5,
-    #fff,
-    #c7bcf0,
-    #93cde1,
-    #b9e9f5
+:global(:root[data-theme="pirate"]) .coverWrap {
+  --cover-inset: 8px;
+  border: 3px solid #e2a322;
+  background: repeating-linear-gradient(
+    90deg,
+    #8a4b24 0 42px,
+    #7a4220 42px 45px,
+    #8a4b24 45px 87px
   );
+}
+
+:global(:root[data-theme="cyber"]) .coverWrap {
+  --cover-inset: 8px;
+  border: 3px solid #ffcf5c;
+  background: linear-gradient(145deg, #3a2f7a, #141033);
+  box-shadow:
+    0 28px 50px -20px #000b,
+    0 0 32px #ffcf5c22;
 }
 
 @media (min-width: 820px) {

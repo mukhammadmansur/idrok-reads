@@ -138,6 +138,24 @@
   font-weight: 600;
 }
 
+.editLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.4rem;
+  margin-top: -0.5rem;
+  transition: color 0.15s ease;
+}
+
+.editLink:hover {
+  color: var(--accent);
+}
+
 .createForm {
   background: var(--bg);
   border: 1px solid var(--line);
@@ -178,11 +196,11 @@
 }
 
 .avatarSelectRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  justify-items: center;
   gap: 0.65rem;
-  overflow-x: auto;
   padding: 0.35rem 0.2rem 0.5rem;
-  scrollbar-width: thin;
 }
 
 .avatarPickBtn {

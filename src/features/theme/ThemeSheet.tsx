@@ -3,6 +3,7 @@ import { Sheet } from "../../design-system/Sheet";
 import { themes } from "../../content";
 import { useProgress } from "../../lib/context";
 import { ThemeGlyph } from "./ThemeGlyph";
+import { WORLD_MASCOT } from "./WorldCritter";
 import styles from "./ThemeSheet.module.css";
 
 export function ThemeSheet({
@@ -18,11 +19,12 @@ export function ThemeSheet({
       open={open}
       onClose={onClose}
       title="O‘qish muhiti"
-      description="Hikoya o‘zgarmaydi — faqat atrofingdagi kayfiyat o‘zgaradi."
+      description="Har olamda o‘z jonivori va o‘z kitobi bor. Hikoya o‘zgarmaydi — dunyo o‘zgaradi."
     >
       <div className={styles.grid}>
         {themes.map((theme) => {
           const selected = progress.theme === theme.id;
+          const world = theme.id === "classic" ? null : theme.id;
           return (
             <button
               key={theme.id}
@@ -34,12 +36,12 @@ export function ThemeSheet({
                 onClose();
               }}
             >
-              <span
-                className={styles.icon}
-                data-material={theme.id}
-                aria-hidden="true"
-              >
-                <ThemeGlyph theme={theme.id} size={22} />
+              <span className={styles.icon} aria-hidden="true">
+                {world ? (
+                  <img src={WORLD_MASCOT[world]} alt="" loading="lazy" />
+                ) : (
+                  <ThemeGlyph theme={theme.id} size={24} />
+                )}
               </span>
               <span className={styles.copy}>
                 <strong>{theme.name}</strong>

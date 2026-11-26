@@ -6,10 +6,13 @@
       "title": "Oyga maktub",
       "subtitle": "Kichik tulkining katta orzusi",
       "description": "Tulkixon Oyga xat yozdi. Quyonvoy unga yordam beradi. Xat Oyga yetib borarmikan?",
-      "cover": "/art/oy-dosti.svg",
-      "age": [6, 10],
+      "cover": "/art/worlds/cover-oy-dosti.jpg",
+      "age": [
+        6,
+        10
+      ],
       "minutes": 6,
-      "category": "Do‘stlik",
+      "category": "Ertak",
       "reward": "Oy do‘sti",
       "video": {
         "url": "https://www.youtube.com/watch?v=yXe0yxzYkjo",
@@ -22,14 +25,22 @@
         {
           "id": "moon-1",
           "prompt": "Tulkixon kimga maktub yozdi?",
-          "options": ["Quyoshga", "Oyga", "Dengizga"],
+          "options": [
+            "Quyoshga",
+            "Oyga",
+            "Dengizga"
+          ],
           "answer": 1,
           "explanation": "Tulkixon Oy yolg‘iz bo‘lmasin deb unga do‘stlik maktubini yozdi."
         },
         {
           "id": "moon-2",
           "prompt": "Tulkixon va Quyonvoy avval nimani yasashdi?",
-          "options": ["Qog‘oz samolyot", "Katta kema", "Qor odam"],
+          "options": [
+            "Qog‘oz samolyot",
+            "Katta kema",
+            "Qor odam"
+          ],
           "answer": 0,
           "explanation": "Ular maktubni uchirish uchun qog‘oz samolyot yasashdi."
         },
@@ -95,10 +106,13 @@
       "title": "Bulutlar kemasi",
       "subtitle": "Shamol olib kelgan sarguzasht",
       "description": "Zara bobosi bilan qog‘oz kema yasaydi. Kichik kema bir chumoliga yordam beradi.",
-      "cover": "/art/bulut-kemasi.svg",
-      "age": [6, 10],
+      "cover": "/art/worlds/cover-bulut-kemasi.jpg",
+      "age": [
+        6,
+        10
+      ],
       "minutes": 5,
-      "category": "Sarguzasht",
+      "category": "Ertak",
       "reward": "Orzular sayyohi",
       "video": {
         "url": "https://www.youtube.com/watch?v=Xo0jbo0Z_Pk",
@@ -111,21 +125,33 @@
         {
           "id": "cloud-1",
           "prompt": "Zara kemasiga qanday nom berdi?",
-          "options": ["Yulduz", "Orzu", "Quyosh"],
+          "options": [
+            "Yulduz",
+            "Orzu",
+            "Quyosh"
+          ],
           "answer": 1,
           "explanation": "Zara kichik kemasiga «Orzu» deb nom berdi."
         },
         {
           "id": "cloud-2",
           "prompt": "Yelkan nimadan yasaldi?",
-          "options": ["Bargdan", "Toshdan", "Muzdan"],
+          "options": [
+            "Bargdan",
+            "Toshdan",
+            "Muzdan"
+          ],
           "answer": 0,
           "explanation": "Zara yashil bargni cho‘pga mahkamladi."
         },
         {
           "id": "cloud-3",
           "prompt": "Zara kimga yordam berdi?",
-          "options": ["Kapalakka", "Baliqqa", "Chumoliga"],
+          "options": [
+            "Kapalakka",
+            "Baliqqa",
+            "Chumoliga"
+          ],
           "answer": 2,
           "explanation": "Kema ho‘l toshda qolgan chumolini qirg‘oqqa olib bordi."
         }
@@ -180,10 +206,13 @@
       "title": "Dengizning kichik siri",
       "subtitle": "Do‘sting bilan qo‘rqinch ham kichrayadi",
       "description": "Kitvoy chuqur suvdan qo‘rqadi. Toshbaqacha yonida bo‘lsa, u dadilroq suzadi.",
-      "cover": "/art/dengiz-siri.svg",
-      "age": [6, 10],
+      "cover": "/art/worlds/cover-dengiz-siri.jpg",
+      "age": [
+        6,
+        10
+      ],
       "minutes": 7,
-      "category": "Tabiat",
+      "category": "Ilmiy",
       "reward": "Dengiz kashfiyotchisi",
       "video": {
         "url": "https://www.youtube.com/watch?v=dciLg3Zm1hI",
@@ -196,7 +225,11 @@
         {
           "id": "sea-1",
           "prompt": "Kitvoy nimadan qo‘rqardi?",
-          "options": ["Chuqur suvdan", "Quyoshdan", "Marjondan"],
+          "options": [
+            "Chuqur suvdan",
+            "Quyoshdan",
+            "Marjondan"
+          ],
           "answer": 0,
           "explanation": "Chuqur suv Kitvoyga qorong‘i ko‘rinardi."
         },
@@ -266,27 +299,288 @@
           "alt": "Kitvoy tanish marjonlar yonidagi uyiga xursand qaytyapti."
         }
       ]
+    },
+    {
+      "id": "amir-temur",
+      "slug": "amir-temur",
+      "title": "Amir Temur",
+      "subtitle": "Jasur sohibqironning bolaligi",
+      "description": "Kichkina Temur Shahrisabzda o‘sdi. U jasurlik va adolat bilan buyuk sarkardaga aylandi.",
+      "cover": "/art/worlds/cover-amir-temur.jpg",
+      "age": [
+        6,
+        10
+      ],
+      "minutes": 6,
+      "category": "Tarixiy",
+      "reward": "Temur qalqoni",
+      "quiz": [
+        {
+          "id": "temur-1",
+          "prompt": "Amir Temur qayerda tug‘ilgan?",
+          "options": [
+            "Samarqandda",
+            "Shahrisabzda",
+            "Toshkentda"
+          ],
+          "answer": 1,
+          "explanation": "Amir Temur Shahrisabz degan yashil vodiyda tug‘ilgan."
+        },
+        {
+          "id": "temur-2",
+          "prompt": "Temur bolaligida nimani o‘rgangandi?",
+          "options": [
+            "Otda chopishni",
+            "Suzishni",
+            "Rasm chizishni"
+          ],
+          "answer": 0,
+          "explanation": "Temur otasi bilan otda chopishni o‘rgangan."
+        },
+        {
+          "id": "temur-3",
+          "prompt": "Temur qanday yo‘lboshchi bo‘lishni orzu qilardi?",
+          "options": [
+            "Mashhur",
+            "Boy",
+            "Adolatli"
+          ],
+          "answer": 2,
+          "explanation": "Temur xalqini himoya qiladigan adolatli yo‘lboshchi bo‘lishni orzu qilardi."
+        }
+      ],
+      "status": "published",
+      "pages": [
+        {
+          "text": "Shahrisabz degan yashil vodiyda, tog‘larning etagida kichkina Temur dunyoga keldi. Uning uyi bog‘lar va mevali daraxtlar orasida edi. Temur har kuni ertalab qushlarning sayrashidan uyg‘onardi.",
+          "image": "/art/picture-temur-village.webp",
+          "alt": "Temur tug‘ilgan yashil qishloq, bog‘lar va tog‘lar."
+        },
+        {
+          "text": "Temur otasi bilan otda chopishni o‘rgandi. U qo‘rqmas, lekin sabrli edi. Otasi: \"Jasur bo‘lish — qo‘rqmaslik emas, qo‘rquvni yengishdir\", der edi.",
+          "image": "/art/picture-temur-horse.webp",
+          "alt": "Kichkina Temur otda chopishni o‘rganmoqda."
+        },
+        {
+          "text": "Temur do‘stlari bilan katta daraxt tagida shatranj o‘ynardi. U har bir yurishni yaxshilab o‘ylardi. \"G‘olib bo‘lish uchun avval o‘ylash kerak\", derdi u.",
+          "image": "/art/picture-temur-chess.webp",
+          "alt": "Temur do‘stlari bilan shatranj o‘ynamoqda."
+        },
+        {
+          "text": "Kechqurun Temur tepalikka chiqib, o‘z yurtiga qarardi. U xalqini himoya qiladigan adolatli yo‘lboshchi bo‘lishni orzu qilardi.",
+          "image": "/art/picture-temur-dream.webp",
+          "alt": "Temur tepalikdan yurtiga qarab orzu qilmoqda."
+        },
+        {
+          "text": "Temur katta bo‘lgach, jasur suvoriylarni yig‘di. Ular yurtni himoya qilish uchun birga yo‘lga chiqdilar. Bayroqlar shamolda hilpirardi.",
+          "image": "/art/picture-temur-riders.webp",
+          "alt": "Temur jasur suvoriylari bilan yo‘lga chiqmoqda."
+        },
+        {
+          "text": "Temur Samarqandda ulug‘vor shaharlar qurdirdi. Madrasalar, bozorlar va go‘zal bog‘lar barpo etildi. Uning jasorati va adolati avlodlarga o‘rnak bo‘ldi.",
+          "image": "/art/picture-temur-city.webp",
+          "alt": "Samarqandning ulug‘vor shahri va gumbazlari."
+        }
+      ]
+    },
+    {
+      "id": "kitty-bogi",
+      "slug": "kitty-bogi",
+      "title": "Kitty va Sehrli Bog‘",
+      "subtitle": "Pushti mo‘jizalar olami",
+      "description": "Oppoq mushukcha Kitty sehrli bog‘da pushti gullar, quyon do‘sti va yulduzli yo‘l bilan tanishadi.",
+      "cover": "/art/worlds/cover-kitty-bogi.jpg",
+      "age": [
+        4,
+        8
+      ],
+      "minutes": 5,
+      "category": "Premium",
+      "reward": "Pushti yulduz",
+      "quiz": [
+        {
+          "id": "kitty-1",
+          "prompt": "Kitty qanday uyda yashardi?",
+          "options": [
+            "Pushti uyda",
+            "Ko‘k uyda",
+            "Oq uyda"
+          ],
+          "answer": 0,
+          "explanation": "Kitty pushti rangli kichkina uyda yashardi."
+        },
+        {
+          "id": "kitty-2",
+          "prompt": "Kitty bog‘da kim bilan choy ichdi?",
+          "options": [
+            "Mushuk bilan",
+            "Quyon bilan",
+            "Qush bilan"
+          ],
+          "answer": 1,
+          "explanation": "Kitty kichkina quyon do‘sti bilan choy ichdi."
+        },
+        {
+          "id": "kitty-3",
+          "prompt": "Sehrli bog‘ Kitty uchun nimaga aylandi?",
+          "options": [
+            "Ikkinchi uyiga",
+            "Qo‘rqinchli joyga",
+            "Uzoq xotiraga"
+          ],
+          "answer": 0,
+          "explanation": "Sehrli bog‘ Kittyning ikkinchi uyiga aylandi."
+        }
+      ],
+      "status": "published",
+      "pages": [
+        {
+          "text": "Pushti rangli kichkina uyda oppoq mushukcha Kitty yashardi. Ertalab quyosh nurlari yurak shaklidagi derazadan kirardi. Kitty ko‘zlarini ochib, shirin cho‘zildi.",
+          "image": "/art/picture-kitty-wake.webp",
+          "alt": "Kitty pushti xonada uyg‘onmoqda."
+        },
+        {
+          "text": "Kitty bog‘ eshigini ochdi. Eshik orqasida sehrli bog‘ — pushti gullar dengizi kutib turardi. Havoda yulduzchalardek uchqunlar uchardi.",
+          "image": "/art/picture-kitty-gate.webp",
+          "alt": "Kitty sehrli bog‘ eshigidan kiryapti."
+        },
+        {
+          "text": "Kitty kapalaklar bilan o‘ynadi. Ular pushti va oq rangda, guldan gulga qo‘nardi. Kitty quvonchdan sakrab, ularning ortidan yugurdi.",
+          "image": "/art/picture-kitty-butterflies.webp",
+          "alt": "Kitty kapalaklar bilan o‘ynamoqda."
+        },
+        {
+          "text": "Bog‘ o‘rtasida kichkina quyon do‘sti Kittyni choyga taklif qildi. Ular qulupnayli tort yedilar va pushti piyolalarda choy ichdilar.",
+          "image": "/art/picture-kitty-tea.webp",
+          "alt": "Kitty quyon do‘sti bilan choy ichmoqda."
+        },
+        {
+          "text": "Kech kirgach, bog‘da yulduzli yo‘l yorishib ketdi. Kitty oy nurida yurib, uchib yurgan o‘t chiroqlarini kuzatdi. Har bir yulduz unga yo‘l ko‘rsatardi.",
+          "image": "/art/picture-kitty-star.webp",
+          "alt": "Kitty yulduzli yo‘l bo‘ylab yurmoqda."
+        },
+        {
+          "text": "Kitty do‘stlari bilan bayram qildi. Ular qo‘shiq aytdilar va raqsga tushdilar. Sehrli bog‘ endi Kittyning ikkinchi uyiga aylandi.",
+          "image": "/art/picture-kitty-party.webp",
+          "alt": "Kitty do‘stlari bilan bayram qilmoqda."
+        }
+      ]
+    },
+    {
+      "id": "qaroqchi-siri",
+      "slug": "qaroqchi-siri",
+      "title": "Qaroqchilar Oroli Siri",
+      "subtitle": "Dahshatli kemaning xazinasi",
+      "description": "Jasur dengizchi tumanli dengizda qaroqchilar oroliga borib, arvoh qaroqchi bilan do‘stlashadi va xazinani topadi.",
+      "cover": "/art/worlds/cover-qaroqchi-siri.jpg",
+      "age": [
+        7,
+        11
+      ],
+      "minutes": 6,
+      "category": "Premium",
+      "reward": "Xazina xaritasi",
+      "quiz": [
+        {
+          "id": "pirate-1",
+          "prompt": "Ali qayerga ketayotgan edi?",
+          "options": [
+            "Qaroqchilar oroliga",
+            "Oyga",
+            "Cho‘lga"
+          ],
+          "answer": 0,
+          "explanation": "Ali qaroqchilar orolining sirini topmoqchi edi."
+        },
+        {
+          "id": "pirate-2",
+          "prompt": "G‘orda kim paydo bo‘ldi?",
+          "options": [
+            "Arvoh qaroqchi",
+            "Katta ajdaho",
+            "Dengiz toshbaqasi"
+          ],
+          "answer": 0,
+          "explanation": "G‘orda mehribon arvoh qaroqchi paydo bo‘ldi."
+        },
+        {
+          "id": "pirate-3",
+          "prompt": "Ali eng ko‘p nimadan xursand bo‘ldi?",
+          "options": [
+            "Oltinlardan",
+            "Yangi do‘stdan",
+            "Xaritadan"
+          ],
+          "answer": 1,
+          "explanation": "Ali xazinadan ko‘ra yangi do‘st topganidan xursand edi."
+        }
+      ],
+      "status": "published",
+      "pages": [
+        {
+          "text": "Tumanli dengizda yog‘och kema suzib borardi. Kemada jasur dengizchi Ali turardi. U qaroqchilar orolining sirini topmoqchi edi.",
+          "image": "/art/picture-pirate-fog.webp",
+          "alt": "Kema tumanli dengizda suzib bormoqda."
+        },
+        {
+          "text": "Kema bosh suyak shaklidagi qoyali orolga yetib keldi. Ali kichkina qayiqda sohilga chiqdi. Oy bulutlar orasidan mo‘ralardi.",
+          "image": "/art/picture-pirate-island.webp",
+          "alt": "Ali qaroqchilar oroliga yaqinlashmoqda."
+        },
+        {
+          "text": "Ali g‘orga kirdi. Ichkarida eski yog‘och sandiq oltin nur bilan yonardi. Unda qadimiy xazina va xarita yotardi.",
+          "image": "/art/picture-pirate-cave.webp",
+          "alt": "G‘or ichida oltin nurli xazina sandig‘i."
+        },
+        {
+          "text": "Birdan g‘orda shaffof arvoh qaroqchi paydo bo‘ldi. U qo‘rqinchli emas, mehribon edi. \"Xazinani ochish uchun topishmoqni yeching\", dedi u.",
+          "image": "/art/picture-pirate-ghost.webp",
+          "alt": "Mehribon arvoh qaroqchi Ali bilan uchrashmoqda."
+        },
+        {
+          "text": "Ali arvoh qaroqchi bilan birga o‘tirib, topishmoqni o‘yladi. Javobni topgach, arvoh quvonchdan kulib yubordi. Ular do‘st bo‘lishdi.",
+          "image": "/art/picture-pirate-riddle.webp",
+          "alt": "Ali va arvoh qaroqchi topishmoq yechmoqda."
+        },
+        {
+          "text": "Sandiq ochildi — ichida oltin tangalar va eski xarita bor edi. Ali xazinadan ko‘ra yangi do‘st topganidan xursand edi. Kema uyga yo‘l oldi.",
+          "image": "/art/picture-pirate-treasure.webp",
+          "alt": "Ali va arvoh qaroqchi xazinani topib xursand."
+        }
+      ]
     }
   ],
   "generalQuiz": [
     {
       "id": "general-1",
       "prompt": "O‘simlik o‘sishi uchun nimalar kerak?",
-      "options": ["Faqat qorong‘ilik", "Suv va quyosh nuri", "Faqat toshlar"],
+      "options": [
+        "Faqat qorong‘ilik",
+        "Suv va quyosh nuri",
+        "Faqat toshlar"
+      ],
       "answer": 1,
       "explanation": "Suv va quyosh nuri o‘simliklarning o‘sishiga yordam beradi."
     },
     {
       "id": "general-2",
       "prompt": "Do‘sting xafa bo‘lsa, nima qilish mumkin?",
-      "options": ["Uni tinglash", "Ustidan kulish", "Gapini bo‘lish"],
+      "options": [
+        "Uni tinglash",
+        "Ustidan kulish",
+        "Gapini bo‘lish"
+      ],
       "answer": 0,
       "explanation": "Tinglash va mehr ko‘rsatish do‘stimizga yordam beradi."
     },
     {
       "id": "general-3",
       "prompt": "Qaysi hayvon dengizda yashaydi?",
-      "options": ["Tulki", "Quyon", "Kit"],
+      "options": [
+        "Tulki",
+        "Quyon",
+        "Kit"
+      ],
       "answer": 2,
       "explanation": "Kit — dengizda yashaydigan sutemizuvchi hayvon."
     }

@@ -247,6 +247,19 @@
   color: var(--ink);
 }
 
+.parentAction {
+  min-height: 40px;
+  color: var(--muted);
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.parentAction:hover {
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+  opacity: 1;
+}
+
 .sideProfile {
   display: flex;
   align-items: center;
@@ -412,7 +425,9 @@
 
 :global(:root[data-theme="magic"]) .shell,
 :global(:root[data-theme="pirate"]) .shell,
-:global(:root[data-theme="cyber"]) .shell {
+:global(:root[data-theme="cyber"]) .shell,
+:global(:root[data-theme="kitty"]) .shell,
+:global(:root[data-theme="ghost"]) .shell {
   background: transparent;
 }
 
@@ -432,17 +447,17 @@
 }
 
 :global(:root[data-theme="cyber"]) .sidebar {
-  background: linear-gradient(160deg, #1a1048cc, #070514ee);
-  border-right-color: #5ef2ff55;
+  background: linear-gradient(160deg, #2a2266d9, #0b0a2aee);
+  border-right-color: #8f7fe055;
   backdrop-filter: blur(20px);
-  box-shadow: 1px 0 24px #ff4fd822;
+  box-shadow: 1px 0 24px #f27fb21f;
 }
 
 :global(:root[data-theme="cyber"]) .brandMark,
 :global(:root[data-theme="magic"]) .brandMark {
-  border-color: #5ef2ff70;
-  background: linear-gradient(145deg, #241858, #120c28);
-  box-shadow: 0 0 16px #5ef2ff22;
+  border-color: #ffcf5c70;
+  background: linear-gradient(145deg, #322a6e, #141033);
+  box-shadow: 0 0 16px #ffcf5c22;
 }
 
 :global(:root[data-theme="magic"]) .brandMark {
@@ -452,12 +467,23 @@
 
 :global(:root[data-theme="cyber"]) .navLink.active,
 :global(:root[data-theme="magic"]) .navLink.active {
-  box-shadow: inset 0 0 0 1px #5ef2ff40;
+  box-shadow: inset 0 0 0 1px #ffcf5c40;
 }
 
 @media (max-width: 350px) {
   .brand {
-    font-size: 20px;
+    font-size: 18px;
+    gap: 8px;
+  }
+
+  .brandMark {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .headerActions {
+    gap: 4px;
   }
 
   .themeButton span {
@@ -465,8 +491,19 @@
   }
 
   .themeButton {
-    width: 44px;
+    width: 40px;
+    min-height: 40px;
     justify-content: center;
     padding: 0;
+  }
+
+  .parentLockBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .profileButton {
+    width: 42px;
+    height: 42px;
   }
 }

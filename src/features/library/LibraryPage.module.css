@@ -29,8 +29,19 @@
 
 .headerLeft {
   display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.headerCopy {
+  display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+.headerBuddy {
+  flex: none;
+  margin: -14px -6px -18px 0;
 }
 
 .pageTitle {
@@ -156,7 +167,7 @@
 
 .worldList {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.85rem;
 }
 
@@ -222,31 +233,40 @@
   box-shadow: 0 6px 18px rgba(36, 81, 63, 0.14);
 }
 
-.theme_adventure.worldTileActive {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border-color: #d97706;
-  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.18);
+.theme_fairy.worldTileActive {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border-color: #7c3aed;
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.18);
 }
-.theme_adventure.worldTileActive .worldLabel {
-  color: #92400e;
-}
-
-.theme_friendship.worldTileActive {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-color: #16a34a;
-  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.18);
-}
-.theme_friendship.worldTileActive .worldLabel {
-  color: #166534;
+.theme_fairy.worldTileActive .worldLabel {
+  color: #6d28d9;
 }
 
-.theme_nature.worldTileActive {
+.theme_science.worldTileActive {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   border-color: #0284c7;
   box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18);
 }
-.theme_nature.worldTileActive .worldLabel {
+.theme_science.worldTileActive .worldLabel {
   color: #0369a1;
+}
+
+.theme_history.worldTileActive {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #d97706;
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.18);
+}
+.theme_history.worldTileActive .worldLabel {
+  color: #92400e;
+}
+
+.theme_premium.worldTileActive {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+  border-color: #db2777;
+  box-shadow: 0 6px 18px rgba(219, 39, 119, 0.2);
+}
+.theme_premium.worldTileActive .worldLabel {
+  color: #be185d;
 }
 
 /* Status Filter Pills */
@@ -280,9 +300,9 @@
 
 .statusPillActive {
   background: var(--accent) !important;
-  color: #ffffff !important;
+  color: var(--accent-ink) !important;
   border-color: var(--accent) !important;
-  box-shadow: 0 3px 10px rgba(36, 81, 63, 0.2);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 /* --------------------------------------------------------------------------
@@ -326,23 +346,27 @@
 }
 
 /* Category Theme Accents on Card Hover */
-.card_adventure:hover {
+.card_fairy:hover {
+  border-color: #8b5cf6;
+}
+
+.card_science:hover {
+  border-color: #0ea5e9;
+}
+
+.card_history:hover {
   border-color: #f59e0b;
 }
 
-.card_friendship:hover {
-  border-color: #22c55e;
-}
-
-.card_nature:hover {
-  border-color: #0ea5e9;
+.card_premium:hover {
+  border-color: #ec4899;
 }
 
 /* Cover Frame */
 .coverFrame {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 11;
+  aspect-ratio: 4 / 5;
   background: #fdfaf3;
   overflow: hidden;
   display: flex;
@@ -387,7 +411,7 @@
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.3px;
-  color: var(--ink);
+  color: #2b2440;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -429,7 +453,7 @@
   border-radius: 9999px;
   font-size: 0.725rem;
   font-weight: 700;
-  color: var(--ink-soft);
+  color: #544b3a;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -525,8 +549,8 @@
 
 .btnStart {
   background: var(--accent);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(36, 81, 63, 0.25);
+  color: var(--accent-ink);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .bookCard:hover .btnStart {
@@ -535,13 +559,13 @@
 }
 
 .btnContinue {
-  background: #ea580c;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+  background: var(--warm);
+  color: var(--accent-ink);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--warm) 35%, transparent);
 }
 
 .bookCard:hover .btnContinue {
-  background: #c2410c;
+  background: color-mix(in srgb, var(--warm) 84%, black);
   transform: scale(1.02);
 }
 
@@ -574,8 +598,16 @@
 }
 
 .emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 26px;
+  background: var(--accent-soft);
+  color: var(--accent);
   font-size: 3rem;
   line-height: 1;
+  box-shadow: inset 0 0 0 2px var(--line);
 }
 
 .emptyState h3 {
@@ -600,13 +632,13 @@
   gap: 0.4rem;
   padding: 0.65rem 1.25rem;
   background: var(--accent);
-  color: #ffffff;
+  color: var(--accent-ink);
   border: none;
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(36, 81, 63, 0.2);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 25%, transparent);
   transition: all 0.18s ease;
 }
 
@@ -617,41 +649,106 @@
 }
 
 /* --------------------------------------------------------------------------
-   5. THEME OVERRIDES (Forest, Ice, Holo)
+   5. THEME OVERRIDES (Magic, Pirate, Cyber)
    -------------------------------------------------------------------------- */
-:global(:root[data-theme="forest"]) .bookCard {
-  border: 2.5px solid #79542c;
-  background: #f6f3dc;
-  box-shadow: 0 6px 0 -2px #79542c, 0 10px 24px rgba(60, 40, 20, 0.08);
+:global(:root[data-theme="magic"]) .bookCard {
+  border: 2px solid #c9a24a;
+  background: linear-gradient(180deg, #2b1858, #1c0f3d);
+  box-shadow:
+    0 0 0 3px #4c2d8a55,
+    0 14px 30px #12082480;
 }
 
-:global(:root[data-theme="forest"]) .bookInfo {
-  background: url("/art/iqro-vines-v1.svg") right bottom / 32px auto no-repeat;
+:global(:root[data-theme="magic"]) .bookCard:hover {
+  border-color: #ffe7a2;
+  box-shadow:
+    0 0 0 3px #7a4cff66,
+    0 18px 38px #12082499,
+    0 0 26px #c084fc33;
 }
 
-:global(:root[data-theme="ice"]) .bookCard {
-  border: 2.5px solid #b5d9ec;
-  background: #f0f9ff;
-  box-shadow: 0 6px 0 -2px #a9cde5, 0 10px 24px rgba(181, 217, 236, 0.3);
+:global(:root[data-theme="magic"]) .bookInfo {
+  background:
+    url("/art/iqro-stars-v1.svg") right bottom / 52px auto no-repeat,
+    radial-gradient(circle at 100% 100%, #6d3cff26, transparent 55%);
 }
 
-:global(:root[data-theme="ice"]) .bookInfo {
-  background: url("/art/iqro-frost-v1.svg") right bottom / 32px auto no-repeat;
+:global(:root[data-theme="magic"]) .bookSubtitle {
+  color: #d7c4a4;
 }
 
-:global(:root[data-theme="holo"]) .bookCard {
-  border-color: #60dcff40;
-  background: linear-gradient(135deg, #173f5680, #0b2237b3);
-  backdrop-filter: blur(16px);
-  box-shadow: inset 0 1px 0 #94efff20, 0 8px 24px rgba(0, 0, 0, 0.35);
+:global(:root[data-theme="magic"]) .theme_all.worldTileActive {
+  background: linear-gradient(135deg, #3a2270, #241145);
+  border-color: #ffd56a;
+  box-shadow: 0 6px 18px #12082466;
 }
 
-:global(:root[data-theme="holo"]) .bookTitle {
-  color: #e0f2fe;
+:global(:root[data-theme="magic"]) .theme_all.worldTileActive .worldLabel {
+  color: #fff6ea;
 }
 
-:global(:root[data-theme="holo"]) .bookSubtitle {
-  color: #94a3b8;
+:global(:root[data-theme="pirate"]) .bookCard {
+  border: 2px solid #b07a3a;
+  background: #fff3d8;
+  box-shadow:
+    0 7px 0 -2px #8a4b24,
+    0 14px 28px #3b241218;
+}
+
+:global(:root[data-theme="pirate"]) .bookCard:hover {
+  border-color: #e2a322;
+  box-shadow:
+    0 7px 0 -2px #6b3a1c,
+    0 18px 34px #3b241228;
+}
+
+:global(:root[data-theme="pirate"]) .bookInfo {
+  background:
+    url("/art/iqro-ropes-v1.svg") right bottom / 56px auto no-repeat,
+    radial-gradient(circle at 100% 100%, #f0c98733, transparent 60%);
+}
+
+:global(:root[data-theme="cyber"]) .bookCard {
+  border: 1px solid #a898ff55;
+  background: linear-gradient(160deg, #2a2266cc, #141033e6);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 0 #ffe6a833,
+    0 14px 30px #000a,
+    0 0 24px #ffcf5c12;
+}
+
+:global(:root[data-theme="cyber"]) .bookCard:hover {
+  border-color: #ffcf5c;
+  box-shadow:
+    inset 0 1px 0 #fff0c055,
+    0 18px 36px #000b,
+    0 0 30px #ffcf5c33;
+}
+
+:global(:root[data-theme="cyber"]) .bookInfo {
+  background:
+    linear-gradient(#ffcf5c80, #ffcf5c80) right bottom / 26px 1px no-repeat,
+    linear-gradient(#ffcf5c80, #ffcf5c80) right bottom / 1px 26px no-repeat,
+    radial-gradient(circle at 100% 100%, #ffcf5c1a, transparent 55%);
+}
+
+:global(:root[data-theme="cyber"]) .bookTitle {
+  color: #fff6e3;
+}
+
+:global(:root[data-theme="cyber"]) .bookSubtitle {
+  color: #cfc5f0;
+}
+
+:global(:root[data-theme="cyber"]) .theme_all.worldTileActive {
+  background: linear-gradient(135deg, #3a2f7a, #1b1546);
+  border-color: #ffcf5c;
+  box-shadow: 0 6px 18px #000a, 0 0 16px #ffcf5c24;
+}
+
+:global(:root[data-theme="cyber"]) .theme_all.worldTileActive .worldLabel {
+  color: #fff6e3;
 }
 
 /* --------------------------------------------------------------------------
@@ -771,11 +868,106 @@
   }
 
   .booksGrid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .bookCard {
+    border-radius: 20px;
+  }
+
+  .coverTopBadges {
+    top: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    gap: 0.3rem;
+  }
+
+  .categoryBadge,
+  .ribbonAge {
+    padding: 0.25rem 0.55rem;
+    font-size: 0.65rem;
+  }
+
+  .categoryBadge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .ribbonCompleted,
+  .ribbonReading {
+    padding: 0.25rem 0.55rem;
+    font-size: 0.625rem;
+  }
+
+  .coverBottomMeta {
+    bottom: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    gap: 0.3rem;
+  }
+
+  .timeBadge,
+  .pageBadge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .timeBadge svg,
+  .pageBadge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .bookInfo {
+    padding: 0.7rem 0.75rem 0.85rem;
+  }
+
+  .bookTitle {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .bookSubtitle {
+    display: none;
+  }
+
+  .progressContainer {
+    margin-top: 0.5rem;
+  }
+
+  .actionWrap {
+    margin-top: 0.6rem;
+  }
+
+  .actionButton {
+    height: 40px;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    gap: 0.35rem;
+  }
+
+  .actionButton svg {
+    width: 16px;
+    height: 16px;
   }
 
   .coverFrame {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 5;
+  }
+}
+
+@media (max-width: 380px) {
+  .booksGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bookCard {
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  .bookSubtitle {
+    display: block;
   }
 }

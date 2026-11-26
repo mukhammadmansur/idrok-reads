@@ -1,14 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  KeyRound,
-  LogOut,
-  Plus,
-  ShieldCheck,
-  Trash2,
-  Users,
-} from "lucide-react";
-import { Avatar, STORYBOOK_AVATARS, type AvatarId } from "../../design-system/Avatar";
+import { KeyRound, LogOut, ShieldCheck } from "lucide-react";
 import { api } from "../../lib/api";
 import { useProgress } from "../../lib/context";
 import { GoogleButton } from "../auth/GoogleButton";
@@ -17,16 +9,7 @@ import styles from "./ParentSettingsTab.module.css";
 
 export function ParentSettingsTab() {
   const navigate = useNavigate();
-  const {
-    user,
-    children: profiles,
-    createChild,
-    deleteChild,
-    logout,
-    login,
-    register,
-    googleLogin,
-  } = useProgress();
+  const { user, logout, login, register, googleLogin } = useProgress();
   const parentAccess = useParentAccess();
 
   // PIN state
@@ -35,13 +18,6 @@ export function ParentSettingsTab() {
   const [pinBusy, setPinBusy] = useState(false);
   const [pinMsg, setPinMsg] = useState("");
   const [pinError, setPinError] = useState("");
-
-  // Child creation state
-  const [childName, setChildName] = useState("");
-  const [childAvatar, setChildAvatar] = useState<AvatarId>("lion");
-  const [childBusy, setChildBusy] = useState(false);
-  const [childMsg, setChildMsg] = useState("");
-  const [childError, setChildError] = useState("");
 
   // Auth form state if guest
   const [authMode, setAuthMode] = useState<"login" | "register">("register");
@@ -82,37 +58,6 @@ export function ParentSettingsTab() {
     }
   };
 
-  const handleAddChild = async (e: FormEvent) => {
-    e.preventDefault();
-    setChildMsg("");
-    setChildError("");
-    if (!childName.trim()) return;
-    setChildBusy(true);
-    try {
-      await createChild(childName.trim(), childAvatar);
-      setChildMsg(`${childName.trim()} profili qo‘shildi.`);
-      setChildName("");
-    } catch (cause) {
-      setChildError(
-        cause instanceof Error ? cause.message : "Profil qo‘shilmadi.",
-      );
-    } finally {
-      setChildBusy(false);
-    }
-  };
-
-  const handleDeleteChild = async (id: string, name: string) => {
-    if (!confirm(`Haqiqatan ham ${name} profilini o‘chirmoqchimisiz?`)) return;
-    try {
-      await deleteChild(id);
-      setChildMsg(`${name} profili o‘chirildi.`);
-    } catch (cause) {
-      setChildError(
-        cause instanceof Error ? cause.message : "Profil o‘chirilmadi.",
-      );
-    }
-  };
-
   const handleAuth = async (e: FormEvent) => {
     e.preventDefault();
     setAuthError("");
@@ -137,8 +82,8 @@ export function ParentSettingsTab() {
   return (
     <div className={styles.page}>
       <header className={styles.heading}>
-        <span className={styles.eyebrow}>SOZLAMALAR VA XAVFSIZLIK</span>
-        <h1>Hisob va PIN</h1>
+        <span className={styles.eyebrow}>SOZLAMALAR</span>
+        <h1>Hisob va xavfsizlik</h1>
       </header>
 
       {/* 1. PARENT ACCOUNT */}
@@ -321,98 +266,6 @@ export function ParentSettingsTab() {
             <span>{pinBusy ? "Saqlanmoqda…" : "PIN-kodni saqlash"}</span>
           </button>
         </form>
-      </section>
-
-      {/* 3. MANAGE CHILDREN */}
-      <section className={styles.card}>
-        <div className={styles.cardHead}>
-          <Users size={24} style={{ color: "var(--accent)" }} />
-          <div>
-            <h2>Farzandlar profillari</h2>
-            <p>Oila hisobida {profiles.length} / 6 profil mavjud.</p>
-          </div>
-        </div>
-
-        {childMsg && <p className={styles.message}>{childMsg}</p>}
-        {childError && <p className={styles.error}>{childError}</p>}
-
-        <div className={styles.childrenList}>
-          {profiles.map((p) => (
-            <div key={p.id} className={styles.childItem}>
-              <div className={styles.childInfo}>
-                <Avatar avatar={p.avatar} size={42} />
-                <span className={styles.childName}>{p.name}</span>
-              </div>
-              <div className={styles.childActions}>
-                {profiles.length > 1 && (
-                  <button
-                    type="button"
-                    className={styles.deleteBtn}
-                    onClick={() => handleDeleteChild(p.id, p.name)}
-                  >
-                    <Trash2 size={16} />
-                    <span>O‘chirish</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {profiles.length < 6 && (
-          <form onSubmit={handleAddChild} style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.5rem" }}>
-            <h3 style={{ fontSize: "1rem", margin: "0.25rem 0" }}>
-              Yangi farzand qo‘shish
-            </h3>
-            <div className={styles.field}>
-              <label htmlFor="new-child-name" className={styles.label}>
-                Ismi
-              </label>
-              <input
-                id="new-child-name"
-                type="text"
-                required
-                maxLength={20}
-                className={styles.input}
-                placeholder="Masalan, Madina"
-                value={childName}
-                onChange={(e) => setChildName(e.target.value)}
-              />
-            </div>
-
-            <div className={styles.field}>
-              <span className={styles.label}>Belgisi</span>
-              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                {STORYBOOK_AVATARS.map((a) => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    style={{
-                      border: childAvatar === a.id ? "2px solid var(--accent)" : "1px solid var(--line)",
-                      background: childAvatar === a.id ? "var(--accent-soft)" : "transparent",
-                      borderRadius: "50%",
-                      padding: 4,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => setChildAvatar(a.id)}
-                    aria-label={a.label}
-                  >
-                    <Avatar avatar={a.id} size={36} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className={styles.addBtn}
-              disabled={childBusy || !childName.trim()}
-            >
-              <Plus size={18} />
-              <span>{childBusy ? "Qo‘shilmoqda…" : "Profil qo‘shish"}</span>
-            </button>
-          </form>
-        )}
       </section>
     </div>
   );

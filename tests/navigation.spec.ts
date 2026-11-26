@@ -16,12 +16,12 @@ import type { ProfileProgress, ThemeId } from "../src/content/types";
 
 const startedAt = "2026-11-01T10:00:00.000Z";
 const completedAt = "2026-11-01T10:05:00.000Z";
-const themes: ThemeId[] = ["classic", "forest", "ice", "holo"];
+const themes: ThemeId[] = ["classic", "magic", "cyber", "pirate"];
 const destinations = [
-  { label: "Kutubxona", path: "/" },
+  { label: "Bosh sahifa", path: "/" },
+  { label: "Kutubxona", path: "/library" },
   { label: "Savol-javob", path: "/quiz" },
   { label: "Yutuqlarim", path: "/rewards" },
-  { label: "Akkaunt", path: "/account" },
 ];
 const emptyProgress = (theme: ThemeId = "classic"): ProfileProgress => ({
   version: 1,
@@ -55,7 +55,6 @@ type MockApi = {
   parent: ParentAccess;
   progress: ProfileProgress;
   videos: StoryVideoMap;
-  parentVideos: StoryVideoMap;
   calls: ApiCall[];
   handlers: Map<string, (route: Route) => Promise<void>>;
 };
@@ -83,7 +82,6 @@ const test = base.extend<{ mockApi: MockApi }>({
         parent: googleAccess(),
         progress: emptyProgress(),
         videos: {},
-        parentVideos: {},
         calls: [],
         handlers: new Map(),
       };
@@ -109,10 +107,10 @@ const test = base.extend<{ mockApi: MockApi }>({
             return reply(route, mock.parent);
           case "GET /api/children/navigation-child/progress":
             return reply(route, { revision: 1, progress: mock.progress });
+          case "POST /api/children/navigation-child/events":
+            return reply(route, { revision: 1, progress: mock.progress });
           case "GET /api/videos":
             return reply(route, { videos: mock.videos });
-          case "GET /api/parent/videos":
-            return reply(route, { videos: mock.parentVideos });
           // Child mode closes parent controls. The mock acknowledges the lock
           // without changing the fixture so each test keeps its declared state.
           case "POST /api/parent/lock":
@@ -173,6 +171,26 @@ async function seedGuest(page: Page, progress = emptyProgress()) {
   await page.addInitScript((value) => {
     if (!localStorage.getItem("iqro.progress.v1"))
       localStorage.setItem("iqro.progress.v1", JSON.stringify(value));
+    // The child shell requires a local profile for guests.
+    if (!localStorage.getItem("iqro.local_profiles.v1")) {
+      localStorage.setItem(
+        "iqro.local_profiles.v1",
+        JSON.stringify([
+          {
+            id: "navigation-guest",
+            name: "Kitobxon",
+            avatarId: "sun",
+            createdAt: "2026-11-01T10:00:00.000Z",
+            progress: value,
+            activeReadingSeconds: 0,
+          },
+        ]),
+      );
+      localStorage.setItem(
+        "iqro.active_local_profile_id.v1",
+        "navigation-guest",
+      );
+    }
   }, progress);
 }
 
@@ -230,7 +248,7 @@ async function expectActive(
 }
 
 async function visitChildDestinations(page: Page, mobile: boolean) {
-  await expectActive(page, "Kutubxona");
+  await expectActive(page, "Bosh sahifa");
   await expect(childNav(page).getByRole("link")).toHaveCount(4);
   for (const { label, path } of destinations.slice(1)) {
     const link = childNav(page).getByRole("link", { name: label, exact: true });
@@ -239,6 +257,10 @@ async function visitChildDestinations(page: Page, mobile: boolean) {
     await link.click();
     await expect(page).toHaveURL((url) => url.pathname === path);
     await expectActive(page, label);
+    if (path === "/library")
+      await expect(
+        page.getByRole("heading", { name: "Sehrli kitoblar javoni" }),
+      ).toBeVisible();
     if (path === "/quiz")
       await expect(
         page.getByRole("heading", { name: "Qani, bir o‘ylab ko‘ramiz!" }),
@@ -247,30 +269,21 @@ async function visitChildDestinations(page: Page, mobile: boolean) {
       await expect(
         page.getByRole("heading", { name: "Har bir sahifa — yangi yulduz" }),
       ).toBeVisible();
-    if (path === "/account")
-      await expect(
-        page.getByRole("heading", { name: "Akkauntga kirish", exact: true }),
-      ).toBeVisible();
     await expectNoOverflow(page);
   }
-  await page
-    .getByRole("button", { name: "Ro‘yxatdan o‘tish", exact: true })
-    .click();
-  await expect(page).toHaveURL((url) => url.pathname === "/account/register");
-  await expectActive(page, "Akkaunt", "location");
   await childNav(page)
     .getByRole("link", { name: "Savol-javob", exact: true })
     .click();
   await page.getByRole("link", { name: "Boshlash", exact: true }).click();
   await expect(page).toHaveURL((url) => url.pathname === "/quiz/general");
   await expect(
-    page.getByRole("group", { name: "Javobni tanlang" }),
+    page.getByRole("group", { name: "Javobni tanla" }),
   ).toBeVisible();
   await expectActive(page, "Savol-javob", "location");
   await childNav(page)
     .getByRole("link", { name: "Kutubxona", exact: true })
     .click();
-  await expect(page).toHaveURL((url) => url.pathname === "/" && !url.search);
+  await expect(page).toHaveURL((url) => url.pathname === "/library");
   await expectActive(page, "Kutubxona");
   await storyCards(page).filter({ hasText: "Oyga maktub" }).click();
   await expect(page).toHaveURL((url) => url.pathname === "/story/oy-dosti");
@@ -343,7 +356,7 @@ for (const viewport of [
         .getByRole("link", { name: "IdrokReads", exact: true })
         .focus();
       const lastAction = sidebar.getByRole("button", {
-        name: /Mehmon kitobxon/,
+        name: /Kitobxon/,
       });
       const initiallyClipped =
         (await lastAction.boundingBox())!.y +
@@ -356,6 +369,10 @@ for (const viewport of [
         ).toBeGreaterThan(viewport.height);
       }
       const themeAction = sidebar.getByRole("button", { name: /^Muhit:/ });
+      const profileAction = sidebar.getByRole("link", {
+        name: "Mening profilim",
+        exact: true,
+      });
       const parentAction = sidebar.getByRole("link", {
         name: "Ota-onalar paneli",
         exact: true,
@@ -365,6 +382,7 @@ for (const viewport of [
           nav.getByRole("link", { name: label, exact: true }),
         ),
         themeAction,
+        profileAction,
         parentAction,
         lastAction,
       ];
@@ -389,15 +407,20 @@ for (const viewport of [
           await sidebar.evaluate((element) => element.scrollTop),
         ).toBeGreaterThan(0);
       await page.keyboard.press("Enter");
+      const switcher = page.getByRole("dialog", { name: "Kim o‘qiydi?" });
+      await expect(switcher).toBeVisible();
       await expect(
-        page.getByRole("dialog", { name: "Xush kelibsiz" }),
-      ).toBeVisible();
+        switcher.getByRole("link", {
+          name: "O‘z profilimni tahrirlash",
+          exact: true,
+        }),
+      ).toHaveAttribute("href", "/profile");
       await page.keyboard.press("Escape");
       await expect(lastAction).toBeFocused();
       await parentAction.press("Enter");
-      await expect(page).toHaveURL((url) => url.pathname === "/parent/login");
+      await expect(page).toHaveURL((url) => url.pathname === "/parent");
       await expect(
-        page.getByRole("heading", { name: "Akkauntga kirish", exact: true }),
+        page.getByRole("dialog", { name: "Ota-onalar paneli" }),
       ).toBeVisible();
       await expectNoOverflow(page);
     });
@@ -440,14 +463,26 @@ for (const viewport of [
       await expectNoOverflow(page);
       await page.keyboard.press("Escape");
       await page
-        .getByRole("button", { name: "Profil menyusi", exact: true })
+        .getByRole("button", { name: "Profil", exact: true })
         .click();
-      const profile = page.getByRole("dialog", { name: "Xush kelibsiz" });
+      const profile = page.getByRole("dialog", { name: "Kim o‘qiydi?" });
       await expect(profile).toBeVisible();
       await profile
+        .getByRole("link", { name: "O‘z profilimni tahrirlash", exact: true })
+        .click();
+      await expect(page).toHaveURL((url) => url.pathname === "/profile");
+      await expect(
+        page.getByRole("heading", { name: "Mening profilim", exact: true }),
+      ).toBeVisible();
+      await expectNoOverflow(page);
+      await page
+        .locator("header")
         .getByRole("link", { name: "Ota-onalar paneli", exact: true })
         .click();
-      await expect(page).toHaveURL((url) => url.pathname === "/parent/login");
+      await expect(page).toHaveURL((url) => url.pathname === "/parent");
+      await expect(
+        page.getByRole("dialog", { name: "Ota-onalar paneli" }),
+      ).toBeVisible();
       await expectNoOverflow(page);
     });
   }
@@ -463,45 +498,39 @@ for (const width of [375, 1440]) {
     await page.goto("/parent");
     const nav = page.getByRole("navigation", { name: "Ota-onalar menyusi" });
     await expect(
-      page.getByRole("heading", {
-        name: "Har bir farzand — o‘z yo‘lida.",
-      }),
+      page.getByRole("heading", { name: "Farzandlarim", exact: true }),
     ).toBeVisible();
     await expect(nav.locator("a[aria-current]")).toHaveCount(1);
     await expect(
-      nav.getByRole("link", { name: "Natijalar", exact: true }),
+      nav.getByRole("link", { name: "Umumiy", exact: true }),
     ).toHaveAttribute("aria-current", "page");
     await expectAccessible(page);
-    await nav.getByRole("link", { name: "Videolar", exact: true }).click();
-    await expect(page).toHaveURL((url) => url.pathname === "/parent/videos");
+    await nav.getByRole("link", { name: "Farzandlar", exact: true }).click();
+    await expect(page).toHaveURL((url) => url.pathname === "/parent/children");
     await expect(
-      page.getByRole("heading", { name: "Har bir hikoyaning videosi." }),
+      page.getByRole("heading", { name: "Farzandlar", exact: true }),
     ).toBeVisible();
     await expect(nav.locator("a[aria-current]")).toHaveCount(1);
     await expect(
-      nav.getByRole("link", { name: "Videolar", exact: true }),
+      nav.getByRole("link", { name: "Farzandlar", exact: true }),
     ).toHaveAttribute("aria-current", "page");
     await expect(
-      nav.getByRole("link", { name: "Natijalar", exact: true }),
+      nav.getByRole("link", { name: "Umumiy", exact: true }),
     ).not.toHaveAttribute("aria-current");
     await expectNoOverflow(page);
     await expectAccessible(page);
-    await nav.getByRole("link", { name: "Akkaunt", exact: true }).click();
-    await expect(page).toHaveURL((url) => url.pathname === "/account");
-    await expect(
-      page.getByRole("heading", { name: "Oilamizning kutubxonasi" }),
-    ).toBeVisible();
-    await expectActive(page, "Akkaunt");
-    await page
-      .getByRole("link", { name: "Natijalar paneli", exact: true })
+    await nav
+      .getByRole("link", { name: "Sozlamalar", exact: true })
       .click();
-    await expect(page).toHaveURL((url) => url.pathname === "/parent");
+    await expect(page).toHaveURL((url) => url.pathname === "/parent/settings");
     await expect(
-      nav.getByRole("link", { name: "Natijalar", exact: true }),
-    ).toHaveAttribute("aria-current", "page");
-    await nav.getByRole("link", { name: "Kutubxona", exact: true }).click();
+      page.getByRole("heading", { name: "Hisob va xavfsizlik", exact: true }),
+    ).toBeVisible();
+    await nav
+      .getByRole("link", { name: "Kutubxonaga qaytish", exact: true })
+      .click();
     await expect(page).toHaveURL((url) => url.pathname === "/");
-    await expectActive(page, "Kutubxona");
+    await expectActive(page, "Bosh sahifa");
     await expectNoOverflow(page);
   });
 }
@@ -510,25 +539,25 @@ test("library search and reading filters persist in the URL through browser back
   page,
 }) => {
   await seedGuest(page, readingFixture());
-  await page.goto("/");
+  await page.goto("/library");
   await expect(storyCards(page)).toHaveCount(3);
   const moon = storyCards(page).filter({ hasText: "Oyga maktub" });
   await expect(moon).toContainText("99%");
-  await expect(moon).not.toContainText("Tugatilgan");
+  await expect(moon).not.toContainText("O‘qib bo‘lindi");
   await expect(moon.getByRole("progressbar")).toHaveAttribute(
     "aria-valuenow",
     "99",
   );
   const filters = page.getByRole("group", { name: "O‘qish holati" });
   await filters
-    .getByRole("button", { name: "Boshlangan", exact: true })
+    .getByRole("button", { name: "O‘qilayotganlar", exact: true })
     .click();
   await expect(storyCards(page)).toHaveCount(1);
   await expect(
-    filters.getByRole("button", { name: "Boshlangan" }),
+    filters.getByRole("button", { name: "O‘qilayotganlar" }),
   ).toHaveAttribute("aria-pressed", "true");
   await page
-    .getByRole("searchbox", { name: "Hikoya qidirish" })
+    .getByRole("searchbox", { name: "Ertak qidirish" })
     .fill("DO'STLIK");
   await expect(page).toHaveURL(
     (url) =>
@@ -536,17 +565,17 @@ test("library search and reading filters persist in the URL through browser back
       url.searchParams.get("status") === "reading",
   );
   await expect(storyCards(page)).toHaveCount(1);
-  await expect(page.getByRole("status")).toHaveText("1 ta hikoya topildi");
+  await expect(page.getByText("3 ta ertak", { exact: true })).toBeVisible();
   const filteredUrl = page.url();
   await moon.click();
   await expectActive(page, "Kutubxona", "location");
   await page.goBack();
   await expect(page).toHaveURL(filteredUrl);
   await expect(
-    page.getByRole("searchbox", { name: "Hikoya qidirish" }),
+    page.getByRole("searchbox", { name: "Ertak qidirish" }),
   ).toHaveValue("DO'STLIK");
   await expect(
-    filters.getByRole("button", { name: "Boshlangan" }),
+    filters.getByRole("button", { name: "O‘qilayotganlar" }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(storyCards(page)).toHaveCount(1);
   await page.goForward();
@@ -555,12 +584,12 @@ test("library search and reading filters persist in the URL through browser back
   await page.reload();
   await expect(page).toHaveURL(filteredUrl);
   await expect(
-    page.getByRole("searchbox", { name: "Hikoya qidirish" }),
+    page.getByRole("searchbox", { name: "Ertak qidirish" }),
   ).toHaveValue("DO'STLIK");
   await expect(storyCards(page)).toHaveCount(1);
   await page.getByRole("button", { name: "Qidiruvni tozalash" }).click();
   await filters
-    .getByRole("button", { name: "Tugatilgan", exact: true })
+    .getByRole("button", { name: "Tugatilganlar", exact: true })
     .click();
   await expect(page).toHaveURL(
     (url) =>
@@ -569,32 +598,27 @@ test("library search and reading filters persist in the URL through browser back
   );
   await expect(storyCards(page)).toHaveCount(1);
   await expect(storyCards(page)).toContainText("Bulutlar kemasi");
-  await expect(storyCards(page)).toContainText("Tugatilgan");
+  await expect(storyCards(page)).toContainText("O‘qib bo‘lindi");
   await expect(storyCards(page).getByRole("progressbar")).toHaveAttribute(
     "aria-valuenow",
     "100",
   );
-  await filters.getByRole("button", { name: "Barchasi", exact: true }).click();
+  await filters
+    .getByRole("button", { name: "Barcha kitoblar", exact: true })
+    .click();
   await expect(page).toHaveURL((url) => !url.search);
   await expect(storyCards(page)).toHaveCount(3);
 });
 
-for (const { status, label, message } of [
-  {
-    status: "reading",
-    label: "Boshlangan",
-    message: "Hali boshlagan hikoyang yo‘q. Kutubxonadan birini tanla.",
-  },
-  {
-    status: "completed",
-    label: "Tugatilgan",
-    message: "Hikoyani o‘qib tugatganingdan keyin shu yerda ko‘rinadi.",
-  },
+for (const { status, label } of [
+  { status: "reading", label: "O‘qilayotganlar" },
+  { status: "completed", label: "Tugatilganlar" },
 ]) {
   test(`library ${status} empty state is honest and its recovery resets filters`, async ({
     page,
   }) => {
-    await page.goto(`/?status=${status}`);
+    await seedGuest(page);
+    await page.goto(`/library?status=${status}`);
     await expect(
       page
         .getByRole("group", { name: "O‘qish holati" })
@@ -602,17 +626,22 @@ for (const { status, label, message } of [
     ).toHaveAttribute("aria-pressed", "true");
     await expect(storyCards(page)).toHaveCount(0);
     await expect(
-      page.getByRole("heading", { name: "Hikoya topilmadi" }),
+      page.getByRole("heading", { name: "Ertak topilmadi" }),
     ).toBeVisible();
-    await expect(page.getByRole("status")).toHaveText("0 ta hikoya topildi");
-    await expect(page.getByText(message, { exact: true })).toBeVisible();
+    await expect(page.getByText("3 ta ertak", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText(
+        "Bu bo‘limda hozircha kitob yo‘q. Barcha ertaklarni ochishing mumkin.",
+        { exact: true },
+      ),
+    ).toBeVisible();
     await page
-      .getByRole("button", { name: "Barcha hikoyalar", exact: true })
+      .getByRole("button", { name: "Barcha ertaklarni ko‘rish", exact: true })
       .click();
     await expect(page).toHaveURL((url) => !url.search);
     await expect(storyCards(page)).toHaveCount(3);
     await expect(
-      page.getByRole("heading", { name: "Hikoya topilmadi" }),
+      page.getByRole("heading", { name: "Ertak topilmadi" }),
     ).toHaveCount(0);
   });
 }
@@ -621,13 +650,14 @@ test("library unmatched search announces zero results; clearing preserves status
   page,
 }) => {
   await seedGuest(page, readingFixture());
-  await page.goto("/?status=reading&q=topilmaydigan-hikoya");
+  await page.goto("/library?status=reading&q=topilmaydigan-hikoya");
   await expect(storyCards(page)).toHaveCount(0);
-  await expect(page.getByRole("status")).toHaveText("0 ta hikoya topildi");
+  await expect(page.getByText("3 ta ertak", { exact: true })).toBeVisible();
   await expect(
-    page.getByText("Boshqa nom bilan qidir yoki barcha hikoyalarni ko‘r.", {
-      exact: true,
-    }),
+    page.getByText(
+      "«topilmaydigan-hikoya» bo‘yicha hech qanday ertak chiqmadi. Boshqa so‘z bilan qidirib ko‘r!",
+      { exact: true },
+    ),
   ).toBeVisible();
   await page.getByRole("button", { name: "Qidiruvni tozalash" }).click();
   await expect(page).toHaveURL(
@@ -637,20 +667,20 @@ test("library unmatched search announces zero results; clearing preserves status
   );
   await expect(storyCards(page)).toHaveCount(1);
   await page
-    .getByRole("searchbox", { name: "Hikoya qidirish" })
+    .getByRole("searchbox", { name: "Ertak qidirish" })
     .fill("hech-narsa");
   await expect(storyCards(page)).toHaveCount(0);
   await page
-    .getByRole("button", { name: "Barcha hikoyalar", exact: true })
+    .getByRole("button", { name: "Barcha ertaklarni ko‘rish", exact: true })
     .click();
   await expect(page).toHaveURL((url) => !url.search);
   await expect(
-    page.getByRole("searchbox", { name: "Hikoya qidirish" }),
+    page.getByRole("searchbox", { name: "Ertak qidirish" }),
   ).toHaveValue("");
   await expect(
     page
       .getByRole("group", { name: "O‘qish holati" })
-      .getByRole("button", { name: "Barchasi" }),
+      .getByRole("button", { name: "Barcha kitoblar" }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(storyCards(page)).toHaveCount(3);
 });
@@ -661,7 +691,7 @@ for (const failure of ["network", "http", "invalid-json"] as const) {
     mockApi,
   }) => {
     mockApi.session = familySession();
-    await seedGuest(page, readingFixture("holo"));
+    await seedGuest(page, readingFixture("cyber"));
     let failed = true;
     mockApi.handlers.set("GET /api/session", async (route) => {
       if (!failed) return reply(route, mockApi.session);
@@ -722,7 +752,7 @@ async function finishSeededReader(page: Page) {
   ).toHaveAttribute("aria-valuenow", "8");
   await page.getByRole("button", { name: "Yakunlash", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Barakalla!", exact: true }),
+    page.getByRole("heading", { name: /^Barakalla/ }),
   ).toBeVisible();
 }
 
@@ -732,9 +762,6 @@ async function expectNoVideo(page: Page) {
     page.getByRole("button", { name: "Videoni ko‘rish", exact: true }),
   ).toHaveCount(0);
   await expect(page.locator("main img")).toHaveCount(0);
-  await expect(
-    page.getByRole("link", { name: "YouTube’da ochish" }),
-  ).toHaveCount(0);
   await expect(
     page.getByText(/Namuna video|Big Buck Bunny|Sintel|Elephants Dream/i),
   ).toHaveCount(0);
@@ -754,24 +781,26 @@ test("reader completion shows the library video without an override and loads no
     }),
   ).toBeVisible();
   await expect(
-    page.getByText("Kitob uchun video", { exact: true }),
+    page.getByText("Hikoya videosi", { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Videoni ko‘rish", exact: true }),
   ).toBeVisible();
   await expect(page.locator("iframe, video")).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: "YouTube’da ochish" }),
-  ).toHaveAttribute("href", "https://www.youtube.com/watch?v=yXe0yxzYkjo");
+    page.getByText("SciShow Kids · inglizcha", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("Ota-ona tanlovi", { exact: true })).toHaveCount(
     0,
   );
   expect(callsTo(mockApi, "GET /api/videos").length).toBeGreaterThan(0);
   await expectNoOverflow(page);
-  await page.getByRole("link", { name: "Savol-javob", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Savol-javobni yechish", exact: true })
+    .click();
   await expect(page).toHaveURL((url) => url.pathname === "/quiz/oy-dosti");
   await expect(
-    page.getByRole("group", { name: "Javobni tanlang" }),
+    page.getByRole("group", { name: "Javobni tanla" }),
   ).toBeVisible();
 });
 
@@ -805,7 +834,7 @@ for (const { storyId, title, videoId, poster } of [
       page.getByRole("heading", { name: title, exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Kitob uchun video", { exact: true }),
+      page.getByText("Hikoya videosi", { exact: true }),
     ).toBeVisible();
     const play = page.getByRole("button", {
       name: "Videoni ko‘rish",
@@ -813,9 +842,6 @@ for (const { storyId, title, videoId, poster } of [
     });
     await expect(play.locator("img")).toHaveAttribute("src", poster);
     await expect(page.locator("iframe")).toHaveCount(0);
-    await expect(
-      page.getByRole("link", { name: "YouTube’da ochish" }),
-    ).toHaveAttribute("href", `https://www.youtube.com/watch?v=${videoId}`);
     // Check our embed contract without depending on third-party playback.
     await page.route("https://www.youtube-nocookie.com/embed/**", (route) =>
       route.fulfill({
@@ -828,7 +854,7 @@ for (const { storyId, title, videoId, poster } of [
     await expect(page.locator("iframe")).toHaveAttribute("title", title);
     await expect(page.locator("iframe")).toHaveAttribute(
       "src",
-      `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&playsinline=1&autoplay=1`,
+      `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1`,
     );
   });
 }
@@ -875,209 +901,7 @@ test("reader video request failure stays explicit at completion and retry uses o
     page.getByRole("button", { name: "Videoni ko‘rish", exact: true }),
   ).toBeVisible();
   await expect(page.locator("iframe")).toHaveCount(0);
-  await expect(
-    page.getByRole("link", { name: "YouTube’da ochish" }),
-  ).toHaveAttribute("href", "https://www.youtube.com/watch?v=A1b2C3d4E5F");
   await expect(page.getByText("Namuna video", { exact: true })).toHaveCount(0);
-});
-
-function configureParentVideos(mock: MockApi) {
-  mock.session = familySession();
-  mock.parentVideos = {
-    "oy-dosti": {
-      url: "https://youtu.be/A1b2C3d4E5F",
-      title: "Saqlangan oilaviy video",
-      updatedAt: startedAt,
-    },
-  };
-}
-
-async function clickWithConfirmation(
-  page: Page,
-  action: Locator,
-  accept: boolean,
-  message: RegExp,
-) {
-  const dialogPromise = page.waitForEvent("dialog");
-  const clickPromise = action.click();
-  const dialog = await dialogPromise;
-  expect(dialog.type()).toBe("confirm");
-  expect(dialog.message()).toMatch(message);
-  if (accept) await dialog.accept();
-  else await dialog.dismiss();
-  await clickPromise;
-}
-
-test("parent video drafts never change published links; save and confirmed refresh use mocked server state", async ({
-  page,
-  mockApi,
-}) => {
-  configureParentVideos(mockApi);
-  mockApi.handlers.set("POST /api/parent/videos", async (route) => {
-    const body = route.request().postDataJSON() as {
-      storyId: string;
-      url: string;
-      title: string;
-    };
-    const video = { ...body, updatedAt: completedAt };
-    mockApi.parentVideos[body.storyId] = video;
-    return reply(route, { video });
-  });
-  await page.goto("/parent/videos");
-  const card = page.getByRole("article", { name: "Oyga maktub", exact: true });
-  const url = card.getByRole("textbox", {
-    name: "YouTube havolasi",
-    exact: true,
-  });
-  const title = card.getByRole("textbox", { name: "Video nomi", exact: true });
-  const published = card.getByRole("link", { name: "Saqlangan oilaviy video" });
-  await expect(published).toHaveAttribute(
-    "href",
-    "https://www.youtube.com/watch?v=A1b2C3d4E5F",
-  );
-  await url.fill("https://youtu.be/F6g7H8i9J0K");
-  await title.fill("Yangi oilaviy video");
-  await expect(card.getByRole("status")).toHaveText("Saqlanmagan o‘zgarishlar");
-  await expect(published).toHaveAttribute(
-    "href",
-    "https://www.youtube.com/watch?v=A1b2C3d4E5F",
-  );
-  await expect(
-    card.getByRole("link", { name: "Tanlangan videoni tekshirish" }),
-  ).toHaveAttribute("href", "https://www.youtube.com/watch?v=F6g7H8i9J0K");
-  expect(callsTo(mockApi, "POST /api/parent/videos")).toHaveLength(0);
-  await card.getByRole("button", { name: "Saqlash", exact: true }).click();
-  await expect(card.getByRole("status")).toHaveText(
-    "Saqlandi. Kitob oxirida shu video chiqadi.",
-  );
-  await expect(
-    card.getByRole("link", { name: "Yangi oilaviy video" }),
-  ).toHaveAttribute("href", "https://www.youtube.com/watch?v=F6g7H8i9J0K");
-  expect(callsTo(mockApi, "POST /api/parent/videos")).toEqual([
-    {
-      key: "POST /api/parent/videos",
-      body: {
-        storyId: "oy-dosti",
-        url: "https://youtu.be/F6g7H8i9J0K",
-        title: "Yangi oilaviy video",
-      },
-    },
-  ]);
-
-  await url.fill("https://example.invalid/not-youtube");
-  await title.fill("Saqlanmagan nom");
-  await card.getByRole("button", { name: "Saqlash", exact: true }).click();
-  await expect(card.getByRole("alert")).toContainText(
-    "bu YouTube videosi emas",
-  );
-  const before = callsTo(mockApi, "GET /api/parent/videos").length;
-  const refresh = page.getByRole("button", { name: "Yangilash", exact: true });
-  await clickWithConfirmation(
-    page,
-    refresh,
-    false,
-    /Saqlanmagan video o‘zgarishlari/,
-  );
-  await expect(url).toHaveValue("https://example.invalid/not-youtube");
-  await expect(card.getByRole("alert")).toBeVisible();
-  expect(callsTo(mockApi, "GET /api/parent/videos")).toHaveLength(before);
-  await clickWithConfirmation(page, refresh, true, /bekor qilib yangilaysizmi/);
-  await expect
-    .poll(() => callsTo(mockApi, "GET /api/parent/videos").length)
-    .toBeGreaterThan(before);
-  await expect(url).toHaveValue("https://youtu.be/F6g7H8i9J0K");
-  await expect(title).toHaveValue("Yangi oilaviy video");
-  await expect(card.getByRole("alert")).toHaveCount(0);
-  await expect(card.getByRole("status")).toHaveCount(0);
-  await expect(card.locator("form")).toHaveAttribute(
-    "data-video-dirty",
-    "false",
-  );
-});
-
-test("in-app navigation away from an unsaved parent video draft asks first", async ({
-  page,
-  mockApi,
-}) => {
-  configureParentVideos(mockApi);
-  await page.goto("/parent/videos");
-  const card = page.getByRole("article", { name: "Oyga maktub", exact: true });
-  const url = card.getByRole("textbox", {
-    name: "YouTube havolasi",
-    exact: true,
-  });
-  const back = page.getByRole("link", {
-    name: "Natijalarga qaytish",
-    exact: true,
-  });
-  await back.click();
-  await expect(page).toHaveURL(/\/parent$/);
-  await page.goBack();
-  await expect(page).toHaveURL(/\/parent\/videos$/);
-  await url.fill("https://youtu.be/F6g7H8i9J0K");
-  await clickWithConfirmation(page, back, false, /Sahifadan chiqib/);
-  await expect(page).toHaveURL(/\/parent\/videos$/);
-  await expect(url).toHaveValue("https://youtu.be/F6g7H8i9J0K");
-  await clickWithConfirmation(page, back, true, /Sahifadan chiqib/);
-  await expect(page).toHaveURL(/\/parent$/);
-  expect(callsTo(mockApi, "POST /api/parent/videos")).toHaveLength(0);
-});
-
-test("parent video removal requires confirmation and restores the library video instead of a demo", async ({
-  page,
-  mockApi,
-}) => {
-  configureParentVideos(mockApi);
-  mockApi.handlers.set("POST /api/parent/videos/remove", async (route) => {
-    const { storyId } = route.request().postDataJSON() as { storyId: string };
-    delete mockApi.parentVideos[storyId];
-    return reply(route, { ok: true });
-  });
-  await page.goto("/parent/videos");
-  const card = page.getByRole("article", { name: "Oyga maktub", exact: true });
-  const remove = card.getByRole("button", {
-    name: "Videoni olib tashlash",
-    exact: true,
-  });
-  await expect(remove).toBeEnabled();
-  await clickWithConfirmation(
-    page,
-    remove,
-    false,
-    /«Oyga maktub».*olib tashlansinmi/,
-  );
-  expect(callsTo(mockApi, "POST /api/parent/videos/remove")).toHaveLength(0);
-  await expect(
-    card.getByRole("link", { name: "Saqlangan oilaviy video" }),
-  ).toBeVisible();
-  await clickWithConfirmation(
-    page,
-    remove,
-    true,
-    /«Oyga maktub».*olib tashlansinmi/,
-  );
-  await expect(card.getByRole("status")).toHaveText(
-    "Kitobning asosiy videosi qaytarildi.",
-  );
-  expect(callsTo(mockApi, "POST /api/parent/videos/remove")).toEqual([
-    { key: "POST /api/parent/videos/remove", body: { storyId: "oy-dosti" } },
-  ]);
-  await expect(
-    card.getByRole("textbox", { name: "YouTube havolasi", exact: true }),
-  ).toHaveValue("https://www.youtube.com/watch?v=yXe0yxzYkjo");
-  await expect(
-    card.getByRole("link", {
-      name: "Oy nega shaklini o‘zgartiradi? (inglizcha)",
-    }),
-  ).toHaveAttribute("href", "https://www.youtube.com/watch?v=yXe0yxzYkjo");
-  await expect(remove).toBeDisabled();
-  await page.reload();
-  await expect(card.getByText("Asl video", { exact: true })).toBeVisible();
-  await expect(
-    card.getByRole("link", {
-      name: "Oy nega shaklini o‘zgartiradi? (inglizcha)",
-    }),
-  ).toBeVisible();
 });
 
 const securityPanel = (page: Page) =>
@@ -1193,11 +1017,10 @@ for (const source of ["status", "parent-locked-error"] as const) {
       .getByRole("link", { name: "Ota-onalar bo‘limini ochish", exact: true })
       .click();
     await expect(page).toHaveURL((url) => url.pathname === "/parent");
+    const gate = page.getByRole("dialog", { name: "Ota-onalar paneli" });
+    await expect(gate).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Bu bo‘lim faqat ota-onalar uchun" }),
-    ).toBeVisible();
-    await expect(
-      page.getByLabel("6 xonali ota-ona kodi", { exact: true }),
+      gate.getByRole("status", { name: "PIN kodi" }),
     ).toBeVisible();
     expect(callsTo(mockApi, "POST /api/parent/pin")).toHaveLength(0);
     expect(callsTo(mockApi, "POST /api/parent/unlock")).toHaveLength(0);
@@ -1347,11 +1170,11 @@ for (const method of ["pin", "password"] as const) {
   });
 }
 
-for (const theme of ["classic", "holo"] as const) {
+for (const theme of ["classic", "cyber"] as const) {
   for (const { path, heading, finish } of [
     {
       path: "/",
-      heading: "Bugun qaysi olamga sayohat qilamiz?",
+      heading: "Salom, Kitobxon!",
       finish: false,
     },
     { path: "/story/oy-dosti", heading: "Oyga maktub", finish: false },
@@ -1380,7 +1203,7 @@ for (const theme of ["classic", "holo"] as const) {
       page,
     }) => {
       await page.setViewportSize({
-        width: theme === "holo" ? 375 : 1440,
+        width: theme === "cyber" ? 375 : 1440,
         height: 900,
       });
       await seedGuest(page, readingFixture(theme));

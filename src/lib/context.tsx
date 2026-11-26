@@ -14,6 +14,7 @@ import {
   recordQuiz,
 } from "./progress";
 import type { ProfileProgress } from "../content/types";
+import { isDarkTheme } from "../content/themes";
 import {
   api,
   ApiError,
@@ -401,10 +402,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = state.progress.theme;
-    document.documentElement.style.colorScheme =
-      state.progress.theme === "magic" || state.progress.theme === "cyber"
-        ? "dark"
-        : "light";
+    document.documentElement.style.colorScheme = isDarkTheme(state.progress.theme)
+      ? "dark"
+      : "light";
   }, [state.progress.theme]);
 
   useEffect(() => {

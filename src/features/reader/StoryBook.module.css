@@ -542,6 +542,12 @@
 .mobilePage .prose {
   margin-bottom: 32px;
   padding: 6px 23px 12px;
+  scrollbar-width: none;
+}
+
+.mobilePage .prose::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .mobilePage .narration {
@@ -588,23 +594,47 @@
 
 :global(:root[data-theme="magic"]) .shell {
   --cover-radius: 30px;
-  --cover-inset: clamp(10px, 1.6vw, 20px);
-  --cover-border: 2px;
+  --cover-inset: min(
+    clamp(12px, 1.8vw, 22px),
+    calc(var(--cover-radius) - var(--cover-border) - 8px)
+  );
+  --cover-border: 4px;
   border: var(--cover-border) solid #ffd56a;
   background:
-    radial-gradient(circle at 18% 20%, #ffd56a55, transparent 18%),
-    radial-gradient(circle at 80% 78%, #ff8bd244, transparent 22%),
+    radial-gradient(circle at 18% 20%, #ffd56a66, transparent 20%),
+    radial-gradient(circle at 80% 78%, #ff8bd244, transparent 24%),
+    radial-gradient(circle at 62% 26%, #ffe7a8cc 0 1.4px, transparent 2.4px) 0 0 /
+      52px 52px,
+    radial-gradient(circle at 30% 72%, #ffffff8c 0 1.1px, transparent 2px) 0 0 /
+      74px 74px,
     radial-gradient(circle at 50% 0%, #c084fc, #4c1d95 62%);
   box-shadow:
     0 34px 64px -24px #12081f,
-    0 0 28px #c084fc66,
+    0 0 30px #c084fc55,
+    inset 0 0 26px #1b0b33aa,
     inset 0 2px 0 #ffe7a8;
 }
 
 :global(:root[data-theme="magic"]) .shell::before {
-  inset: 5px;
-  border: 1px solid #d2b76c70;
-  border-radius: calc(var(--cover-radius) - 5px);
+  inset: 7px;
+  border: 2px solid #d2b76c88;
+  border-radius: calc(var(--cover-radius) - 7px);
+  box-shadow: inset 0 0 0 4px #2a145855;
+}
+
+:global(:root[data-theme="magic"]) .shell::after {
+  right: 16px;
+  bottom: -7px;
+  left: 16px;
+  height: 17px;
+  border: 1px solid #c9a24e;
+  border-radius: 0 0 var(--page-radius) var(--page-radius);
+  background: repeating-linear-gradient(
+    180deg,
+    #f4e6c4 0 1px,
+    #dcc79b 1px 3px
+  );
+  box-shadow: 0 7px 14px #12081f66;
 }
 
 :global(:root[data-theme="magic"]) .faceContent {
@@ -626,95 +656,99 @@
 }
 
 :global(:root[data-theme="pirate"]) .wrap {
-  --paper: #f0f9ff;
-  --paper-deep: #dceef9;
-  --book-ink: #243e50;
-  --book-muted: #537184;
-  --book-line: #b8d7e9;
-  --book-accent: #286583;
-  --book-detail: #537184;
-  --page-growth: url("/art/iqro-frost-v1.svg");
+  --paper: #fbf1d9;
+  --paper-deep: #efdfbe;
+  --book-ink: #3b2412;
+  --book-muted: #7a5640;
+  --book-line: #e0c39a;
+  --book-accent: #a9542f;
+  --book-detail: #8a5a33;
+  --page-growth: url("/art/iqro-ropes-v1.svg");
 }
 
 :global(:root[data-theme="pirate"]) .shell {
-  --cover-radius: 30px;
-  --cover-inset: clamp(10px, 1.6vw, 20px);
-  --cover-border: 1px;
-  border: var(--cover-border) solid #e9fbff;
+  --cover-radius: 26px;
+  --cover-inset: min(
+    clamp(10px, 1.6vw, 20px),
+    calc(var(--cover-radius) - var(--cover-border) - 8px)
+  );
+  --cover-border: 3px;
+  border: var(--cover-border) solid #e2a322;
   background:
-    linear-gradient(
-      125deg,
-      #ffffffc0 0 4%,
-      transparent 4% 19%,
-      #e8fbffb0 19% 20%,
-      transparent 20% 68%,
-      #b8a6e660 68% 74%,
-      transparent 74%
+    radial-gradient(circle at 18% 12%, #ffd56a40, transparent 30%),
+    repeating-linear-gradient(
+      90deg,
+      #8a4b24 0 42px,
+      #7a4220 42px 45px,
+      #8a4b24 45px 87px
     ),
-    conic-gradient(
-      from 35deg at 70% 40%,
-      #b9e9f5,
-      #e9faff,
-      #a7cfe8,
-      #c7bcf0,
-      #e4f9ff,
-      #93cde1,
-      #b9e9f5
-    );
+    linear-gradient(135deg, #9a5a2c, #6b3a1c);
   box-shadow:
-    0 30px 64px -25px #365d8480,
-    0 0 32px #c1f1ff60,
-    inset 0 3px 2px #fff,
-    inset 0 -4px 6px #5c89b080;
+    0 34px 64px -24px #1a0b05,
+    0 0 26px #e2a32233,
+    inset 0 2px 0 #c9843a;
 }
 
 :global(:root[data-theme="pirate"]) .shell::before {
-  inset: 4px;
-  border: 1px solid #ffffffb0;
-  border-radius: calc(var(--cover-radius) - 4px);
-  box-shadow: inset 0 0 12px #fff8;
+  inset: 6px;
+  border: 2px dashed #f0c98799;
+  border-radius: calc(var(--cover-radius) - 6px);
 }
 
 :global(:root[data-theme="pirate"]) .faceContent {
   background:
-    radial-gradient(ellipse at 0% 0%, #b4dced60, transparent 40%),
-    radial-gradient(ellipse at 100% 100%, #cbc1ee38, transparent 48%),
-    linear-gradient(120deg, #fff9, transparent 60%), var(--paper);
+    radial-gradient(ellipse at 0% 0%, #ffd56a33, transparent 40%),
+    radial-gradient(ellipse at 100% 100%, #a9542f1a, transparent 48%),
+    repeating-linear-gradient(0deg, #7b5d2910 0 1px, transparent 1px 4px),
+    var(--paper);
+}
+
+:global(:root[data-theme="pirate"]) .spine {
+  background: linear-gradient(90deg, transparent, #5c3a1e40 48%, transparent);
+}
+
+:global(:root[data-theme="pirate"]) .shell::after {
+  background: repeating-linear-gradient(
+    180deg,
+    #d8b98c 0 1px,
+    #fbf1d9 1px 3px
+  );
+  box-shadow: 0 5px 8px #3b24122e;
 }
 
 :global(:root[data-theme="pirate"]) .scene {
-  --scene-glow: #86d7e3;
-  --scene-spark: #fff;
+  --scene-glow: #ffc46b;
+  --scene-spark: #fff3d0;
 }
 
 :global(:root[data-theme="pirate"]) .sceneHalo {
-  background: conic-gradient(
-    from 30deg,
-    #b2b8ee70,
-    #82e4ed70,
-    #e5faff30,
-    #b2b8ee70
-  );
-  mask: radial-gradient(ellipse, #000 30%, transparent 68%);
+  background:
+    radial-gradient(ellipse at 30% 35%, #ffd56a60, transparent 55%),
+    radial-gradient(ellipse at 70% 70%, #a9542f45, transparent 65%);
 }
 
 :global(:root[data-theme="pirate"]) .sceneLight {
   background: conic-gradient(
-    from 230deg at 45% 55%,
-    transparent 0 35deg,
-    #8ee8f530 40deg 60deg,
-    transparent 70deg 190deg,
-    #beaaf02a 210deg 250deg,
+    from 210deg at 45% 55%,
+    transparent 0 30deg,
+    #ffdfa450 38deg 58deg,
+    transparent 68deg 190deg,
+    #ffb56b3a 210deg 250deg,
     transparent 270deg
   );
 }
 
 :global(:root[data-theme="pirate"]) .motes i {
-  width: 5px;
-  height: 5px;
-  border-radius: 1px;
-  background: #fff;
-  box-shadow: 0 0 8px 2px #96cde8;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffe7a8;
+  box-shadow: 0 0 8px 2px #e2a322;
+}
+
+:global(:root[data-theme="pirate"]) .turnPrev::before,
+:global(:root[data-theme="pirate"]) .turnNext::before {
+  background: linear-gradient(135deg, transparent 47%, #e8cf9e70 49%);
 }
 
 :global(:root[data-theme="magic"]) .pageTrim::before,
@@ -746,106 +780,97 @@
   width: 34px;
 }
 
-:global(:root[data-theme="pirate"]) .spine {
-  background: linear-gradient(90deg, transparent, #4184a820 48%, transparent);
-}
-
-:global(:root[data-theme="pirate"]) .shell::after {
-  background: repeating-linear-gradient(180deg, #b9d8eb 0 1px, #eef8ff 1px 3px);
-}
-
-:global(:root[data-theme="pirate"]) .turnPrev::before,
-:global(:root[data-theme="pirate"]) .turnNext::before {
-  background: linear-gradient(135deg, transparent 47%, #c3deee 49%);
-}
-
 :global(:root[data-theme="cyber"]) .wrap {
-  --paper: #0a25347a;
-  --paper-deep: #0a1c2a;
-  --book-ink: #e4faff;
-  --book-muted: #9fcad9;
-  --book-line: #65e1ff60;
-  --book-accent: #83eaff;
-  --book-detail: #9fcad9;
+  --paper: #fbf4e4;
+  --paper-deep: #efe3c8;
+  --book-ink: #2c2350;
+  --book-muted: #6b5f8c;
+  --book-line: #d9cbae;
+  --book-accent: #6b4bc4;
+  --book-detail: #8a6fd6;
 }
 
 :global(:root[data-theme="cyber"]) .shell {
-  --cover-radius: 23px;
-  --cover-inset: 7px;
-  --cover-border: 1px;
-  border: var(--cover-border) solid #82ebff80;
-  background: linear-gradient(
-    135deg,
-    #8aefff20,
-    #10334830 30%,
-    #0a1c2a70 65%,
-    #64dfff18
+  --cover-radius: 24px;
+  --cover-inset: min(
+    clamp(8px, 1.4vw, 16px),
+    calc(var(--cover-radius) - var(--cover-border) - 8px)
   );
+  --cover-border: 3px;
+  border: var(--cover-border) solid #ffcf5c;
+  background:
+    radial-gradient(circle at 18% 10%, #ffe6a84d, transparent 34%),
+    radial-gradient(circle at 84% 90%, #f27fb23d, transparent 42%),
+    radial-gradient(circle at 62% 30%, #ffe6a8cc 0 1.4px, transparent 2.2px) 0 0 /
+      46px 46px,
+    radial-gradient(circle at 24% 70%, #ffffff99 0 1.1px, transparent 2px) 0 0 /
+      62px 62px,
+    linear-gradient(135deg, #3a2f7a, #221b52 55%, #171143);
   box-shadow:
     0 32px 65px -25px #000b,
-    0 0 30px #24cfff18,
-    inset 0 0 20px #66e4ff10;
+    0 0 32px #ffcf5c1f,
+    inset 0 0 28px #00000059,
+    inset 0 2px 0 #ffe6a8;
 }
 
 :global(:root[data-theme="cyber"]) .shell::before {
-  inset: 3px;
-  border-color: #80edff30;
-  border-radius: calc(var(--cover-radius) - 3px);
+  inset: 5px;
+  border: 1px solid #ffcf5c66;
+  border-radius: calc(var(--cover-radius) - 5px);
   box-shadow:
-    inset 0 1px 0 #a4f3ff70,
-    inset 0 -1px 0 #a4f3ff50;
+    inset 0 1px 0 #ffe6a85c,
+    inset 0 -1px 0 #ffcf5c40;
 }
 
 :global(:root[data-theme="cyber"]) .shell::after {
   z-index: 1;
-  right: 24px;
-  bottom: -4px;
-  left: 24px;
-  height: 7px;
-  border: 1px solid #70e8ff60;
+  right: 20px;
+  bottom: -5px;
+  left: 20px;
+  height: 9px;
+  border: 1px solid #c9a24e;
   border-radius: 0 0 8px 8px;
-  background: linear-gradient(180deg, #75e9ff, #153647 38%, #030d16 70%);
-  box-shadow: 0 4px 16px #5ee6ff30;
+  background: repeating-linear-gradient(
+    180deg,
+    #f4e6c4 0 1px,
+    #dcc79b 1px 3px
+  );
+  box-shadow: 0 6px 14px #0006;
   pointer-events: none;
 }
 
 :global(:root[data-theme="cyber"]) .book {
   background: transparent;
   box-shadow:
-    0 0 0 1px #7ceaff50,
-    inset 0 0 24px #54dfff0c;
+    0 0 0 1px #00000040,
+    inset 0 0 24px #00000026;
 }
 
 :global(:root[data-theme="cyber"]) .faceContent {
   background:
-    linear-gradient(
-      135deg,
-      #78eaff12,
-      transparent 28%,
-      #b4f4ff06 49%,
-      transparent 51%
-    ),
-    radial-gradient(ellipse at 50% 0%, #19708c30, transparent 65%), var(--paper);
+    radial-gradient(ellipse at 0% 0%, #ffe6a833, transparent 40%),
+    radial-gradient(ellipse at 100% 100%, #8a6fd61a, transparent 46%),
+    var(--paper);
 }
 
 :global(:root[data-theme="cyber"]) .faceContent::before {
   position: absolute;
   z-index: 1;
   inset: 10px;
-  border: 1px solid #65e1ff26;
+  border: 1px solid #d9cbae80;
   border-radius: 8px;
   background:
-    linear-gradient(#81edff80, #81edff80) left top / 26px 1px no-repeat,
-    linear-gradient(#81edff80, #81edff80) left top / 1px 26px no-repeat,
-    linear-gradient(#81edff80, #81edff80) right bottom / 26px 1px no-repeat,
-    linear-gradient(#81edff80, #81edff80) right bottom / 1px 26px no-repeat;
+    linear-gradient(#c9a24e80, #c9a24e80) left top / 26px 1px no-repeat,
+    linear-gradient(#c9a24e80, #c9a24e80) left top / 1px 26px no-repeat,
+    linear-gradient(#c9a24e80, #c9a24e80) right bottom / 26px 1px no-repeat,
+    linear-gradient(#c9a24e80, #c9a24e80) right bottom / 1px 26px no-repeat;
   content: "";
   pointer-events: none;
 }
 
 :global(:root[data-theme="cyber"]) .left,
 :global(:root[data-theme="cyber"]) .right {
-  box-shadow: inset 0 0 24px #51dfff08;
+  box-shadow: inset 0 0 22px #c9a24e14;
 }
 
 :global(:root[data-theme="cyber"]) .spine {
@@ -853,74 +878,61 @@
   background: linear-gradient(
     90deg,
     transparent,
-    #03121a80 35%,
-    #68e5ff70 49%,
-    #68e5ff70 51%,
-    #03121a80 65%,
+    #14103380 35%,
+    #ffcf5c66 49%,
+    #ffcf5c66 51%,
+    #14103380 65%,
     transparent
   );
-  box-shadow: 0 0 20px #36dfff12;
+  box-shadow: 0 0 18px #ffcf5c14;
 }
 
 :global(:root[data-theme="cyber"]) .scene {
-  --scene-glow: #54dcff;
-  --scene-spark: #b0f4ff;
+  --scene-glow: #ffcf5c;
+  --scene-spark: #fff6e3;
 }
 
 :global(:root[data-theme="cyber"]) .sceneLight {
   background: conic-gradient(
     from 210deg,
     transparent 0 30deg,
-    #65dfff20 40deg 65deg,
+    #ffcf5c26 40deg 65deg,
     transparent 80deg 360deg
   );
 }
 
 :global(:root[data-theme="cyber"]) .imprint {
-  filter: drop-shadow(0 0 5px #62e4ff80);
+  filter: drop-shadow(0 0 5px #ffcf5c66);
 }
 
 :global(:root[data-theme="cyber"]) .prose {
-  background: radial-gradient(ellipse at 50% 50%, #04162440, transparent 80%);
-}
-
-:global(:root[data-theme="cyber"]) .opening {
-  font-weight: 700;
-  line-height: 1.15;
-}
-
-:global(:root[data-theme="cyber"]) .dropCap::first-letter {
-  float: none;
-  padding: 0;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
+  background: radial-gradient(ellipse at 50% 50%, #c9a24e0f, transparent 80%);
 }
 
 :global(:root[data-theme="cyber"]) .sheetFace {
-  background: #081e2c;
+  background: #fbf4e4;
   box-shadow:
-    0 0 0 1px #87edff80,
-    0 0 24px #46dfff18;
+    0 0 0 1px #d9cbaecc,
+    0 8px 20px #00000047;
 }
 
 :global(:root[data-theme="cyber"]) .sheetFace::after {
   background: linear-gradient(
     90deg,
-    #64dfff10,
+    #c9a24e14,
     transparent 14%,
     transparent 85%,
-    #64dfff18
+    #c9a24e1c
   );
-  box-shadow: inset 0 0 0 1px #87edff40;
+  box-shadow: inset 0 0 0 1px #d9cbae99;
 }
 
 :global(:root[data-theme="cyber"]) .turnPrev::before,
 :global(:root[data-theme="cyber"]) .turnNext::before {
-  border-right: 2px solid #85ecff;
-  border-bottom: 2px solid #85ecff;
-  background: linear-gradient(135deg, transparent 47%, #62e4ff20 49%);
-  box-shadow: 2px 2px 8px #62e4ff18;
+  border-right: 2px solid #ffcf5c;
+  border-bottom: 2px solid #ffcf5c;
+  background: linear-gradient(135deg, transparent 47%, #ffcf5c1f 49%);
+  box-shadow: 2px 2px 8px #ffcf5c1f;
 }
 
 @media (max-width: 719px) {

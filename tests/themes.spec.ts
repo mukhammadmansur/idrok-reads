@@ -19,13 +19,39 @@ test.beforeEach(async ({ page }) => {
       },
     }),
   );
+  // The redesigned child world requires a local profile before the library
+  // opens. Seed a default guest so the reader and home pages render directly;
+  // per-test seeds below overwrite its progress (theme, reading position).
+  await page.addInitScript(() => {
+    if (!localStorage.getItem("iqro.local_profiles.v1")) {
+      localStorage.setItem(
+        "iqro.local_profiles.v1",
+        JSON.stringify([
+          {
+            id: "themes-guest",
+            name: "Kitobxon",
+            avatarId: "sun",
+            createdAt: "2026-11-01T10:00:00.000Z",
+            progress: {
+              version: 1,
+              reading: {},
+              quizzes: {},
+              theme: "classic",
+            },
+            activeReadingSeconds: 0,
+          },
+        ]),
+      );
+      localStorage.setItem("iqro.active_local_profile_id.v1", "themes-guest");
+    }
+  });
 });
 
 const themes = [
-  { id: "classic", name: "Klassik kitob", short: "Klassik" },
-  { id: "forest", name: "Yashil o‘rmon", short: "O‘rmon" },
-  { id: "ice", name: "Muz saroyi", short: "Muz" },
-  { id: "holo", name: "Gologramma kitob", short: "Kelajak" },
+  { id: "classic", name: "Oddiy kitob", short: "Oddiy" },
+  { id: "magic", name: "Sehrgar olami", short: "Sehr" },
+  { id: "cyber", name: "Kosmos olami", short: "Kosmos" },
+  { id: "pirate", name: "Qaroqchilar dengizi", short: "Dengiz" },
 ] as const;
 
 for (const width of [320, 390, 1440]) {
@@ -37,7 +63,7 @@ for (const width of [320, 390, 1440]) {
     for (const theme of themes) {
       await page.getByRole("button", { name: /O‘qish muhiti:|Muhit:/ }).click();
       const dialog = page.getByRole("dialog", { name: "O‘qish muhiti" });
-      await expect(dialog.locator("[data-material]")).toHaveCount(4);
+      await expect(dialog.locator("button[aria-pressed]")).toHaveCount(4);
       await dialog
         .getByRole("button", { name: new RegExp(theme.name) })
         .click();
@@ -63,7 +89,7 @@ for (const width of [320, 390, 1440]) {
     await page.goto("/parent/login");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "classic");
     await page.goto("/");
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "holo");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "pirate");
   });
 
   for (const theme of themes) {
@@ -72,17 +98,7 @@ for (const width of [320, 390, 1440]) {
     }) => {
       await page.setViewportSize({ width, height: width === 320 ? 568 : 844 });
       await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.addInitScript((id) => {
-        localStorage.setItem(
-          "iqro.progress.v1",
-          JSON.stringify({
-            version: 1,
-            reading: {},
-            quizzes: {},
-            theme: id,
-          }),
-        );
-      }, theme.id);
+      await seedTheme(page, theme.id);
       await page.goto("/read/oy-dosti");
       const progress = page.getByRole("progressbar", {
         name: /o‘qish jarayoni/,
@@ -96,13 +112,8 @@ for (const width of [320, 390, 1440]) {
           paper: getComputedStyle(element).getPropertyValue("--paper").trim(),
           ink: getComputedStyle(element).getPropertyValue("--book-ink").trim(),
         }));
-      if (theme.id === "holo") {
-        expect(material).toEqual({ paper: "#0a25347a", ink: "#e4faff" });
-        const font = await page
-          .locator('[class*="prose"] p')
-          .first()
-          .evaluate((element) => getComputedStyle(element).fontFamily);
-        expect(font).toContain("Segoe UI");
+      if (theme.id === "cyber") {
+        expect(material).toEqual({ paper: "#fbf4e4", ink: "#2c2350" });
       }
       await page.getByRole("button", { name: "Keyingi", exact: true }).click();
       await expect(progress).toHaveAttribute("aria-valuenow", "2");
@@ -121,8 +132,11 @@ for (const width of [320, 390, 1440]) {
       await dialog
         .getByRole("button", { name: "Juda katta", exact: true })
         .click();
+      // The settings sheet groups themes separately from the text sizes, and
+      // "Oddiy" appears in both groups, so scope theme picks to the grid.
+      const themeGrid = dialog.locator('[class*="themeGrid"]');
       for (const option of themes) {
-        await dialog
+        await themeGrid
           .getByRole("button", { name: option.short, exact: true })
           .click();
         await expect(page.locator("html")).toHaveAttribute(
@@ -131,7 +145,7 @@ for (const width of [320, 390, 1440]) {
         );
         await expect(progress).toHaveAttribute("aria-valuenow", "2");
       }
-      await dialog
+      await themeGrid
         .getByRole("button", { name: theme.short, exact: true })
         .click();
       await dialog.getByRole("button", { name: "Yopish", exact: true }).click();
@@ -165,7 +179,7 @@ for (const width of [320, 390, 1440]) {
         .getByRole("button", { name: "Yakunlash", exact: true })
         .click();
       await expect(
-        page.getByRole("heading", { name: "Barakalla!" }),
+        page.getByRole("heading", { name: /^Barakalla/ }),
       ).toBeVisible();
       await expect(page.locator("iframe")).toHaveCount(0);
       await page.getByRole("button", { name: /Videoni ko‘rish/ }).click();
@@ -176,21 +190,11 @@ for (const width of [320, 390, 1440]) {
     });
   }
 
-  test(`holographic glass keeps both flip faces full height and supports drag at ${width}px`, async ({
+  test(`cyber glass keeps both flip faces full height and supports drag at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: width === 320 ? 568 : 844 });
-    await page.addInitScript(() =>
-      localStorage.setItem(
-        "iqro.progress.v1",
-        JSON.stringify({
-          version: 1,
-          reading: {},
-          quizzes: {},
-          theme: "holo",
-        }),
-      ),
-    );
+    await seedTheme(page, "cyber");
     await page.goto("/read/oy-dosti");
     const progress = page.getByRole("progressbar", { name: /o‘qish jarayoni/ });
     const book = page.locator('[class*="book"][data-size]');
@@ -232,7 +236,7 @@ for (const width of [320, 390, 1440]) {
     ).toBe(true);
   });
 
-  for (const theme of ["forest", "ice"] as const) {
+  for (const theme of ["magic", "pirate"] as const) {
     test(`${theme} living scenes and all enriched pages remain readable at ${width}px`, async ({
       page,
     }) => {
@@ -240,12 +244,7 @@ for (const width of [320, 390, 1440]) {
       await page.setViewportSize({ width, height: width === 320 ? 568 : 844 });
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
-      await page.addInitScript((id) => {
-        localStorage.setItem(
-          "iqro.progress.v1",
-          JSON.stringify({ version: 1, reading: {}, quizzes: {}, theme: id }),
-        );
-      }, theme);
+      await seedTheme(page, theme);
       await page.goto("/read/oy-dosti");
       const scene = page.locator('[class*="sceneImage"]').first();
       await expect
@@ -264,7 +263,7 @@ for (const width of [320, 390, 1440]) {
           .first()
           .evaluate((element) => getComputedStyle(element).backgroundImage),
       ).toContain(
-        theme === "forest" ? "enchanted-bark-v1.webp" : "conic-gradient",
+        theme === "magic" ? "radial-gradient" : "repeating-linear-gradient",
       );
       expect(
         await page
@@ -274,7 +273,7 @@ for (const width of [320, 390, 1440]) {
             (element) => getComputedStyle(element, "::before").backgroundImage,
           ),
       ).toContain(
-        theme === "forest" ? "iqro-vines-v1.svg" : "iqro-frost-v1.svg",
+        theme === "magic" ? "iqro-stars-v1.svg" : "iqro-ropes-v1.svg",
       );
       expect(
         await scene.evaluate(
@@ -343,7 +342,10 @@ for (const width of [320, 390, 1440]) {
           .getByRole("button", { name: "Matn va muhit sozlamalari" })
           .click();
         const dialog = page.getByRole("dialog", { name: "O‘qish sozlamalari" });
-        await dialog.getByRole("button", { name: label, exact: true }).click();
+        await dialog
+          .getByRole("group", { name: "Matn o‘lchami" })
+          .getByRole("button", { name: label, exact: true })
+          .click();
         await dialog
           .getByRole("button", { name: "Yopish", exact: true })
           .click();
@@ -553,20 +555,62 @@ async function mockSpeech(
   }, options);
 }
 
+/** Seeds the guest progress store and the active local profile with a theme. */
+async function seedTheme(page: Page, theme: string) {
+  await page.addInitScript((id) => {
+    const progress = {
+      version: 1,
+      reading: {},
+      quizzes: {},
+      theme: id,
+    };
+    localStorage.setItem("iqro.progress.v1", JSON.stringify(progress));
+    const profiles = JSON.parse(
+      localStorage.getItem("iqro.local_profiles.v1") || "[]",
+    );
+    const next = profiles.length
+      ? profiles.map((profile: any) => ({ ...profile, progress }))
+      : [
+          {
+            id: "themes-guest",
+            name: "Kitobxon",
+            avatarId: "sun",
+            createdAt: "2026-11-01T10:00:00.000Z",
+            progress,
+          },
+        ];
+    localStorage.setItem("iqro.local_profiles.v1", JSON.stringify(next));
+    localStorage.setItem("iqro.active_local_profile_id.v1", next[0].id);
+  }, theme);
+}
+
 async function seedReader(page: Page, position = 0) {
   await page.addInitScript((index) => {
-    if (localStorage.getItem("iqro.progress.v1")) return;
-    localStorage.setItem(
-      "iqro.progress.v1",
-      JSON.stringify({
-        version: 1,
-        reading: {
-          "oy-dosti": { page: index, startedAt: "2026-01-01T00:00:00.000Z" },
-        },
-        quizzes: {},
-        theme: "classic",
-      }),
+    const progress = {
+      version: 1,
+      reading: {
+        "oy-dosti": { page: index, startedAt: "2026-01-01T00:00:00.000Z" },
+      },
+      quizzes: {},
+      theme: "classic",
+    };
+    localStorage.setItem("iqro.progress.v1", JSON.stringify(progress));
+    const profiles = JSON.parse(
+      localStorage.getItem("iqro.local_profiles.v1") || "[]",
     );
+    const next = profiles.length
+      ? profiles.map((profile: any) => ({ ...profile, progress }))
+      : [
+          {
+            id: "themes-guest",
+            name: "Kitobxon",
+            avatarId: "sun",
+            createdAt: "2026-11-01T10:00:00.000Z",
+            progress,
+          },
+        ];
+    localStorage.setItem("iqro.local_profiles.v1", JSON.stringify(next));
+    localStorage.setItem("iqro.active_local_profile_id.v1", next[0].id);
   }, position);
 }
 
@@ -598,7 +642,7 @@ async function finishReader(page: Page) {
     await expect(progress).toHaveAttribute("aria-valuenow", String(index));
   }
   await page.getByRole("button", { name: "Yakunlash", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Barakalla!" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Barakalla/ })).toBeVisible();
 }
 
 test.describe("reader polish regressions", () => {
@@ -642,12 +686,14 @@ test.describe("reader polish regressions", () => {
       await page.setViewportSize(layout);
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/read/oy-dosti");
+      const themeGrid = (dialog: Locator) =>
+        dialog.locator('[class*="themeGrid"]');
       for (const theme of themes) {
         await page
           .getByRole("button", { name: "Matn va muhit sozlamalari" })
           .click();
         const dialog = page.getByRole("dialog", { name: "O‘qish sozlamalari" });
-        await dialog
+        await themeGrid(dialog)
           .getByRole("button", { name: theme.short, exact: true })
           .click();
         await dialog
@@ -736,7 +782,6 @@ test.describe("reader polish regressions", () => {
       if (layout.width >= 1000) {
         for (const action of await actions.locator("a, button").all())
           await expectInsideViewport(page, action);
-        await expectInsideViewport(page, page.locator('[class*="nextStory"]'));
         const hero = (await page.locator('[class*="doneHero"]').boundingBox())!;
         const video = (await page
           .locator('[class*="doneVideo"]')
@@ -766,11 +811,11 @@ test.describe("reader polish regressions", () => {
       await expectNoHorizontalOverflow(page);
       await finishReader(page);
       await page
-        .getByRole("link", { name: "Savol-javob", exact: true })
+        .getByRole("link", { name: "Savol-javobni yechish", exact: true })
         .click();
       await expect(page).toHaveURL(/\/quiz\/oy-dosti$/);
       await expect(
-        page.getByRole("group", { name: "Javobni tanlang" }),
+        page.getByRole("group", { name: "Javobni tanla" }),
       ).toBeVisible();
       await expect(
         page.getByRole("heading", { name: "Avval sarguzashtni kashf etamiz" }),
@@ -799,6 +844,7 @@ test.describe("reader polish regressions", () => {
         .click();
       const dialog = page.getByRole("dialog", { name: "O‘qish sozlamalari" });
       await dialog
+        .locator('[class*="themeGrid"]')
         .getByRole("button", { name: theme.short, exact: true })
         .click();
       await dialog.getByRole("button", { name: "Yopish", exact: true }).click();

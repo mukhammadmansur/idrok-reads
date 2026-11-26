@@ -129,7 +129,7 @@ const dayName = (value: string) =>
   weekdays[new Date(`${value}T12:00:00Z`).getUTCDay()];
 
 export function ParentDashboard() {
-  const { selectedChildId, user } = useProgress();
+  const { user } = useProgress();
   const access = useParentAccess();
   const refreshAccess = access?.refresh;
   const [data, setData] = useState<FamilyOverview | null>(null);
@@ -168,9 +168,8 @@ export function ParentDashboard() {
   }, [load]);
 
   const child =
-    data?.children.find(
-      (entry) => entry.profile.id === (selected ?? selectedChildId),
-    ) ?? data?.children[0];
+    data?.children.find((entry) => entry.profile.id === selected) ??
+    data?.children[0];
 
   if (!data)
     return (
@@ -203,8 +202,8 @@ export function ParentDashboard() {
           Ism va belgini tanlang. Kitob o‘qish boshlangach, natijalar shu yerda
           ko‘rinadi.
         </p>
-        <Link to="/parent/account" className={buttonClass({ size: "lg" })}>
-          Profil qo‘shish
+        <Link to="/parent/children" className={buttonClass({ size: "lg" })}>
+          Farzandingizni qo‘shing
           <ArrowRight size={18} />
         </Link>
       </div>
@@ -224,28 +223,34 @@ export function ParentDashboard() {
       </header>
 
       {/* HORIZONTAL CHILD SELECTOR PILLS */}
-      <div className={styles.childSelectorBar} role="tablist" aria-label="Farzandlar ro‘yxati">
-        {data.children.map((entry) => {
-          const active = child?.profile.id === entry.profile.id;
-          return (
-            <button
-              key={entry.profile.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              className={`${styles.childPill} ${active ? styles.childPillActive : ""}`}
-              onClick={() => setSelected(entry.profile.id)}
-            >
-              <Avatar avatar={entry.profile.avatar} size={28} />
-              <span>{entry.profile.name}</span>
-            </button>
-          );
-        })}
+      <div className={styles.childSelectorBar}>
+        <div
+          className={styles.childTabs}
+          role="tablist"
+          aria-label="Farzandlar ro‘yxati"
+        >
+          {data.children.map((entry) => {
+            const active = child?.profile.id === entry.profile.id;
+            return (
+              <button
+                key={entry.profile.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`${styles.childPill} ${active ? styles.childPillActive : ""}`}
+                onClick={() => setSelected(entry.profile.id)}
+              >
+                <Avatar avatar={entry.profile.avatar} size={28} />
+                <span>{entry.profile.name}</span>
+              </button>
+            );
+          })}
+        </div>
 
         {data.children.length < 6 && (
-          <Link to="/parent/account" className={styles.addChildPill}>
+          <Link to="/parent/children" className={styles.addChildPill}>
             <Plus size={16} />
-            <span>Farzand qo‘shish</span>
+            <span>Farzandingizni qo‘shing</span>
           </Link>
         )}
       </div>

@@ -196,7 +196,7 @@ function AccountHome() {
               <span>
                 <Plus size={20} />
               </span>
-              <strong>Bola qo‘shish</strong>
+              <strong>Farzandingizni qo‘shing</strong>
             </button>
           )}
         </div>
@@ -208,13 +208,13 @@ function AccountHome() {
                 <UserRound size={20} />
               </span>
               <div>
-                <h3>Yangi bola profili</h3>
+                <h3>Farzandingizni qo‘shing</h3>
                 <p>
-                  Faqat ism va belgi. Familiya yoki tug‘ilgan sana kerak emas.
+                  Faqat ism va qahramon. Familiya yoki tug‘ilgan sana kerak emas.
                 </p>
               </div>
             </div>
-            <label htmlFor="child-name">Bolaning ismi</label>
+            <label htmlFor="child-name">Farzandingizning ismi</label>
             <input
               id="child-name"
               value={name}
@@ -222,10 +222,10 @@ function AccountHome() {
               maxLength={30}
               required
               autoComplete="off"
-              placeholder="Masalan, Azizbek"
+              placeholder="Masalan, Madina"
             />
             <fieldset className={styles.avatars}>
-              <legend>Belgi tanlang</legend>
+              <legend>Qahramonini tanlang</legend>
               {avatarChoices.map((choice) => (
                 <button
                   key={choice.id}

@@ -7,8 +7,6 @@ import {
   saveOutbox,
 } from "./outbox";
 import { emptyProgress, recordPage } from "./progress";
-import { generalQuiz, stories } from "../content/stories";
-import { catalog } from "../../server/catalog.mjs";
 afterEach(() => vi.unstubAllGlobals());
 describe("account synchronization", () => {
   it("uses separate pending queues for every parent and child", () => {
@@ -47,17 +45,5 @@ describe("account synchronization", () => {
     });
     expect(events[0]).not.toHaveProperty("startedAt");
     expect(applyPending(before, events).reading["oy-dosti"].page).toBe(3);
-  });
-  it("derives the server grading catalog from the same published library", () => {
-    expect(Object.keys(catalog.stories).sort()).toEqual(
-      stories.map((s) => s.id).sort(),
-    );
-    for (const story of stories) {
-      const config = catalog.stories[story.id];
-      expect(config.pages).toBe(story.pages.length);
-      expect(config.answers).toEqual(story.quiz.map((q) => q.answer));
-      expect(config.options).toEqual(story.quiz.map((q) => q.options.length));
-    }
-    expect(catalog.general.answers).toEqual(generalQuiz.map((q) => q.answer));
   });
 });

@@ -13,7 +13,6 @@ import {
 import { Avatar } from "../../design-system/Avatar";
 import { ThemeSheet } from "../../features/theme/ThemeSheet";
 import { ThemeGlyph } from "../../features/theme/ThemeGlyph";
-import { ProfileSwitcherModal } from "../../features/profile/ProfileSwitcherModal";
 import { themeById } from "../../content";
 import { useProgress } from "../../lib/context";
 import styles from "./ChildLayout.module.css";
@@ -41,7 +40,6 @@ export function ChildLayout() {
   } = useProgress();
 
   const [themeOpen, setThemeOpen] = useState(false);
-  const [switcherOpen, setSwitcherOpen] = useState(false);
 
   const currentSection = location.pathname.startsWith("/story/")
     ? "/library"
@@ -52,7 +50,6 @@ export function ChildLayout() {
 
   useEffect(() => {
     setThemeOpen(false);
-    setSwitcherOpen(false);
   }, [location.pathname]);
 
   // Auto-dismiss toast after 6 seconds
@@ -135,25 +132,27 @@ export function ChildLayout() {
           </span>
         </button>
 
-        <Link to="/parent" className={styles.sideAction}>
-          <ShieldCheck size={20} />
+        <Link to="/profile" className={styles.sideAction}>
+          <UserRound size={20} />
+          <span>Mening profilim</span>
+        </Link>
+
+        <Link
+          to="/parent"
+          className={`${styles.sideAction} ${styles.parentAction}`}
+        >
+          <ShieldCheck size={17} />
           <span>Ota-onalar paneli</span>
         </Link>
 
         {/* ACTIVE CHILD PILL AT VERY BOTTOM */}
-        <button
-          type="button"
-          className={styles.sideProfile}
-          onClick={() => setSwitcherOpen(true)}
-          aria-haspopup="dialog"
-          aria-expanded={switcherOpen}
-        >
+        <Link to="/profile" className={styles.sideProfile}>
           <Avatar avatar={child?.avatar ?? "sun"} size={42} />
           <span className={styles.sideProfileCopy}>
             <strong>{child?.name ?? "Kitobxon"}</strong>
             <small>Profilni almashtirish</small>
           </span>
-        </button>
+        </Link>
       </aside>
 
       <div className={styles.mainWrap}>
@@ -188,15 +187,13 @@ export function ChildLayout() {
               <ShieldCheck size={20} />
             </Link>
 
-            <button
-              type="button"
+            <Link
+              to="/profile"
               className={styles.profileButton}
-              onClick={() => setSwitcherOpen(true)}
               aria-label={`${child?.name ?? "Kitobxon"} — profilni almashtirish`}
-              aria-haspopup="dialog"
             >
               <Avatar avatar={child?.avatar ?? "sun"} size={42} />
-            </button>
+            </Link>
           </div>
         </header>
 
@@ -222,23 +219,20 @@ export function ChildLayout() {
         {/* MOBILE BOTTOM NAV - 4 ITEMS */}
         <nav className={styles.bottomNav} aria-label="Asosiy menyu">
           {navigation(24)}
-          <button
-            type="button"
+          <Link
+            to="/profile"
             className={styles.navLink}
-            onClick={() => setSwitcherOpen(true)}
-            aria-label="Profilni almashtirish"
+            aria-current={
+              location.pathname === "/profile" ? "page" : undefined
+            }
           >
             <UserRound size={24} strokeWidth={1.8} />
             <span>Profil</span>
-          </button>
+          </Link>
         </nav>
       </div>
 
       <ThemeSheet open={themeOpen} onClose={() => setThemeOpen(false)} />
-      <ProfileSwitcherModal
-        isOpen={switcherOpen}
-        onClose={() => setSwitcherOpen(false)}
-      />
     </div>
   );
 }

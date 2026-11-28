@@ -760,6 +760,16 @@
   color: #fff6e3;
 }
 
+:global(:root[data-theme="ghost"]) .theme_all.worldTileActive {
+  background: linear-gradient(135deg, #103347, #0a1626);
+  border-color: #34d399;
+  box-shadow: 0 6px 18px #000a, 0 0 16px #34d39930;
+}
+
+:global(:root[data-theme="ghost"]) .theme_all.worldTileActive .worldLabel {
+  color: #e6f1ff;
+}
+
 /* --------------------------------------------------------------------------
    6. RESPONSIVE BREAKPOINTS
    -------------------------------------------------------------------------- */

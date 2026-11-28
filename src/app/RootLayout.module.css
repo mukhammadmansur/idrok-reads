@@ -43,6 +43,9 @@
   margin-top: 6px;
 }
 
+/* Opacity only: a transform here (even a filled-in identity matrix) becomes
+   the containing block for position:fixed descendants like the child sidebar,
+   which then stretches to the full page height and scrolls with it. */
 .routeView {
   animation: routeIn 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -50,7 +53,6 @@
 @keyframes routeIn {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.995);
   }
 }
 

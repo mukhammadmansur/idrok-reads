@@ -1,4 +1,5 @@
 import { Gem, LockKeyhole, Sparkles, X } from "lucide-react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import styles from "./PremiumLockModal.module.css";
 
@@ -11,7 +12,7 @@ interface Props {
 
 export function PremiumLockModal({ open, onClose, kind, title }: Props) {
   if (!open) return null;
-  return (
+  return createPortal(
     <div
       className={styles.backdrop}
       role="dialog"
@@ -57,7 +58,8 @@ export function PremiumLockModal({ open, onClose, kind, title }: Props) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

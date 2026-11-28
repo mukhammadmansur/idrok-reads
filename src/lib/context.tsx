@@ -495,8 +495,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   );
 
   const purchase = useCallback(
-    async (plan: string) => hydrate(await api.subscribe(plan)),
-    [hydrate],
+    async (plan: string) => {
+      // Merge without hydrate(): its accountLoading flag would swap the tree
+      // to LoadingScreen and unmount the shop before its success state shows.
+      const view = await api.subscribe(plan);
+      publish({ ...live.current, ...view });
+    },
+    [publish],
   );
 
   const logout = useCallback(async () => {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   BadgeCheck,
   BookOpenCheck,
@@ -215,66 +216,70 @@ export function ParentShopTab() {
         </div>
       </section>
 
-      {confirmPlan && (
-        <div
-          className={styles.confirmBackdrop}
-          role="dialog"
-          aria-modal="true"
-          onClick={() => !busy && setConfirmPlan(null)}
-        >
+      {confirmPlan &&
+        createPortal(
           <div
-            className={styles.confirmCard}
-            onClick={(event) => event.stopPropagation()}
+            className={styles.confirmBackdrop}
+            role="dialog"
+            aria-modal="true"
+            onClick={() => !busy && setConfirmPlan(null)}
           >
-            <button
-              type="button"
-              className={styles.confirmClose}
-              onClick={() => setConfirmPlan(null)}
-              aria-label="Yopish"
+            <div
+              className={styles.confirmCard}
+              onClick={(event) => event.stopPropagation()}
             >
-              <X size={16} />
-            </button>
-            <h2>Obunani tasdiqlang</h2>
-            <p className={styles.confirmPlanName}>{confirmPlan.name}</p>
-            <p className={styles.confirmPrice}>
-              {formatPrice(confirmPlan.price)} so‘m {confirmPlan.period}
-            </p>
-            <p className={styles.planNote}>{confirmPlan.note}</p>
-            <button
-              type="button"
-              className={styles.buyBtn}
-              disabled={busy}
-              onClick={() => void confirmPurchase()}
-            >
-              {busy ? "Rasmiylashtirilmoqda…" : "Ha, sotib olaman"}
-            </button>
-          </div>
-        </div>
-      )}
+              <button
+                type="button"
+                className={styles.confirmClose}
+                onClick={() => setConfirmPlan(null)}
+                aria-label="Yopish"
+              >
+                <X size={16} />
+              </button>
+              <h2>Obunani tasdiqlang</h2>
+              <p className={styles.confirmPlanName}>{confirmPlan.name}</p>
+              <p className={styles.confirmPrice}>
+                {formatPrice(confirmPlan.price)} so‘m {confirmPlan.period}
+              </p>
+              <p className={styles.planNote}>{confirmPlan.note}</p>
+              <button
+                type="button"
+                className={styles.buyBtn}
+                disabled={busy}
+                onClick={() => void confirmPurchase()}
+              >
+                {busy ? "Rasmiylashtirilmoqda…" : "Ha, sotib olaman"}
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
 
-      {successPlan && (
-        <div className={styles.successOverlay}>
-          <div className={styles.successCard}>
-            <span className={styles.confetti} aria-hidden="true">
-              {Array.from({ length: 14 }).map((_, index) => (
-                <i key={index} style={{ "--c": index } as React.CSSProperties} />
-              ))}
-            </span>
-            <span className={styles.successCheck}>
-              <Check size={40} strokeWidth={3} />
-            </span>
-            <h2>Tabriklaymiz!</h2>
-            <p>«{successPlan}» obunasi faollashdi. Premium kitoblar va olamlar endi ochiq!</p>
-            <button
-              type="button"
-              className={styles.buyBtn}
-              onClick={() => setSuccessPlan(null)}
-            >
-              Ajoyib!
-            </button>
-          </div>
-        </div>
-      )}
+      {successPlan &&
+        createPortal(
+          <div className={styles.successOverlay}>
+            <div className={styles.successCard}>
+              <span className={styles.confetti} aria-hidden="true">
+                {Array.from({ length: 14 }).map((_, index) => (
+                  <i key={index} style={{ "--c": index } as React.CSSProperties} />
+                ))}
+              </span>
+              <span className={styles.successCheck}>
+                <Check size={40} strokeWidth={3} />
+              </span>
+              <h2>Tabriklaymiz!</h2>
+              <p>«{successPlan}» obunasi faollashdi. Premium kitoblar va olamlar endi ochiq!</p>
+              <button
+                type="button"
+                className={styles.buyBtn}
+                onClick={() => setSuccessPlan(null)}
+              >
+                Ajoyib!
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

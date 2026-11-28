@@ -503,6 +503,9 @@ function Reader({
                   className={active ? styles.themeActive : ""}
                   onClick={() => {
                     if (themeLocked) {
+                      // The sheet is a top-layer <dialog>; close it so the
+                      // portaled lock modal is not painted underneath.
+                      setSettingsOpen(false);
                       setLockOpen(true);
                       return;
                     }

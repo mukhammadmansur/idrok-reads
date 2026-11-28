@@ -63,7 +63,7 @@ for (const width of [320, 390, 1440]) {
     for (const theme of themes) {
       await page.getByRole("button", { name: /O‘qish muhiti:|Muhit:/ }).click();
       const dialog = page.getByRole("dialog", { name: "O‘qish muhiti" });
-      await expect(dialog.locator("button[aria-pressed]")).toHaveCount(4);
+      await expect(dialog.locator("button[aria-pressed]")).toHaveCount(6);
       await dialog
         .getByRole("button", { name: new RegExp(theme.name) })
         .click();

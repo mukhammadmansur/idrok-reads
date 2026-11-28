@@ -1,6 +1,9 @@
-import { Check } from "lucide-react";
+import { useState } from "react";
+import { Check, LockKeyhole } from "lucide-react";
 import { Sheet } from "../../design-system/Sheet";
 import { themes } from "../../content";
+import { isPremiumTheme } from "../../content/premium";
+import { PremiumLockModal } from "../premium/PremiumLockModal";
 import { useProgress } from "../../lib/context";
 import { ThemeGlyph } from "./ThemeGlyph";
 import { WORLD_MASCOT } from "./WorldCritter";
@@ -13,7 +16,8 @@ export function ThemeSheet({
   open: boolean;
   onClose: () => void;
 }) {
-  const { progress, update } = useProgress();
+  const { progress, update, premium } = useProgress();
+  const [lockOpen, setLockOpen] = useState(false);
   return (
     <Sheet
       open={open}
@@ -24,6 +28,7 @@ export function ThemeSheet({
       <div className={styles.grid}>
         {themes.map((theme) => {
           const selected = progress.theme === theme.id;
+          const locked = isPremiumTheme(theme.id) && !premium;
           const world = theme.id === "classic" ? null : theme.id;
           return (
             <button
@@ -32,6 +37,13 @@ export function ThemeSheet({
               className={`${styles.option} ${selected ? styles.selected : ""}`}
               aria-pressed={selected}
               onClick={() => {
+                if (locked) {
+                  // The sheet is a top-layer <dialog>; close it so the
+                  // portaled lock modal is not painted underneath.
+                  onClose();
+                  setLockOpen(true);
+                  return;
+                }
                 update((value) => ({ ...value, theme: theme.id }));
                 onClose();
               }}
@@ -47,11 +59,17 @@ export function ThemeSheet({
                 <strong>{theme.name}</strong>
                 <small>{theme.description}</small>
               </span>
+              {locked && <LockKeyhole size={18} className={styles.lock} />}
               {selected && <Check size={20} className={styles.check} />}
             </button>
           );
         })}
       </div>
+      <PremiumLockModal
+        open={lockOpen}
+        onClose={() => setLockOpen(false)}
+        kind="theme"
+      />
     </Sheet>
   );
 }

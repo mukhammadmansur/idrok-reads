@@ -28,6 +28,8 @@ class ApiError(Exception):
 
 THEMES = ["classic", "magic", "cyber", "pirate", "kitty", "ghost"]
 LEGACY_THEMES = {"forest": "magic", "ice": "pirate", "holo": "cyber"}
+# Worlds that require an active family subscription (roadmap P4 gating rule).
+PREMIUM_THEMES = {"kitty", "ghost"}
 AVATARS = [
     "lion", "owl", "bear", "wolf", "falcon", "fox", "whale", "cat",
     "rabbit", "rocket", "star", "sun", "moon", "cloud", "leaf", "snow",

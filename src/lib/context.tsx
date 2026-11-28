@@ -68,12 +68,14 @@ interface State extends AccountSession {
 }
 
 interface ProgressContext extends State {
+  premium: boolean;
   update: (change: (p: ProfileProgress) => ProfileProgress) => void;
   answerQuiz: (id: string, answers: number[]) => void;
   login: (email: string, password: string) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  purchase: (plan: string) => Promise<void>;
   createChild: (name: string, avatar: ChildProfile["avatar"]) => Promise<void>;
   updateChild: (
     id: string,
@@ -93,6 +95,7 @@ const anonymous: AccountSession = {
   children: [],
   selectedChildId: null,
   parent: null,
+  subscription: null,
 };
 
 function initialGuestProgress(): ProfileProgress {
@@ -491,6 +494,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [hydrate],
   );
 
+  const purchase = useCallback(
+    async (plan: string) => hydrate(await api.subscribe(plan)),
+    [hydrate],
+  );
+
   const logout = useCallback(async () => {
     try {
       await api.logout();
@@ -610,6 +618,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     <Context.Provider
       value={{
         ...state,
+        premium: !!state.subscription,
         toastMessage,
         clearToast: () => setToastMessage(null),
         setToast: (msg: string | null) => setToastMessage(msg),
@@ -619,6 +628,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         register,
         googleLogin,
         logout,
+        purchase,
         createChild,
         updateChild,
         deleteChild,

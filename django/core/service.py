@@ -8,6 +8,7 @@ digest is stored.
 """
 
 import math
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from django.conf import settings
@@ -31,6 +32,7 @@ from .helpers import (
     now_dt,
     password_hash,
     password_matches,
+    PREMIUM_THEMES,
     require_value,
     valid_email,
     valid_password,
@@ -43,6 +45,8 @@ from .models import (
     ReadingProgress,
     Session,
     StoryVideo,
+    Subscription,
+    SubscriptionPlan,
     User,
 )
 from .youtube import canonical_youtube_url
@@ -115,7 +119,13 @@ class Store:
     def session_view(self, token):
         current = self.session(token)
         if not current:
-            return {"user": None, "children": [], "selectedChildId": None, "parent": None}
+            return {
+                "user": None,
+                "children": [],
+                "selectedChildId": None,
+                "parent": None,
+                "subscription": None,
+            }
         children = list(current.user.children.all())
         return {
             "user": {"id": current.user.uid, "email": current.user.email},
@@ -126,7 +136,50 @@ class Store:
                 if current.selected_child_id
                 else (children[0].uid if children else None)
             ),
+            "subscription": self.active_subscription(current.user),
         }
+
+    # -- subscription ---------------------------------------------------------
+
+    def active_subscription(self, user):
+        row = (
+            Subscription.objects.select_related("plan")
+            .filter(user=user, expires_at__gt=self.clock())
+            .first()
+        )
+        if not row:
+            return None
+        return {
+            "plan": row.plan.slug,
+            "planName": row.plan.name,
+            "provider": row.provider,
+            "expiresAt": iso(
+                datetime.fromtimestamp(row.expires_at / 1000, tz=timezone.utc)
+            ),
+        }
+
+    def subscribe(self, token, body):
+        keys(body, ["plan"])
+        current = self.family.require_parent(token)
+        plan = SubscriptionPlan.objects.filter(
+            slug=body.get("plan"), active=True
+        ).first()
+        if not plan:
+            raise ApiError(404, "Tarif topilmadi.", "not_found")
+        now = self.clock()
+        existing = Subscription.objects.filter(
+            user=current.user, expires_at__gt=now
+        ).first()
+        base = existing.expires_at if existing else now
+        days = 365 if plan.period == "/yil" else 30
+        Subscription.objects.create(
+            user=current.user,
+            plan=plan,
+            provider="demo",
+            created_at=now,
+            expires_at=base + days * 86400000,
+        )
+        return self.session_view(token)
 
     def issue_session(self, user):
         token = new_token()
@@ -410,8 +463,33 @@ class Store:
             and 1 <= len(body["events"]) <= 50,
             "Bir so‘rovda 1–50 ta natija yuborilsin.",
         )
+        premium = self.active_subscription(current.user) is not None
         for event in body["events"]:
             self.validate_event(event)
+            if premium:
+                continue
+            if event["type"] == "theme" and event["theme"] in PREMIUM_THEMES:
+                raise ApiError(
+                    402,
+                    "Bu olam premium obunaga kiradi. Ota-onangizdan so‘rang!",
+                    "premium_required",
+                )
+            story_id = (
+                event.get("storyId")
+                if event["type"] == "reading"
+                else (
+                    event.get("quizId")
+                    if event["type"] == "quiz" and event.get("quizId") != "general"
+                    else None
+                )
+            )
+            story = story_by_id(story_id) if story_id else None
+            if story and story.get("premium"):
+                raise ApiError(
+                    402,
+                    "Bu kitob premium obunaga kiradi. Ota-onangizdan so‘rang!",
+                    "premium_required",
+                )
         with transaction.atomic():
             for event in body["events"]:
                 payload = event_payload_hash(event)

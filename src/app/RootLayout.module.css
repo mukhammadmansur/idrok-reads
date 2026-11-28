@@ -42,3 +42,20 @@
   gap: 9px;
   margin-top: 6px;
 }
+
+.routeView {
+  animation: routeIn 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes routeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.995);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .routeView {
+    animation: none;
+  }
+}

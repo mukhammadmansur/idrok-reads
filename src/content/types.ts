@@ -52,6 +52,7 @@ export interface Theme {
   name: string;
   short: string;
   description: string;
+  premium?: boolean;
 }
 
 export interface ReadingRecord {

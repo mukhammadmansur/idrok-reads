@@ -375,6 +375,8 @@
 }
 
 .coverImage {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -514,6 +516,12 @@
   color: var(--ink);
   margin: 0;
   line-height: 1.25;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.5em;
 }
 
 .bookSubtitle {
@@ -529,7 +537,8 @@
 }
 
 .actionWrap {
-  margin-top: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .actionButton {
@@ -969,5 +978,91 @@
 
   .bookSubtitle {
     display: block;
+  }
+}
+
+/* Premium lock + entrance choreography */
+.premiumChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #3a2a00;
+  background: linear-gradient(180deg, #ffe08a, #ffc93c);
+  box-shadow: 0 3px 10px rgba(255, 201, 60, 0.45);
+  animation: chipGlow 2.2s ease-in-out infinite;
+}
+
+.bookLocked .coverImage {
+  filter: saturate(0.6) brightness(0.85);
+}
+
+.bookLocked .coverFrame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 12, 40, 0) 45%, rgba(20, 12, 40, 0.5));
+}
+
+.bookCard {
+  animation: cardIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+.worldTile,
+.statusPill {
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.worldTile:active,
+.statusPill:active {
+  transform: scale(0.96);
+}
+
+.worldTileActive {
+  animation: tilePop 0.32s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+}
+
+@keyframes tilePop {
+  0% {
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes chipGlow {
+  0%,
+  100% {
+    box-shadow: 0 3px 10px rgba(255, 201, 60, 0.45);
+  }
+  50% {
+    box-shadow: 0 3px 18px rgba(255, 201, 60, 0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bookCard,
+  .worldTileActive,
+  .premiumChip {
+    animation: none;
   }
 }

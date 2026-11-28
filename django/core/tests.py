@@ -697,3 +697,81 @@ class GoogleTests(ApiBase):
             client, "/api/auth/google", "POST", {"credential": "not-a-real-token"}
         )
         self.assertEqual(response.status_code, 503)
+
+
+class PremiumGatingTests(ApiBase):
+    def setUp(self):
+        super().setUp()
+        from core.models import SubscriptionPlan
+
+        SubscriptionPlan.objects.create(
+            slug="oilaviy", name="Oilaviy", price=33000, period="/oy", order=1
+        )
+
+    def test_premium_story_and_theme_locked_without_subscription(self):
+        client = Client()
+        self.register(client)
+        child_id = self.child(client)
+        response, payload = self.request(
+            client,
+            f"/api/children/{child_id}/events",
+            "POST",
+            {"events": [
+                {"id": self.event_id(), "type": "reading", "storyId": "kitty-bogi", "page": 0, "complete": False},
+            ]},
+        )
+        self.assertEqual(response.status_code, 402)
+        self.assertEqual(payload["code"], "premium_required")
+        response, payload = self.request(
+            client,
+            f"/api/children/{child_id}/events",
+            "POST",
+            {"events": [{"id": self.event_id(), "type": "theme", "theme": "ghost"}]},
+        )
+        self.assertEqual(response.status_code, 402)
+        self.assertEqual(payload["code"], "premium_required")
+
+    def test_free_content_stays_open_without_subscription(self):
+        client = Client()
+        self.register(client)
+        child_id = self.child(client)
+        response, _ = self.request(
+            client,
+            f"/api/children/{child_id}/events",
+            "POST",
+            {"events": [self.reading(page=0, complete=False)]},
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_checkout_unlocks_premium_and_session_reports_subscription(self):
+        client = Client()
+        self.register(client)
+        child_id = self.child(client)
+        response, session = self.request(
+            client, "/api/subscribe/checkout", "POST", {"plan": "oilaviy"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(session["subscription"]["plan"], "oilaviy")
+        response, _ = self.request(
+            client,
+            f"/api/children/{child_id}/events",
+            "POST",
+            {"events": [
+                {"id": self.event_id(), "type": "reading", "storyId": "kitty-bogi", "page": 0, "complete": False},
+                {"id": self.event_id(), "type": "theme", "theme": "ghost"},
+            ]},
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_checkout_requires_parent_unlock_and_known_plan(self):
+        client = Client()
+        self.register(client)
+        response, _ = self.request(
+            client, "/api/subscribe/checkout", "POST", {"plan": "nope"}
+        )
+        self.assertEqual(response.status_code, 404)
+        self.request(client, "/api/parent/lock", "POST", {})
+        response, _ = self.request(
+            client, "/api/subscribe/checkout", "POST", {"plan": "oilaviy"}
+        )
+        self.assertEqual(response.status_code, 403)

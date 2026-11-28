@@ -79,7 +79,9 @@ export function RootLayout() {
   return (
     <>
       <WorldStage />
-      <Outlet />
+      <div key={location.pathname} className={styles.routeView}>
+        <Outlet />
+      </div>
     </>
   );
 }

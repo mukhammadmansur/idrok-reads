@@ -8,17 +8,22 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
 import { buttonClass } from "../../design-system/Button";
 import { storyBySlug } from "../../content";
+import { isPremiumStory } from "../../content/premium";
 import { useProgress } from "../../lib/context";
+import { PremiumLockModal } from "../premium/PremiumLockModal";
 import { NotFoundPage } from "../../app/NotFoundPage";
 import styles from "./StoryPage.module.css";
 
 export function StoryPage() {
   const { slug } = useParams();
   const story = storyBySlug(slug);
-  const { progress } = useProgress();
+  const { progress, premium } = useProgress();
+  const [lockOpen, setLockOpen] = useState(false);
   if (!story) return <NotFoundPage />;
+  const locked = isPremiumStory(story) && !premium;
 
   const record = progress.reading[story.id];
   const completed = !!record?.completedAt;
@@ -32,6 +37,12 @@ export function StoryPage() {
 
   return (
     <div className={styles.page}>
+      <PremiumLockModal
+        open={lockOpen}
+        onClose={() => setLockOpen(false)}
+        kind="story"
+        title={story.title}
+      />
       <Link to="/library" className={styles.back}>
         <ArrowLeft size={20} />
         Kutubxonaga qaytish
@@ -79,13 +90,24 @@ export function StoryPage() {
           )}
 
           <div className={styles.actions}>
-            <Link
-              to={`/read/${story.slug}`}
-              className={buttonClass({ size: "lg", full: true })}
-            >
-              <Icon size={20} />
-              <span>{label}</span>
-            </Link>
+            {locked ? (
+              <button
+                type="button"
+                onClick={() => setLockOpen(true)}
+                className={buttonClass({ size: "lg", full: true })}
+              >
+                <Icon size={20} />
+                <span>Premium — ochish</span>
+              </button>
+            ) : (
+              <Link
+                to={`/read/${story.slug}`}
+                className={buttonClass({ size: "lg", full: true })}
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </Link>
+            )}
             {completed && (
               <Link
                 to={`/quiz/${story.id}`}

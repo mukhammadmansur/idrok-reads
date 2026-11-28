@@ -22,7 +22,11 @@ with open(LIBRARY_PATH, encoding="utf-8") as library_file:
 
 catalog = {
     "stories": {
-        story["id"]: {"pages": len(story["pages"]), **grading(story["quiz"])}
+        story["id"]: {
+            "pages": len(story["pages"]),
+            "premium": str(story.get("category", "")).strip().lower() == "premium",
+            **grading(story["quiz"]),
+        }
         for story in library["stories"]
         if story["status"] == "published"
     },

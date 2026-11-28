@@ -48,11 +48,18 @@ export interface FamilyOverview {
   generatedAt: string;
   children: FamilyChild[];
 }
+export interface SubscriptionInfo {
+  plan: string;
+  planName: string;
+  provider: string;
+  expiresAt: string;
+}
 export interface AccountSession {
   user: ParentAccount | null;
   children: ChildProfile[];
   selectedChildId: string | null;
   parent: ParentAccess | null;
+  subscription: SubscriptionInfo | null;
 }
 export interface ServerProgress {
   revision: number;
@@ -178,6 +185,8 @@ export const api = {
     ),
   session: () => request<AccountSession>("/session"),
   pricing: () => request<{ plans: PricingPlan[] }>("/pricing"),
+  subscribe: (plan: string) =>
+    request<AccountSession>("/subscribe/checkout", { plan }),
   news: () => request<{ news: NewsEntry[] }>("/news"),
   guides: () => request<{ guides: GuidesBySection }>("/guides"),
   register: (email: string, password: string) =>

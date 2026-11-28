@@ -221,6 +221,10 @@ def dispatch(request, path):
     if method == "POST" and full_path == "/api/parent/videos/remove":
         return json_response(200, store.remove_story_video(token, json_body(request)))
 
+    if method == "POST" and full_path == "/api/subscribe/checkout":
+        store.rate("subscribe", client_ip(request), 10, 3600000)
+        return json_response(200, store.subscribe(token, json_body(request)))
+
     if method == "POST" and full_path in ("/api/auth/register", "/api/auth/login"):
         body = json_body(request)
         result = (

@@ -1,3 +1,4 @@
+import { useState, type CSSProperties } from "react";
 import {
   Atom,
   BookOpen,
@@ -15,7 +16,9 @@ import {
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { stories } from "../../content";
+import { isPremiumStory } from "../../content/premium";
 import { useProgress } from "../../lib/context";
+import { PremiumLockModal } from "../premium/PremiumLockModal";
 import { ProgressBar } from "../../design-system/ProgressBar";
 import { AhaMomentBanner } from "../onboarding/AhaMomentBanner";
 import { WorldCritter } from "../theme/WorldCritter";
@@ -89,7 +92,9 @@ const STATUS_OPTIONS: { id: string; label: string; icon: LucideIcon }[] = [
 ];
 
 export function LibraryPage() {
-  const { progress, children: profiles, selectedChildId, user } = useProgress();
+  const { progress, children: profiles, selectedChildId, user, premium } =
+    useProgress();
+  const [lockOpen, setLockOpen] = useState(false);
   const child = profiles.find((profile) => profile.id === selectedChildId);
   const world = progress.theme === "classic" ? null : progress.theme;
   const [params, setParams] = useSearchParams();
@@ -281,8 +286,11 @@ export function LibraryPage() {
             </button>
           </div>
         ) : (
-          <div className={styles.booksGrid}>
-            {filtered.map((story) => {
+          <div
+            className={styles.booksGrid}
+            key={`${topic}|${status}|${query}`}
+          >
+            {filtered.map((story, index) => {
               const record = progress.reading[story.id];
               const isCompleted = !!record?.completedAt;
               const percent = isCompleted
@@ -294,6 +302,7 @@ export function LibraryPage() {
                     )
                   : 0;
               const currentStep = record ? record.page + 1 : 0;
+              const locked = isPremiumStory(story) && !premium;
 
               const normCat = normalize(story.category);
               const catMeta = CATEGORY_META[normCat] ?? {
@@ -307,7 +316,16 @@ export function LibraryPage() {
                 <Link
                   key={story.id}
                   to={`/story/${story.slug}`}
-                  className={`${styles.bookCard} ${styles[`card_${cardTheme}`]}`}
+                  style={{ "--i": index } as CSSProperties}
+                  onClick={(event) => {
+                    if (locked) {
+                      event.preventDefault();
+                      setLockOpen(true);
+                    }
+                  }}
+                  className={`${styles.bookCard} ${styles[`card_${cardTheme}`]} ${
+                    locked ? styles.bookLocked : ""
+                  }`}
                 >
                   {/* Cover Art Container */}
                   <div className={styles.coverFrame}>
@@ -324,6 +342,12 @@ export function LibraryPage() {
                         <CategoryIcon size={14} />
                         <span>{story.category}</span>
                       </span>
+
+                      {locked && (
+                        <span className={styles.premiumChip}>
+                          <Gem size={13} /> Premium
+                        </span>
+                      )}
 
                       {isCompleted ? (
                         <span className={styles.ribbonCompleted}>
@@ -402,6 +426,11 @@ export function LibraryPage() {
           </div>
         )}
       </section>
+      <PremiumLockModal
+        open={lockOpen}
+        onClose={() => setLockOpen(false)}
+        kind="story"
+      />
     </div>
   );
 }

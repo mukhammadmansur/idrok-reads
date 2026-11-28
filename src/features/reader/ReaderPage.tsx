@@ -4,6 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Home,
+  LockKeyhole,
   Medal,
   MessageCircleQuestion,
   RotateCcw,
@@ -21,11 +22,13 @@ import { IconButton } from "../../design-system/IconButton";
 import { ProgressBar } from "../../design-system/ProgressBar";
 import { Sheet } from "../../design-system/Sheet";
 import { stories, storyBySlug, themes } from "../../content";
+import { isPremiumStory } from "../../content/premium";
 import { storyVideo } from "../../content/videos";
 import { api, type StoryVideoMap } from "../../lib/api";
 import { useProgress } from "../../lib/context";
 import { completeStory, recordPage } from "../../lib/progress";
 import { useReadingActivity } from "../../lib/useReadingActivity";
+import { PremiumLockModal, PremiumLockScreen } from "../premium/PremiumLockModal";
 import { ThemeGlyph } from "../theme/ThemeGlyph";
 import { WorldCritter } from "../theme/WorldCritter";
 import { NotFoundPage } from "../../app/NotFoundPage";
@@ -37,8 +40,11 @@ const sizes = ["Oddiy", "Katta", "Juda katta"];
 
 export function ReaderPage() {
   const { slug } = useParams();
+  const { premium } = useProgress();
   const story = storyBySlug(slug);
   if (!story) return <NotFoundPage />;
+  if (isPremiumStory(story) && !premium)
+    return <PremiumLockScreen title={story.title} kind="story" />;
 
   return <Reader key={story.id} story={story} />;
 }
@@ -51,6 +57,7 @@ function Reader({
   const {
     progress,
     update,
+    premium,
     children: profiles,
     selectedChildId,
   } = useProgress();
@@ -64,6 +71,7 @@ function Reader({
     () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [lockOpen, setLockOpen] = useState(false);
   const [finished, setFinished] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [speechNote, setSpeechNote] = useState("");
@@ -486,19 +494,28 @@ function Reader({
           <div className={styles.themeGrid}>
             {themes.map((theme) => {
               const active = progress.theme === theme.id;
+              const themeLocked = !!theme.premium && !premium;
               return (
                 <button
                   key={theme.id}
                   type="button"
                   aria-pressed={active}
                   className={active ? styles.themeActive : ""}
-                  onClick={() =>
-                    update((value) => ({ ...value, theme: theme.id }))
-                  }
+                  onClick={() => {
+                    if (themeLocked) {
+                      setLockOpen(true);
+                      return;
+                    }
+                    update((value) => ({ ...value, theme: theme.id }));
+                  }}
                 >
                   <ThemeGlyph theme={theme.id} size={20} />
                   <span>{theme.short}</span>
-                  {active && <Check size={16} />}
+                  {themeLocked ? (
+                    <LockKeyhole size={14} />
+                  ) : (
+                    active && <Check size={16} />
+                  )}
                 </button>
               );
             })}
@@ -510,6 +527,11 @@ function Reader({
           davomida amal qiladi.
         </p>
       </Sheet>
+      <PremiumLockModal
+        open={lockOpen}
+        onClose={() => setLockOpen(false)}
+        kind="theme"
+      />
     </div>
   );
 }

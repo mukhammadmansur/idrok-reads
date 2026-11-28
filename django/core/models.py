@@ -481,3 +481,26 @@ class SubscriptionPlan(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Subscription(models.Model):
+    """A purchase linking a family account to a plan.
+
+    `provider` is "demo" while checkout is simulated; Payme/Click webhooks
+    (roadmap P4) will write rows with provider "payme"/"click".
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="subscriptions")
+    plan = models.ForeignKey(
+        SubscriptionPlan, on_delete=models.PROTECT, related_name="subscriptions"
+    )
+    provider = models.CharField(max_length=16, default="demo")
+    created_at = models.BigIntegerField()  # epoch ms, like Session.expires_at
+    expires_at = models.BigIntegerField()  # epoch ms
+
+    class Meta:
+        db_table = "core_subscription"
+        ordering = ["-expires_at"]
+
+    def __str__(self):
+        return f"{self.user.email} — {self.plan.slug} until {self.expires_at}"

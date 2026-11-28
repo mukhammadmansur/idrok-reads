@@ -42,6 +42,7 @@ describe("executeBackgroundAutoMerge - Background Auto-Merge Engine", () => {
       children: [{ id: "srv-1", name: "Ali", avatar: "cat", createdAt: "" }],
       selectedChildId: "srv-1",
       parent: null,
+      subscription: null,
     });
     const mockEvents = vi.fn().mockResolvedValue({ revision: 1, progress: {} });
     const mockCreateChild = vi.fn();
@@ -60,6 +61,7 @@ describe("executeBackgroundAutoMerge - Background Auto-Merge Engine", () => {
       children: [{ id: "srv-1", name: "Kitobxon", avatar: "sun", createdAt: "" }],
       selectedChildId: "srv-1",
       parent: null,
+      subscription: null,
     };
 
     const result = await executeBackgroundAutoMerge(serverSession, apiClient as any);
@@ -102,6 +104,7 @@ describe("executeBackgroundAutoMerge - Background Auto-Merge Engine", () => {
       children: [{ id: "srv-ali", name: "ali", avatar: "sun", createdAt: "" }],
       selectedChildId: "srv-ali",
       parent: null,
+      subscription: null,
     };
 
     const result = await executeBackgroundAutoMerge(serverSession, apiClient as any);
@@ -122,6 +125,7 @@ describe("executeBackgroundAutoMerge - Background Auto-Merge Engine", () => {
       ],
       selectedChildId: "srv-madina",
       parent: null,
+      subscription: null,
     });
     const mockEvents = vi.fn().mockResolvedValue({ revision: 1, progress: {} });
 
@@ -138,6 +142,7 @@ describe("executeBackgroundAutoMerge - Background Auto-Merge Engine", () => {
       children: [{ id: "srv-ali", name: "Ali", avatar: "sun", createdAt: "" }],
       selectedChildId: "srv-ali",
       parent: null,
+      subscription: null,
     };
 
     const result = await executeBackgroundAutoMerge(serverSession, apiClient as any);
@@ -167,6 +172,7 @@ describe("executeBackgroundAutoMerge - Background Auto-Merge Engine", () => {
       children: [{ id: "srv-ali", name: "Ali", avatar: "sun", createdAt: "" }],
       selectedChildId: "srv-ali",
       parent: null,
+      subscription: null,
     };
 
     const result = await executeBackgroundAutoMerge(serverSession, apiClient as any);

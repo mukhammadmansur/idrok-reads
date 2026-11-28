@@ -54,12 +54,14 @@ export const themes: Theme[] = [
     name: "Pushti mushukcha",
     short: "Mushukcha",
     description: "Pushti gulzor va shirin mushukcha. Hammadan shirin o‘qish!",
+    premium: true,
   },
   {
     id: "ghost",
     name: "Arvoh qaroqchilar",
     short: "Arvoh",
     description: "Tumanli dengizda arvoh kema suzadi. Jasurlar uchun!",
+    premium: true,
   },
 ];
 

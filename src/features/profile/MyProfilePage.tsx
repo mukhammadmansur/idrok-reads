@@ -1,11 +1,13 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Check, Plus, Save, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, LockKeyhole, Plus, Save, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, STORYBOOK_AVATARS, type AvatarId } from "../../design-system/Avatar";
 import { PageIntro } from "../../design-system/PageIntro";
 import { ThemeGlyph } from "../theme/ThemeGlyph";
 import { ProfileSwitcherModal } from "./ProfileSwitcherModal";
 import { themes } from "../../content";
+import { isPremiumTheme } from "../../content/premium";
+import { PremiumLockModal } from "../premium/PremiumLockModal";
 import { useProgress } from "../../lib/context";
 import styles from "./MyProfilePage.module.css";
 
@@ -18,6 +20,7 @@ export function MyProfilePage() {
     update,
     selectChild,
     setToast,
+    premium,
   } = useProgress();
 
   const child = profiles.find((profile) => profile.id === selectedChildId);
@@ -29,6 +32,7 @@ export function MyProfilePage() {
   const [saved, setSaved] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [switching, setSwitching] = useState<string | null>(null);
+  const [lockOpen, setLockOpen] = useState(false);
 
   useEffect(() => {
     setName(child?.name ?? "");
@@ -186,16 +190,24 @@ export function MyProfilePage() {
           <div className={styles.worldRow}>
             {themes.map((theme) => {
               const active = progress.theme === theme.id;
+              const locked = isPremiumTheme(theme.id) && !premium;
               return (
                 <button
                   key={theme.id}
                   type="button"
                   className={`${styles.worldOption} ${active ? styles.worldActive : ""}`}
-                  onClick={() => update((value) => ({ ...value, theme: theme.id }))}
+                  onClick={() => {
+                    if (locked) {
+                      setLockOpen(true);
+                      return;
+                    }
+                    update((value) => ({ ...value, theme: theme.id }));
+                  }}
                   aria-pressed={active}
                 >
                   <ThemeGlyph theme={theme.id} size={30} />
                   <span>{theme.short}</span>
+                  {locked && <LockKeyhole size={13} />}
                 </button>
               );
             })}
@@ -224,6 +236,11 @@ export function MyProfilePage() {
         </div>
       </form>
 
+      <PremiumLockModal
+        open={lockOpen}
+        onClose={() => setLockOpen(false)}
+        kind="theme"
+      />
       <ProfileSwitcherModal
         isOpen={switcherOpen}
         onClose={() => setSwitcherOpen(false)}

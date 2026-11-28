@@ -14,6 +14,7 @@ from .models import (
     Question,
     Story,
     StoryPage,
+    Subscription,
     SubscriptionPlan,
 )
 
@@ -77,6 +78,13 @@ class SubscriptionPlanAdmin(admin.ModelAdmin):
     list_display = ("name", "price", "period", "max_children", "featured", "active", "order")
     list_filter = ("active", "featured")
     ordering = ("order", "slug")
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ("user", "plan", "provider", "created_at", "expires_at")
+    list_filter = ("provider", "plan")
+    ordering = ("-expires_at",)
 
 
 @admin.register(Question)
